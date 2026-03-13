@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Tồn kho{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Báo cáo tồn kho</h5>
+        <form class="d-flex" method="get">
+            <select name="warehouse" class="form-select form-select-sm me-2">
+                <option value="">Tất cả kho</option>
+                {% for w in warehouses %}
+                <option value="{{ w.id }}">{{ w.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">Lọc</button>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Kho</th>
+                    <th>Số lượng</th>
+                    <th>Đơn vị</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td>{{ stock.product.name }}</td>
+                    <td>{{ stock.warehouse.name }}</td>
+                    <td class="fw-bold">{{ stock.quantity|floatformat:0 }}</td>
+                    <td>{{ stock.product.unit }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">Trống</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Khách hàng / Nhà cung cấp</h3>
+    <a href="{% url 'accounts:customer-create' %}" class="btn btn-primary">Thêm mới</a>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>SĐT</th>
+                    <th>Loại</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in customers %}
+                <tr>
+                    <td><a href="{% url 'debt:customer-debt' c.pk %}">{{ c.name }}</a></td>
+                    <td>{{ c.phone }}</td>
+                    <td>{% if c.is_supplier %}<span class="badge bg-info">NCC</span>{% else %}<span class="badge bg-secondary">Khách</span>{% endif %}</td>
+                    <td><a href="{% url 'accounts:customer-update' c.pk %}" class="btn btn-sm btn-link">Sửa</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

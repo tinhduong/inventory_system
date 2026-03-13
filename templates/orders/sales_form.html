@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">Tạo/Sửa đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% for field in form %}
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="fw-bold mb-3">Hàng hóa yêu cầu</h6>
+                    {{ lines.management_form }}
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="line-items-body">
+                                {% for line_form in lines %}
+                                <tr class="line-item-row">
+                                    <td>{{ line_form.product }}</td>
+                                    <td>{{ line_form.quantity }}</td>
+                                    <td>{{ line_form.unit_price }}</td>
+                                    <td class="text-center">
+                                        {% if line_form.instance.pk %}
+                                            {{ line_form.DELETE }}
+                                        {% else %}
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-line-btn">&times;</button>
+                                        {% endif %}
+                                    </td>
+                                    {% for hidden in line_form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <button type="button" id="add-line-btn" class="btn btn-sm btn-outline-primary mt-2">
+                            <i class="bi bi-plus-circle"></i> Thêm sản phẩm khác
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4 d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">Lưu đơn hàng</button>
+                        <a href="{% url 'orders:sales-list' %}" class="btn btn-outline-secondary btn-lg">Hủy bỏ</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addButton = document.getElementById('add-line-btn');
+    const tableBody = document.getElementById('line-items-body');
+    const totalForms = document.getElementById('id_lines-TOTAL_FORMS');
+
+    function updateRemoveButtons() {
+        const rows = tableBody.getElementsByClassName('line-item-row');
+        const removeBtns = tableBody.querySelectorAll('.remove-line-btn');
+        // If only one row, hide its remove button to prevent deleting the last source row
+        if (rows.length <= 1) {
+            removeBtns.forEach(btn => btn.style.visibility = 'hidden');
+        } else {
+            removeBtns.forEach(btn => btn.style.visibility = 'visible');
+        }
+    }
+
+    // Add listener to existing rows on load
+    const existingBtns = tableBody.querySelectorAll('.remove-line-btn');
+    existingBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const row = btn.closest('.line-item-row');
+            row.remove();
+            totalForms.value = tableBody.getElementsByClassName('line-item-row').length;
+            updateRemoveButtons();
+        });
+    });
+
+    addButton.addEventListener('click', function() {
+        const rows = tableBody.getElementsByClassName('line-item-row');
+        const rowCount = rows.length;
+        const newRow = rows[0].cloneNode(true);
+        
+        // Reset inputs in the new row
+        const inputs = newRow.getElementsByTagName('input');
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].value = '';
+            const name = inputs[i].getAttribute('name').replace('-0-', `-${rowCount}-`);
+            const id = inputs[i].getAttribute('id').replace('-0-', `-${rowCount}-`);
+            inputs[i].setAttribute('name', name);
+            inputs[i].setAttribute('id', id);
+        }
+        
+        const selects = newRow.getElementsByTagName('select');
+        for (let i = 0; i < selects.length; i++) {
+            selects[i].selectedIndex = 0;
+            const name = selects[i].getAttribute('name').replace('-0-', `-${rowCount}-`);
+            const id = selects[i].getAttribute('id').replace('-0-', `-${rowCount}-`);
+            selects[i].setAttribute('name', name);
+            selects[i].setAttribute('id', id);
+        }
+
+        const removeBtn = newRow.querySelector('.remove-line-btn');
+        if (removeBtn) {
+            removeBtn.style.visibility = 'visible';
+            removeBtn.addEventListener('click', function() {
+                newRow.remove();
+                totalForms.value = tableBody.getElementsByClassName('line-item-row').length;
+                updateRemoveButtons();
+            });
+        }
+
+        tableBody.appendChild(newRow);
+        totalForms.value = rowCount + 1;
+        updateRemoveButtons();
+    });
+
+    updateRemoveButtons();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Lịch sử công nợ: {{ customer.name }}</h3>
+    <a href="{% url 'debt:overview' %}" class="btn btn-outline-secondary">Quay lại</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Ngày ghi</th>
+                    <th>Loại tài khoản</th>
+                    <th>Nội dung</th>
+                    <th class="text-end">Số tiền</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>{{ entry.get_account_type_display }}</td>
+                    <td>
+                        {{ entry.note }}
+                        {% if entry.sales_order %}
+                            (Đơn: <a href="{% url 'orders:sales-detail' entry.sales_order.pk %}">{{ entry.sales_order.code }}</a>)
+                        {% elif entry.purchase_order %}
+                            (Đơn: <a href="{% url 'orders:purchase-detail' entry.purchase_order.pk %}">{{ entry.purchase_order.code }}</a>)
+                        {% endif %}
+                    </td>
+                    <td class="text-end fw-bold {% if entry.is_settlement %}text-success{% else %}text-danger{% endif %}">
+                        {% if entry.is_settlement %}-{% else %}+{% endif %}{{ entry.amount|floatformat:0|intcomma }} đ
+                    </td>
+                    <td>
+                        {% if entry.is_settlement %}
+                        <span class="badge bg-success">Thanh toán</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Ghi nợ</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

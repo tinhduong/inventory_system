@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Đơn nhập hàng</h3>
+    <a href="{% url 'orders:purchase-create' %}" class="btn btn-primary">Tạo đơn nhập mới</a>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Ngày nhập</th>
+                    <th>Nhà cung cấp</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.code }}</td>
+                    <td>{{ order.order_date }}</td>
+                    <td>{{ order.supplier.name }}</td>
+                    <td class="fw-bold">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                    <td>
+                        <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'orders:purchase-detail' order.pk %}" class="btn btn-sm btn-outline-info">Chi tiết</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-white fw-bold">
+        {% if object %}Cập nhật{% else %}Thêm mới{% endif %} dữ liệu
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field.errors }}
+                <div class="form-control-wrap">
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                        {{ field }}
+                    {% else %}
+                        <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.name }}" class="form-control" value="{{ field.value|default_if_none:'' }}">
+                    {% endif %}
+                </div>
+                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+            </div>
+            {% endfor %}
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary px-4">Lưu lại</button>
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

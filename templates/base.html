@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hệ thống Quản lý Kho{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; background: #2c3e50; color: white; padding-top: 20px; }
+        .sidebar a { color: #bdc3c7; text-decoration: none; padding: 10px 20px; display: block; }
+        .sidebar a:hover { background: #34495e; color: white; }
+        .sidebar a.active { background: #3498db; color: white; }
+        .content { padding: 20px; }
+        .card { border-radius: 10px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-none d-md-block sidebar">
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold">INVENTORY SYS</h5>
+                    <small>v1.0</small>
+                </div>
+                <hr>
+                <a href="/" class="{% if request.path == '/' %}active{% endif %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <div class="mt-3 px-3 text-uppercase small text-secondary">Danh mục</div>
+                <a href="{% url 'catalog:warehouse-list' %}" class="{% if '/warehouses/' in request.path %}active{% endif %}">
+                    <i class="bi bi-house"></i> Kho
+                </a>
+                <a href="{% url 'catalog:product-list' %}" class="{% if '/products/' in request.path %}active{% endif %}">
+                    <i class="bi bi-box"></i> Sản phẩm
+                </a>
+                <a href="{% url 'catalog:stock-list' %}" class="{% if '/stock/' in request.path %}active{% endif %}">
+                    <i class="bi bi-stack"></i> Tồn kho
+                </a>
+
+                <div class="mt-3 px-3 text-uppercase small text-secondary">Giao dịch</div>
+                <a href="{% url 'orders:sales-list' %}" class="{% if '/sales/' in request.path %}active{% endif %}">
+                    <i class="bi bi-cart"></i> Đơn bán hàng
+                </a>
+                <a href="{% url 'orders:purchase-list' %}" class="{% if '/purchases/' in request.path %}active{% endif %}">
+                    <i class="bi bi-truck"></i> Đơn nhập hàng
+                </a>
+
+                <div class="mt-3 px-3 text-uppercase small text-secondary">Công nợ</div>
+                <a href="{% url 'accounts:customer-list' %}" class="{% if '/customers/' in request.path %}active{% endif %}">
+                    <i class="bi bi-people"></i> Khách hàng / NCC
+                </a>
+                <a href="{% url 'debt:overview' %}" class="{% if '/debt-overview/' in request.path %}active{% endif %}">
+                    <i class="bi bi-wallet2"></i> Tổng quan công nợ
+                </a>
+                
+                {% if user.role == 'ADMIN' %}
+                <div class="mt-3 px-3 text-uppercase small text-secondary">Hệ thống</div>
+                <a href="{% url 'accounts:user-list' %}" class="{% if '/users/' in request.path %}active{% endif %}">
+                    <i class="bi bi-person-gear"></i> Quản lý User
+                </a>
+                {% endif %}
+                
+                <hr>
+                {% if user.is_authenticated %}
+                <div class="px-3 mb-2 small italic text-info">{{ user.username }} ({{ user.get_role_display }})</div>
+                <form action="{% url 'accounts:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link text-secondary text-decoration-none">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</a>
+                {% endif %}
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-10 ms-sm-auto px-md-4 content">
+                {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="py-3">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

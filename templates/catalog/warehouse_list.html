@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Danh sách kho hàng</h3>
+    <a href="{% url 'catalog:warehouse-create' %}" class="btn btn-primary">Thêm kho mới</a>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Tên kho</th>
+                    <th>Vị trí</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in warehouses %}
+                <tr>
+                    <td>{{ w.name }}</td>
+                    <td>{{ w.location }}</td>
+                    <td>
+                        {% if w.is_active %}
+                        <span class="badge bg-success">Hoạt động</span>
+                        {% else %}
+                        <span class="badge bg-danger">Ngừng</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'catalog:warehouse-update' w.pk %}" class="btn btn-sm btn-link">Sửa</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard - Hệ thống Quản lý Kho{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Sản phẩm</h5>
+                <h2 class="fw-bold">{{ product_count }}</h2>
+                <i class="bi bi-box position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Doanh thu bán</h5>
+                <h2 class="fw-bold">{{ total_sales|floatformat:0|intcomma }} đ</h2>
+                <i class="bi bi-currency-dollar position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Khách hàng / NCC</h5>
+                <h2 class="fw-bold">{{ customer_count }}</h2>
+                <i class="bi bi-people position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Kho hàng</h5>
+                <h2 class="fw-bold">{{ warehouse_count }}</h2>
+                <i class="bi bi-house position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-bold">Đơn bán gần đây</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_sales %}
+                        <tr>
+                            <td><a href="{% url 'orders:sales-detail' order.pk %}" class="text-decoration-none">{{ order.code }}</a></td>
+                            <td>{{ order.customer.name }}</td>
+                            <td>{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                            <td>
+                                <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center">Chưa có dữ liệu</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-bold">Đơn nhập gần đây</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Nhà cung cấp</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_purchases %}
+                        <tr>
+                            <td><a href="{% url 'orders:purchase-detail' order.pk %}" class="text-decoration-none">{{ order.code }}</a></td>
+                            <td>{{ order.supplier.name }}</td>
+                            <td>{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                            <td>
+                                <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center">Chưa có dữ liệu</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
