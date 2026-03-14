@@ -6,42 +6,55 @@
 {% block content %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="?period=all" class="btn btn-sm btn-outline-secondary {% if current_period == 'all' %}active{% endif %}">Tất cả</a>
+            <a href="?period=1m" class="btn btn-sm btn-outline-secondary {% if current_period == '1m' %}active{% endif %}">1 tháng</a>
+            <a href="?period=3m" class="btn btn-sm btn-outline-secondary {% if current_period == '3m' %}active{% endif %}">3 tháng</a>
+            <a href="?period=6m" class="btn btn-sm btn-outline-secondary {% if current_period == '6m' %}active{% endif %}">6 tháng</a>
+            <a href="?period=1y" class="btn btn-sm btn-outline-secondary {% if current_period == '1y' %}active{% endif %}">1 năm</a>
+        </div>
+    </div>
 </div>
 
 <div class="row">
-    <div class="col-md-3 mb-4">
+    <div class="col-md-2 mb-4">
         <div class="card text-white bg-primary">
             <div class="card-body">
-                <h5 class="card-title">Sản phẩm</h5>
-                <h2 class="fw-bold">{{ product_count }}</h2>
-                <i class="bi bi-box position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+                <h6 class="card-title">Sản phẩm</h6>
+                <h3 class="fw-bold">{{ product_count }}</h3>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-success">
             <div class="card-body">
-                <h5 class="card-title">Doanh thu bán</h5>
-                <h2 class="fw-bold">{{ total_sales|floatformat:0|intcomma }} đ</h2>
-                <i class="bi bi-currency-dollar position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+                <h6 class="card-title">Doanh thu bán</h6>
+                <h3 class="fw-bold">{{ total_sales|floatformat:0|intcomma }} đ</h3>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h6 class="card-title">Chi phí nhập</h6>
+                <h3 class="fw-bold">{{ total_purchases|floatformat:0|intcomma }} đ</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 mb-4">
         <div class="card text-white bg-info">
             <div class="card-body">
-                <h5 class="card-title">Khách hàng / NCC</h5>
-                <h2 class="fw-bold">{{ customer_count }}</h2>
-                <i class="bi bi-people position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+                <h6 class="card-title">Đối tác</h6>
+                <h3 class="fw-bold">{{ customer_count }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
+    <div class="col-md-2 mb-4">
         <div class="card text-white bg-warning">
             <div class="card-body">
-                <h5 class="card-title">Kho hàng</h5>
-                <h2 class="fw-bold">{{ warehouse_count }}</h2>
-                <i class="bi bi-house position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i>
+                <h6 class="card-title">Kho hàng</h6>
+                <h3 class="fw-bold">{{ warehouse_count }}</h3>
             </div>
         </div>
     </div>
