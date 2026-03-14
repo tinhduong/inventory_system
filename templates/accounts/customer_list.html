@@ -11,7 +11,6 @@
                 <tr>
                     <th>Tên</th>
                     <th>SĐT</th>
-                    <th>Loại</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -20,7 +19,6 @@
                 <tr>
                     <td><a href="{% url 'debt:customer-debt' c.pk %}">{{ c.name }}</a></td>
                     <td>{{ c.phone }}</td>
-                    <td>{% if c.is_supplier %}<span class="badge bg-info">NCC</span>{% else %}<span class="badge bg-secondary">Khách</span>{% endif %}</td>
                     <td><a href="{% url 'accounts:customer-update' c.pk %}" class="btn btn-sm btn-link">Sửa</a></td>
                 </tr>
                 {% endfor %}

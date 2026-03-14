@@ -31,7 +31,6 @@
             <thead>
                 <tr>
                     <th>Đối tác</th>
-                    <th>Loại</th>
                     <th>Chi tiết</th>
                 </tr>
             </thead>
@@ -39,7 +38,6 @@
                 {% for c in top_customers %}
                 <tr>
                     <td>{{ c.name }}</td>
-                    <td>{% if c.is_supplier %}NCC{% else %}Khách{% endif %}</td>
                     <td><a href="{% url 'debt:customer-debt' c.pk %}" class="btn btn-sm btn-outline-info">Lịch sử nợ</a></td>
                 </tr>
                 {% endfor %}

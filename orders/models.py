@@ -43,7 +43,7 @@ class PurchaseOrder(models.Model):
     code = models.CharField(max_length=50, unique=True, verbose_name="Mã đơn nhập")
     warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, verbose_name="Kho nhập")
     employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name="Nhân viên")
-    supplier = models.ForeignKey(Customer, on_delete=models.PROTECT, verbose_name="Nhà cung cấp", limit_choices_to={'is_supplier': True})
+    supplier = models.ForeignKey(Customer, on_delete=models.PROTECT, verbose_name="Nhà cung cấp")
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.DRAFT, verbose_name="Trạng thái")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

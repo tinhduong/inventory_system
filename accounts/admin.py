@@ -14,6 +14,5 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'phone', 'email', 'is_supplier']
+    list_display = ['name', 'phone', 'email']
     search_fields = ['name', 'phone']
-    list_filter = ['is_supplier']

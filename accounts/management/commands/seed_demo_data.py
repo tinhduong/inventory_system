@@ -39,15 +39,11 @@ class Command(BaseCommand):
             )
             products.append(p)
 
-        # 4. Create Customers & Suppliers
-        for i in range(1, 6):
+        # 4. Create Partners
+        for i in range(1, 11):
             Customer.objects.get_or_create(
-                name=f'Khách hàng {i}',
-                defaults={'phone': f'0987000{i}', 'is_supplier': False}
-            )
-            Customer.objects.get_or_create(
-                name=f'Nhà cung cấp {i}',
-                defaults={'phone': f'0123000{i}', 'is_supplier': True}
+                name=f'Đối tác {i}',
+                defaults={'phone': f'0987000{i}', 'address': f'Địa chỉ {i}'}
             )
 
         # 5. Initial Stock

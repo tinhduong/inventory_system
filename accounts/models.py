@@ -14,17 +14,16 @@ class User(AbstractUser):
         return f"{self.username} ({self.get_role_display()})"
 
 class Customer(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Tên khách hàng/NCC")
+    name = models.CharField(max_length=255, verbose_name="Tên đối tác")
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Số điện thoại")
     email = models.EmailField(blank=True, null=True, verbose_name="Email")
     address = models.TextField(blank=True, null=True, verbose_name="Địa chỉ")
     note = models.TextField(blank=True, null=True, verbose_name="Ghi chú")
-    is_supplier = models.BooleanField(default=False, verbose_name="Là nhà cung cấp")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = "Khách hàng / Nhà cung cấp"
-        verbose_name_plural = "Khách hàng / Nhà cung cấp"
+        verbose_name = "Đối tác"
+        verbose_name_plural = "Đối tác"
