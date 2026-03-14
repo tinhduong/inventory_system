@@ -100,6 +100,71 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Hàm định dạng số: 1000000 -> 1,000,000
+        function formatMoney(value) {
+            if (!value) return "";
+            return value.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Hàm bỏ định dạng: 1,000,000 -> 1000000
+        function unformatMoney(value) {
+            return value.replace(/,/g, "");
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Định dạng các ô nhập tiền khi tải trang
+            document.querySelectorAll('.money-input').forEach(function(input) {
+                if (input.value) {
+                    input.value = formatMoney(input.value);
+                }
+
+                // 2. Lắng nghe sự kiện gõ phím để định dạng trực tiếp
+                input.addEventListener('input', function(e) {
+                    let cursorPosition = this.selectionStart;
+                    let oldLength = this.value.length;
+                    
+                    this.value = formatMoney(this.value);
+                    
+                    // Giữ vị trí con trỏ chuột sau khi định dạng (tránh bị nhảy về cuối)
+                    let newLength = this.value.length;
+                    cursorPosition = cursorPosition + (newLength - oldLength);
+                    this.setSelectionRange(cursorPosition, cursorPosition);
+                });
+            });
+
+            // 3. Trước khi submit form, loại bỏ dấu phẩy để Django không bị lỗi validate Decimal
+            document.querySelectorAll('form').forEach(function(form) {
+                form.addEventListener('submit', function() {
+                    form.querySelectorAll('.money-input').forEach(function(input) {
+                        input.value = unformatMoney(input.value);
+                    });
+                });
+            });
+
+            // Xử lý cả các hàng mới được thêm vào formset (nếu có)
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) { // ELEMENT_NODE
+                            node.querySelectorAll('.money-input').forEach(function(input) {
+                                input.addEventListener('input', function(e) {
+                                    this.value = formatMoney(this.value);
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+
+            const mainContent = document.querySelector('main');
+            if (mainContent) {
+                observer.observe(mainContent, { childList: true, subtree: true });
+            }
+        });
+    </script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

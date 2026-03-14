@@ -32,7 +32,7 @@ SalesOrderLineFormSet = inlineformset_factory(
     widgets={
         'product': forms.Select(attrs={'class': 'form-control'}),
         'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
-        'unit_price': forms.NumberInput(attrs={'class': 'form-control'}),
+        'unit_price': forms.TextInput(attrs={'class': 'form-control money-input'}),
     },
     extra=1, can_delete=True
 )
@@ -53,7 +53,7 @@ PurchaseOrderLineFormSet = inlineformset_factory(
     widgets={
         'product': forms.Select(attrs={'class': 'form-control'}),
         'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
-        'unit_price': forms.NumberInput(attrs={'class': 'form-control'}),
+        'unit_price': forms.TextInput(attrs={'class': 'form-control money-input'}),
     },
     extra=1, can_delete=True
 )
