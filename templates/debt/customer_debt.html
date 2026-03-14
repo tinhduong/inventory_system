@@ -26,8 +26,16 @@
     <div class="col-md-4">
         <div class="card {% if net_balance >= 0 %}bg-primary text-white{% else %}bg-danger text-white{% endif %}">
             <div class="card-body">
-                <h6 class="mb-1">Số dư hiện tại (Cần thu)</h6>
-                <h4 class="fw-bold mb-0">{{ net_balance|floatformat:0|intcomma }} đ</h4>
+                <h6 class="mb-1">
+                    {% if net_balance >= 0 %}Số dư cần thu (Khách nợ){% else %}Số dư phải trả (Mình nợ){% endif %}
+                </h6>
+                <h4 class="fw-bold mb-0">
+                    {% if net_balance < 0 %}
+                        {{ net_balance|stringformat:"d"|slice:"1:"|floatformat:0|intcomma }}
+                    {% else %}
+                        {{ net_balance|floatformat:0|intcomma }}
+                    {% endif %} đ
+                </h4>
             </div>
         </div>
     </div>
