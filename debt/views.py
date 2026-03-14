@@ -37,7 +37,27 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['customer'] = Customer.objects.get(pk=self.kwargs['customer_id'])
+        customer_id = self.kwargs['customer_id']
+        context['customer'] = Customer.objects.get(pk=customer_id)
+        
+        # Calculate summary for this customer
+        entries = DebtEntry.objects.filter(customer_id=customer_id)
+        
+        # Receivables (Khách nợ mình)
+        rec = entries.filter(account_type=AccountType.RECEIVABLE)
+        total_rec = rec.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        paid_rec = rec.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        context['receivable_balance'] = total_rec - paid_rec
+        
+        # Payables (Mình nợ NCC)
+        pay = entries.filter(account_type=AccountType.PAYABLE)
+        total_pay = pay.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        paid_pay = pay.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        context['payable_balance'] = total_pay - paid_pay
+        
+        # Final Net Balance (Nếu > 0 là mình phải thu, nếu < 0 là mình phải trả)
+        context['net_balance'] = context['receivable_balance'] - context['payable_balance']
+        
         return context
 
 class SettlementCreateView(LoginRequiredMixin, CreateView):
