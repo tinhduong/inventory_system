@@ -65,6 +65,11 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         # Net: Dương là mình thu, Âm là mình trả
         context['net_balance'] = context['receivable_balance'] - context['payable_balance']
         
+        # Kiểm tra xem có đơn hàng nào chưa xác nhận không (Draft orders)
+        from orders.models import SalesOrder, PurchaseOrder, OrderStatus
+        context['draft_sales'] = SalesOrder.objects.filter(customer_id=customer_id, status=OrderStatus.DRAFT).count()
+        context['draft_purchases'] = PurchaseOrder.objects.filter(supplier_id=customer_id, status=OrderStatus.DRAFT).count()
+        
         return context
 
 class EntryPaymentView(LoginRequiredMixin, View):
