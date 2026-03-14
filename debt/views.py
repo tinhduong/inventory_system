@@ -15,19 +15,42 @@ class DebtOverviewView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # 1. Tính Phải thu (Khách nợ mình)
+        # 1. Tính Phải thu (Tổng hệ thống)
         rec = DebtEntry.objects.filter(account_type=AccountType.RECEIVABLE)
         total_rec = rec.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
         paid_rec = rec.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         context['total_receivable'] = total_rec - paid_rec
 
-        # 2. Tính Phải trả (Mình nợ đối tác)
+        # 2. Tính Phải trả (Tổng hệ thống)
         pay = DebtEntry.objects.filter(account_type=AccountType.PAYABLE)
         total_pay = pay.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
         paid_pay = pay.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         context['total_payable'] = total_pay - paid_pay
 
-        context['top_customers'] = Customer.objects.all()
+        # 3. Tính toán nợ cho từng đối tác để tìm TOP và hỗ trợ search
+        customers = Customer.objects.all()
+        customer_list = []
+        for c in customers:
+            entries = DebtEntry.objects.filter(customer=c)
+            # Thu
+            r = entries.filter(account_type=AccountType.RECEIVABLE)
+            tr = r.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+            pr = r.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+            # Trả
+            p = entries.filter(account_type=AccountType.PAYABLE)
+            tp = p.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+            pp = p.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+            
+            balance = (tr - pr) - (tp - pp)
+            customer_list.append({
+                'obj': c,
+                'balance': balance,
+                'abs_balance': abs(balance)
+            })
+        
+        # Sắp xếp theo dư nợ tuyệt đối giảm dần
+        customer_list.sort(key=lambda x: x['abs_balance'], reverse=True)
+        context['customer_list'] = customer_list
         return context
 
 class CustomerDebtDetailView(LoginRequiredMixin, ListView):
