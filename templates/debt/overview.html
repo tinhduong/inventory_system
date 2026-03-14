@@ -91,12 +91,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const rows = tableBody.getElementsByClassName('partner-row');
     const listTitle = document.getElementById('listTitle');
 
+    // Hàm loại bỏ dấu tiếng Việt
+    function removeAccents(str) {
+        return str.normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+    }
+
     searchInput.addEventListener('input', function() {
-        const query = this.value.toLowerCase().trim();
+        const query = removeAccents(this.value.toLowerCase().trim());
         
         if (query === "") {
             listTitle.innerText = "Dư nợ lớn nhất (Top 3)";
-            // Hiện lại Top 3
             for (let i = 0; i < rows.length; i++) {
                 if (i < 3) {
                     rows[i].classList.remove('d-none');
@@ -106,9 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             listTitle.innerText = "Kết quả tìm kiếm";
-            // Lọc theo keyword
             for (let i = 0; i < rows.length; i++) {
-                const name = rows[i].getAttribute('data-name');
+                const name = removeAccents(rows[i].getAttribute('data-name'));
                 if (name.includes(query)) {
                     rows[i].classList.remove('d-none');
                 } else {
