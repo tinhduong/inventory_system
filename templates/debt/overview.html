@@ -54,7 +54,10 @@
                 </thead>
                 <tbody id="partnerTableBody">
                     {% for item in customer_list %}
-                    <tr class="partner-row {% if forloop.counter > 3 %}d-none{% endif %}" data-name="{{ item.obj.name|lower }}">
+                    <tr class="partner-row {% if forloop.counter > 3 %}d-none{% endif %}" 
+                        data-name="{{ item.obj.name|lower }}"
+                        onclick="window.location='{% url 'debt:customer-debt' item.obj.pk %}'"
+                        style="cursor: pointer;">
                         <td>
                             <div class="fw-bold">{{ item.obj.name }}</div>
                             <small class="text-muted">{{ item.obj.phone|default:"" }}</small>
@@ -71,7 +74,7 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            <a href="{% url 'debt:customer-debt' item.obj.pk %}" class="btn btn-sm btn-outline-primary">
+                            <a href="{% url 'debt:customer-debt' item.obj.pk %}" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();">
                                 <i class="bi bi-clock-history"></i> Chi tiết
                             </a>
                         </td>
