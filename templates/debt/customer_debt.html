@@ -84,6 +84,7 @@
                 </thead>
                 <tbody>
                     {% for entry in entries %}
+                    {% if not entry.is_settlement %}
                     <tr class="{% if entry.status == 'PAID' %}table-light opacity-75{% endif %}">
                         <td class="text-muted small">{{ entry.created_at|date:"d/m/Y H:i" }}</td>
                         <td>
@@ -134,6 +135,23 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% else %}
+                    {# Đây là khoản thanh toán độc lập (không gắn với đơn hàng nào) #}
+                    <tr class="table-info-subtle">
+                        <td class="text-muted small">{{ entry.created_at|date:"d/m/Y H:i" }}</td>
+                        <td colspan="2">
+                            <span class="badge bg-success me-1">{% if entry.account_type == 'RECEIVABLE' %}Phiếu Thu{% else %}Phiếu Chi{% endif %}</span>
+                            <span class="fw-medium text-success">{{ entry.note }}</span>
+                            <div class="small text-muted italic">(Khoản thanh toán tự do)</div>
+                        </td>
+                        <td class="text-end text-success fw-bold">-{{ entry.amount|floatformat:0|intcomma }} đ</td>
+                        <td class="text-end text-muted">---</td>
+                        <td class="text-center">
+                             <span class="badge bg-success">Đã trả</span>
+                        </td>
+                        <td class="text-center">---</td>
+                    </tr>
+                    {% endif %}
                     {% empty %}
                     <tr>
                         <td colspan="7" class="text-center py-4 text-muted">Chưa có lịch sử giao dịch nào.</td>

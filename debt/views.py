@@ -36,9 +36,10 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
     context_object_name = 'entries'
 
     def get_queryset(self):
+        # Lấy các khoản nợ gốc HOẶC các khoản thanh toán tự do (không có parent)
         return DebtEntry.objects.filter(
-            customer_id=self.kwargs['customer_id'],
-            is_settlement=False
+            Q(customer_id=self.kwargs['customer_id']) & 
+            (Q(is_settlement=False) | Q(parent_entry__isnull=True))
         ).order_by('-created_at')
 
     def get_context_data(self, **kwargs):
