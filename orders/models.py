@@ -13,13 +13,19 @@ class SalesOrder(models.Model):
     code = models.CharField(max_length=50, unique=True, verbose_name="Mã đơn hàng")
     warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, verbose_name="Kho xuất")
     employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, verbose_name="Nhân viên")
-    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, verbose_name="Khách hàng")
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, verbose_name="Đối tác")
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.DRAFT, verbose_name="Trạng thái")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     order_date = models.DateField(verbose_name="Ngày đặt hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            from orders.forms import generate_order_code
+            self.code = generate_order_code('SO', SalesOrder)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.code
@@ -50,6 +56,12 @@ class PurchaseOrder(models.Model):
     order_date = models.DateField(verbose_name="Ngày nhập hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            from orders.forms import generate_order_code
+            self.code = generate_order_code('PO', PurchaseOrder)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.code

@@ -1,14 +1,25 @@
-from django import forms
-from django.forms import inlineformset_factory
+from django.utils import timezone
 from .models import SalesOrder, SalesOrderLine, PurchaseOrder, PurchaseOrderLine
+
+def generate_order_code(prefix, model_class):
+    today_str = timezone.now().strftime('%Y%m%d')
+    # Tìm mã đơn hàng cao nhất trong ngày
+    last_order = model_class.objects.filter(code__startswith=f"{prefix}{today_str}").order_by('-code').first()
+    
+    if last_order:
+        last_num = int(last_order.code.split('-')[-1])
+        new_num = last_num + 1
+    else:
+        new_num = 1
+        
+    return f"{prefix}{today_str}-{new_num:03d}"
 
 class SalesOrderForm(forms.ModelForm):
     class Meta:
         model = SalesOrder
-        fields = ['code', 'warehouse', 'customer', 'order_date']
+        fields = ['warehouse', 'customer', 'order_date']
         widgets = {
             'order_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'code': forms.TextInput(attrs={'class': 'form-control'}),
             'warehouse': forms.Select(attrs={'class': 'form-control'}),
             'customer': forms.Select(attrs={'class': 'form-control'}),
         }
@@ -27,10 +38,9 @@ SalesOrderLineFormSet = inlineformset_factory(
 class PurchaseOrderForm(forms.ModelForm):
     class Meta:
         model = PurchaseOrder
-        fields = ['code', 'warehouse', 'supplier', 'order_date']
+        fields = ['warehouse', 'supplier', 'order_date']
         widgets = {
             'order_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'code': forms.TextInput(attrs={'class': 'form-control'}),
             'warehouse': forms.Select(attrs={'class': 'form-control'}),
             'supplier': forms.Select(attrs={'class': 'form-control'}),
         }
