@@ -36,8 +36,6 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
     context_object_name = 'entries'
 
     def get_queryset(self):
-        # Chỉ lấy các khoản nợ gốc (is_settlement=False), 
-        # còn các khoản thanh toán sẽ được lấy qua property payments của từng nợ gốc
         return DebtEntry.objects.filter(
             customer_id=self.kwargs['customer_id'],
             is_settlement=False
@@ -50,22 +48,26 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         
         entries = DebtEntry.objects.filter(customer_id=customer_id)
         
-        # Phải thu của người này
-        rec = entries.filter(account_type=AccountType.RECEIVABLE)
-        t_rec = rec.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        p_rec = rec.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        # 1. Tính Phải thu (Khách nợ mình)
+        rec_entries = entries.filter(account_type=AccountType.RECEIVABLE)
+        t_rec = rec_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        p_rec = rec_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        # Số tiền khách thực sự còn nợ (Nếu < 0 là khách trả dư)
         context['receivable_balance'] = t_rec - p_rec
         
-        # Phải trả của người này
-        pay = entries.filter(account_type=AccountType.PAYABLE)
-        t_pay = pay.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        p_pay = pay.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        # 2. Tính Phải trả (Mình nợ họ)
+        pay_entries = entries.filter(account_type=AccountType.PAYABLE)
+        t_pay = pay_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        p_pay = pay_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        # Số tiền mình thực sự còn nợ (Nếu < 0 là mình trả dư)
         context['payable_balance'] = t_pay - p_pay
         
-        # Net: Dương là mình thu, Âm là mình trả
+        # 3. Số dư tổng cuối cùng
+        # Nếu > 0: Tổng cộng mình đang cần thu về từ người này
+        # Nếu < 0: Tổng cộng mình đang cần trả cho người này
         context['net_balance'] = context['receivable_balance'] - context['payable_balance']
         
-        # Kiểm tra xem có đơn hàng nào chưa xác nhận không (Draft orders)
+        # Draft orders check
         from orders.models import SalesOrder, PurchaseOrder, OrderStatus
         context['draft_sales'] = SalesOrder.objects.filter(customer_id=customer_id, status=OrderStatus.DRAFT).count()
         context['draft_purchases'] = PurchaseOrder.objects.filter(supplier_id=customer_id, status=OrderStatus.DRAFT).count()
