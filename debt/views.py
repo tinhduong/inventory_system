@@ -11,20 +11,20 @@ class DebtOverviewView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Calculate total receivables (Khách nợ mình)
-        receivables = DebtEntry.objects.filter(account_type=AccountType.RECEIVABLE)
-        total_rec = receivables.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        paid_rec = receivables.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        
+        # 1. Tính Phải thu (Khách nợ mình)
+        rec = DebtEntry.objects.filter(account_type=AccountType.RECEIVABLE)
+        total_rec = rec.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        paid_rec = rec.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         context['total_receivable'] = total_rec - paid_rec
 
-        # Calculate total payables (Mình nợ NCC)
-        payables = DebtEntry.objects.filter(account_type=AccountType.PAYABLE)
-        total_pay = payables.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        paid_pay = payables.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        # 2. Tính Phải trả (Mình nợ đối tác)
+        pay = DebtEntry.objects.filter(account_type=AccountType.PAYABLE)
+        total_pay = pay.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        paid_pay = pay.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         context['total_payable'] = total_pay - paid_pay
 
-        # Lists for top debtors
-        context['top_customers'] = Customer.objects.all() # In real app, calculate balance per customer
+        context['top_customers'] = Customer.objects.all()
         return context
 
 class CustomerDebtDetailView(LoginRequiredMixin, ListView):
@@ -40,22 +40,21 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         customer_id = self.kwargs['customer_id']
         context['customer'] = Customer.objects.get(pk=customer_id)
         
-        # Calculate summary for this customer
         entries = DebtEntry.objects.filter(customer_id=customer_id)
         
-        # Receivables (Khách nợ mình)
+        # Phải thu của người này
         rec = entries.filter(account_type=AccountType.RECEIVABLE)
-        total_rec = rec.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        paid_rec = rec.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        context['receivable_balance'] = total_rec - paid_rec
+        t_rec = rec.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        p_rec = rec.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        context['receivable_balance'] = t_rec - p_rec
         
-        # Payables (Mình nợ NCC)
+        # Phải trả của người này
         pay = entries.filter(account_type=AccountType.PAYABLE)
-        total_pay = pay.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        paid_pay = pay.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        context['payable_balance'] = total_pay - paid_pay
+        t_pay = pay.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        p_pay = pay.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        context['payable_balance'] = t_pay - p_pay
         
-        # Final Net Balance (Nếu > 0 là mình phải thu, nếu < 0 là mình phải trả)
+        # Net: Dương là mình thu, Âm là mình trả
         context['net_balance'] = context['receivable_balance'] - context['payable_balance']
         
         return context
