@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thanh toán cho khoản nợ</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info py-2">
+                    <div class="small">Đối tác: <strong>{{ entry.customer.name }}</strong></div>
+                    <div class="small">Giao dịch: <strong>{{ entry.note }}</strong></div>
+                    <div class="small">Tổng nợ gốc: <strong>{{ entry.amount|floatformat:0|intcomma }} đ</strong></div>
+                    <div class="small">Đã thanh toán: <strong>{{ entry.paid_amount|floatformat:0|intcomma }} đ</strong></div>
+                    <div class="hr my-1 border-top border-info opacity-25"></div>
+                    <div class="fw-bold">Số tiền còn lại: {{ entry.remaining_amount|floatformat:0|intcomma }} đ</div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'debt:customer-debt' entry.customer.pk %}" class="btn btn-outline-secondary">Hủy</a>
+                        <button type="submit" class="btn btn-primary">Xác nhận thanh toán</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

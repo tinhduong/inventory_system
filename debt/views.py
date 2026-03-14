@@ -1,10 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
 from django.views.generic import ListView, TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum, Q
-from .models import DebtEntry, Settlement, AccountType
-from .forms import SettlementForm
+from django.contrib import messages
+from .models import DebtEntry, Settlement, AccountType, DebtStatus
+from .forms import SettlementForm, EntryPaymentForm
 from accounts.models import Customer
+from datetime import date
 
 class DebtOverviewView(LoginRequiredMixin, TemplateView):
     template_name = 'debt/overview.html'
@@ -33,7 +36,12 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
     context_object_name = 'entries'
 
     def get_queryset(self):
-        return DebtEntry.objects.filter(customer_id=self.kwargs['customer_id']).order_by('-created_at')
+        # Chỉ lấy các khoản nợ gốc (is_settlement=False), 
+        # còn các khoản thanh toán sẽ được lấy qua property payments của từng nợ gốc
+        return DebtEntry.objects.filter(
+            customer_id=self.kwargs['customer_id'],
+            is_settlement=False
+        ).order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,6 +66,48 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         context['net_balance'] = context['receivable_balance'] - context['payable_balance']
         
         return context
+
+class EntryPaymentView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        entry = get_object_or_404(DebtEntry, pk=pk)
+        form = EntryPaymentForm(initial={
+            'amount': entry.remaining_amount,
+            'payment_date': date.today()
+        })
+        return render(request, 'debt/entry_payment_form.html', {'form': form, 'entry': entry})
+
+    def post(self, request, pk):
+        entry = get_object_or_404(DebtEntry, pk=pk)
+        form = EntryPaymentForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            if amount > entry.remaining_amount:
+                messages.error(request, "Số tiền thanh toán không được lớn hơn số nợ còn lại.")
+                return render(request, 'debt/entry_payment_form.html', {'form': form, 'entry': entry})
+            
+            # 1. Tạo bản ghi Settlement
+            Settlement.objects.create(
+                customer=entry.customer,
+                account_type=entry.account_type,
+                amount_paid=amount,
+                payment_date=form.cleaned_data['payment_date'],
+                note=form.cleaned_data['note']
+            )
+            
+            # 2. Tạo DebtEntry liên kết
+            DebtEntry.objects.create(
+                customer=entry.customer,
+                account_type=entry.account_type,
+                parent_entry=entry,
+                amount=amount,
+                is_settlement=True,
+                note=f"Thanh toán cho đơn: {entry.sales_order.code if entry.sales_order else entry.purchase_order.code}. Nội dung: {form.cleaned_data['note']}"
+            )
+            
+            messages.success(request, f"Đã thanh toán {amount} cho đối tác {entry.customer.name}.")
+            return redirect('debt:customer-debt', customer_id=entry.customer.pk)
+        
+        return render(request, 'debt/entry_payment_form.html', {'form': form, 'entry': entry})
 
 class SettlementCreateView(LoginRequiredMixin, CreateView):
     model = Settlement

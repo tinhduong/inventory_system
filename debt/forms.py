@@ -12,3 +12,8 @@ class SettlementForm(forms.ModelForm):
             'payment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'note': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
+class EntryPaymentForm(forms.Form):
+    amount = forms.DecimalField(max_digits=15, decimal_places=2, label="Số tiền thanh toán", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    payment_date = forms.DateField(label="Ngày thanh toán", widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    note = forms.CharField(label="Ghi chú", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}))

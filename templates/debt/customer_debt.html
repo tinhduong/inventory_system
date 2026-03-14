@@ -61,45 +61,69 @@
                 <thead class="table-light">
                     <tr>
                         <th style="width: 15%">Ngày ghi</th>
-                        <th style="width: 20%">Loại giao dịch</th>
                         <th>Nội dung / Chứng từ</th>
-                        <th class="text-end" style="width: 20%">Số tiền</th>
-                        <th class="text-center" style="width: 15%">Phân loại</th>
+                        <th class="text-end" style="width: 15%">Nợ gốc</th>
+                        <th class="text-end" style="width: 15%">Đã trả</th>
+                        <th class="text-end" style="width: 15%">Còn lại</th>
+                        <th class="text-center" style="width: 15%">Trạng thái</th>
+                        <th class="text-center" style="width: 10%">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for entry in entries %}
-                    <tr>
+                    <tr class="{% if entry.status == 'PAID' %}table-light opacity-75{% endif %}">
                         <td class="text-muted small">{{ entry.created_at|date:"d/m/Y H:i" }}</td>
                         <td>
-                            {% if entry.account_type == 'RECEIVABLE' %}
-                                <span class="text-primary">Bán hàng (Phải thu)</span>
-                            {% else %}
-                                <span class="text-danger">Nhập hàng (Phải trả)</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="fw-medium">{{ entry.note }}</div>
+                            <div class="fw-medium">
+                                {% if entry.account_type == 'RECEIVABLE' %}
+                                    <span class="text-primary small">●</span> Bán:
+                                {% else %}
+                                    <span class="text-danger small">●</span> Nhập:
+                                {% endif %}
+                                {{ entry.note }}
+                            </div>
                             {% if entry.sales_order %}
-                                <div class="small text-muted">Mã đơn: <a href="{% url 'orders:sales-detail' entry.sales_order.pk %}" class="text-decoration-none">{{ entry.sales_order.code }}</a></div>
+                                <div class="small">Mã: <a href="{% url 'orders:sales-detail' entry.sales_order.pk %}" class="text-decoration-none">{{ entry.sales_order.code }}</a></div>
                             {% elif entry.purchase_order %}
-                                <div class="small text-muted">Mã đơn: <a href="{% url 'orders:purchase-detail' entry.purchase_order.pk %}" class="text-decoration-none">{{ entry.purchase_order.code }}</a></div>
+                                <div class="small">Mã: <a href="{% url 'orders:purchase-detail' entry.purchase_order.pk %}" class="text-decoration-none">{{ entry.purchase_order.code }}</a></div>
+                            {% endif %}
+                            
+                            {% if entry.payments.all %}
+                                <div class="mt-2 ps-3 border-start border-2">
+                                    <small class="text-muted d-block mb-1">Các lần thanh toán:</small>
+                                    {% for p in entry.payments.all %}
+                                        <div class="small text-success">
+                                            - {{ p.created_at|date:"d/m/Y" }}: {{ p.amount|floatformat:0|intcomma }} đ
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             {% endif %}
                         </td>
-                        <td class="text-end fw-bold {% if entry.is_settlement %}text-success{% else %}text-danger{% endif %}">
-                            {% if entry.is_settlement %}-{% else %}+{% endif %}{{ entry.amount|floatformat:0|intcomma }} đ
+                        <td class="text-end">{{ entry.amount|floatformat:0|intcomma }} đ</td>
+                        <td class="text-end text-success">{{ entry.paid_amount|floatformat:0|intcomma }} đ</td>
+                        <td class="text-end fw-bold {% if entry.remaining_amount > 0 %}text-danger{% endif %}">
+                            {{ entry.remaining_amount|floatformat:0|intcomma }} đ
                         </td>
                         <td class="text-center">
-                            {% if entry.is_settlement %}
-                                <span class="badge rounded-pill bg-success-subtle text-success border border-success">Thanh toán</span>
+                            {% if entry.status == 'PAID' %}
+                                <span class="badge rounded-pill bg-success">Đã hoàn tất</span>
+                            {% elif entry.status == 'PARTIAL' %}
+                                <span class="badge rounded-pill bg-warning text-dark">Một phần</span>
                             {% else %}
-                                <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning">Ghi nợ</span>
+                                <span class="badge rounded-pill bg-secondary">Chưa trả</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if entry.remaining_amount > 0 %}
+                                <a href="{% url 'debt:entry-payment' entry.pk %}" class="btn btn-sm btn-primary">Thanh toán</a>
+                            {% else %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">Chưa có lịch sử giao dịch nào.</td>
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có lịch sử giao dịch nào.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
