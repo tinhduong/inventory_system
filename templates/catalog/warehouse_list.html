@@ -18,7 +18,11 @@
             <tbody>
                 {% for w in warehouses %}
                 <tr>
-                    <td>{{ w.name }}</td>
+                    <td>
+                        <a href="{% url 'catalog:warehouse-detail' w.pk %}" class="fw-bold text-decoration-none">
+                            {{ w.name }}
+                        </a>
+                    </td>
                     <td>{{ w.location }}</td>
                     <td>
                         {% if w.is_active %}

@@ -6,6 +6,7 @@ app_name = 'catalog'
 urlpatterns = [
     path('warehouses/', views.WarehouseListView.as_view(), name='warehouse-list'),
     path('warehouses/create/', views.WarehouseCreateView.as_view(), name='warehouse-create'),
+    path('warehouses/<int:pk>/', views.WarehouseDetailView.as_view(), name='warehouse-detail'),
     path('warehouses/<int:pk>/update/', views.WarehouseUpdateView.as_view(), name='warehouse-update'),
     
     path('products/', views.ProductListView.as_view(), name='product-list'),
