@@ -22,11 +22,12 @@
 
         /* Sidebar Styling */
         .sidebar { 
-            background: var(--sidebar-bg); 
+            background-color: var(--sidebar-bg) !important; 
             color: white; 
             min-height: 100vh;
             padding: 0;
             z-index: 1050;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
         }
         
         .sidebar a { 
@@ -72,11 +73,18 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        /* Đảm bảo sidebar chiếm toàn bộ chiều cao trên mobile offcanvas */
+        /* Đảm bảo sidebar chiếm toàn bộ chiều cao và có màu nền đúng trên mobile offcanvas */
         @media (max-width: 767.98px) {
             .sidebar.offcanvas-md {
                 width: 280px;
-                background-color: var(--sidebar-bg) !important;
+            }
+        }
+        
+        /* Hiệu chỉnh khi ở chế độ Desktop để không bị ảnh hưởng bởi mặc định của Offcanvas */
+        @media (min-width: 768px) {
+            .sidebar.offcanvas-md {
+                visibility: visible !important;
+                transform: none !important;
             }
         }
     </style>
