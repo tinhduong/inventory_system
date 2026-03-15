@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
@@ -109,6 +109,36 @@ def confirm_purchase_view(request, pk):
     except Exception as e:
         messages.error(request, f"Lỗi khi xác nhận: {str(e)}")
     return redirect('orders:purchase-detail', pk=pk)
+
+def delete_sales_order(request, pk):
+    order = get_object_or_404(SalesOrder, pk=pk)
+    if request.user.role != 'ADMIN':
+        messages.error(request, "Chỉ Admin mới có quyền xóa đơn hàng.")
+        return redirect('orders:sales-detail', pk=pk)
+    
+    if order.status != OrderStatus.DRAFT:
+        messages.error(request, "Chỉ có thể xóa đơn hàng ở trạng thái Nháp.")
+        return redirect('orders:sales-detail', pk=pk)
+    
+    code = order.code
+    order.delete()
+    messages.success(request, f"Đã xóa đơn hàng {code} thành công.")
+    return redirect('orders:sales-list')
+
+def delete_purchase_order(request, pk):
+    order = get_object_or_404(PurchaseOrder, pk=pk)
+    if request.user.role != 'ADMIN':
+        messages.error(request, "Chỉ Admin mới có quyền xóa đơn nhập.")
+        return redirect('orders:purchase-detail', pk=pk)
+    
+    if order.status != OrderStatus.DRAFT:
+        messages.error(request, "Chỉ có thể xóa đơn nhập ở trạng thái Nháp.")
+        return redirect('orders:purchase-detail', pk=pk)
+    
+    code = order.code
+    order.delete()
+    messages.success(request, f"Đã xóa đơn nhập {code} thành công.")
+    return redirect('orders:purchase-list')
 
 def customer_public_order_view(request, token):
     # Try SalesOrder

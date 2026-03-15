@@ -11,6 +11,11 @@
         <a href="{% url 'orders:purchase-confirm' order.pk %}" class="btn btn-success">
             <i class="bi bi-check-circle"></i> Xác nhận nhập kho
         </a>
+        {% if user.role == 'ADMIN' %}
+        <a href="{% url 'orders:purchase-delete' order.pk %}" class="btn btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn nhập này?')">
+            <i class="bi bi-trash"></i> Xóa đơn
+        </a>
+        {% endif %}
         {% endif %}
         <a href="{% url 'orders:purchase-list' %}" class="btn btn-outline-secondary">Quay lại</a>
     </div>
