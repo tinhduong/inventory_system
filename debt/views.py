@@ -7,7 +7,10 @@ from django.contrib import messages
 from .models import DebtEntry, Settlement, AccountType, DebtStatus
 from .forms import SettlementForm, EntryPaymentForm
 from accounts.models import Customer
-from datetime import date
+from django.http import HttpResponse
+from datetime import date, timedelta
+import openpyxl
+from openpyxl.styles import Font, Alignment, PatternFill
 
 class DebtOverviewView(LoginRequiredMixin, TemplateView):
     template_name = 'debt/overview.html'
@@ -60,10 +63,18 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # Lấy các khoản nợ gốc HOẶC các khoản thanh toán tự do (không có parent)
-        return DebtEntry.objects.filter(
+        qs = DebtEntry.objects.filter(
             Q(customer_id=self.kwargs['customer_id']) & 
             (Q(is_settlement=False) | Q(parent_entry__isnull=True))
-        ).order_by('-created_at')
+        )
+        
+        # Lọc theo thời gian
+        days = self.request.GET.get('days')
+        if days and days.isdigit():
+            start_date = date.today() - timedelta(days=int(days))
+            qs = qs.filter(created_at__date__gte=start_date)
+            
+        return qs.order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -96,7 +107,73 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         context['draft_sales'] = SalesOrder.objects.filter(customer_id=customer_id, status=OrderStatus.DRAFT).count()
         context['draft_purchases'] = PurchaseOrder.objects.filter(supplier_id=customer_id, status=OrderStatus.DRAFT).count()
         
+        context['current_days'] = self.request.GET.get('days', '')
         return context
+
+class ExportDebtHistoryView(LoginRequiredMixin, View):
+    def get(self, request, customer_id):
+        customer = get_object_or_404(Customer, pk=customer_id)
+        
+        # Áp dụng logic filter tương tự get_queryset
+        qs = DebtEntry.objects.filter(
+            Q(customer=customer) & 
+            (Q(is_settlement=False) | Q(parent_entry__isnull=True))
+        )
+        
+        days = request.GET.get('days')
+        time_label = "Tat ca"
+        if days and days.isdigit():
+            start_date = date.today() - timedelta(days=int(days))
+            qs = qs.filter(created_at__date__gte=start_date)
+            time_label = f"Trong {days} ngay"
+
+        qs = qs.order_by('-created_at')
+
+        # Tạo workbook
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Lich su cong no"
+
+        # Định dạng header
+        headers = ["Ngay ghi", "Noi dung / Chung tu", "Ma don", "No goc", "Da tra", "Con lai", "Trang thai"]
+        ws.append(headers)
+        
+        header_fill = PatternFill(start_color="3498db", end_color="3498db", fill_type="solid")
+        for col_num, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col_num)
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal="center")
+
+        # Thêm dữ liệu
+        for entry in qs:
+            row = [
+                entry.created_at.strftime("%d/%m/%Y %H:%M"),
+                entry.note,
+                entry.sales_order.code if entry.sales_order else (entry.purchase_order.code if entry.purchase_order else ""),
+                float(entry.amount),
+                float(entry.paid_amount) if not entry.is_settlement else float(entry.amount),
+                float(entry.remaining_amount) if not entry.is_settlement else 0,
+                entry.get_status_display() if not entry.is_settlement else "Da tra"
+            ]
+            ws.append(row)
+
+        # Điều chỉnh độ rộng cột
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            ws.column_dimensions[column].width = max_length + 2
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename="CongNo_{customer.name}_{time_label}.xlsx"'
+        wb.save(response)
+        return response
 
 class EntryPaymentView(LoginRequiredMixin, View):
     def get(self, request, pk):
