@@ -27,6 +27,23 @@ class SalesOrder(models.Model):
             self.code = generate_order_code('SO', SalesOrder)
         super().save(*args, **kwargs)
 
+    @property
+    def debt_entry(self):
+        from debt.models import DebtEntry
+        return DebtEntry.objects.filter(sales_order=self, is_settlement=False).first()
+
+    @property
+    def debt_remaining(self):
+        entry = self.debt_entry
+        return entry.remaining_amount if entry else 0
+
+    @property
+    def debt_status_display(self):
+        entry = self.debt_entry
+        if not entry:
+            return "N/A"
+        return entry.get_status_display()
+
     def __str__(self):
         return self.code
 
@@ -62,6 +79,23 @@ class PurchaseOrder(models.Model):
             from orders.forms import generate_order_code
             self.code = generate_order_code('PO', PurchaseOrder)
         super().save(*args, **kwargs)
+
+    @property
+    def debt_entry(self):
+        from debt.models import DebtEntry
+        return DebtEntry.objects.filter(purchase_order=self, is_settlement=False).first()
+
+    @property
+    def debt_remaining(self):
+        entry = self.debt_entry
+        return entry.remaining_amount if entry else 0
+
+    @property
+    def debt_status_display(self):
+        entry = self.debt_entry
+        if not entry:
+            return "N/A"
+        return entry.get_status_display()
 
     def __str__(self):
         return self.code

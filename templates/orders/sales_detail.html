@@ -68,6 +68,19 @@
                         {{ order.get_status_display }}
                     </span>
                 </p>
+                {% if order.status == 'CONFIRMED' %}
+                <hr>
+                <h6 class="text-secondary text-uppercase mb-3">Công nợ đơn hàng</h6>
+                <p><strong>Tình trạng:</strong> 
+                    <span class="badge {% if order.debt_remaining == 0 %}bg-success{% elif order.debt_remaining < order.total_amount %}bg-warning{% else %}bg-danger{% endif %}">
+                        {{ order.debt_status_display }}
+                    </span>
+                </p>
+                <p><strong>Còn nợ:</strong> <span class="text-danger fw-bold">{{ order.debt_remaining|floatformat:0|intcomma }} đ</span></p>
+                <a href="{% url 'debt:customer-debt' order.customer.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="bi bi-wallet2"></i> Chi tiết công nợ đối tác
+                </a>
+                {% endif %}
                 <hr>
                 <p class="small text-muted">Link công khai: <br>
                     <a href="{% url 'orders:public-order' order.public_token %}" target="_blank">
