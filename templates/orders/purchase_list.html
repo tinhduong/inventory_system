@@ -30,7 +30,7 @@
                     {% for order in orders %}
                     <tr>
                         <td>{{ order.code }}</td>
-                        <td>{{ order.order_date }}</td>
+                        <td>{{ order.order_date|date:"d/m/Y" }}</td>
                         <td>{{ order.supplier.name }}</td>
                         <td class="fw-bold">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
                         <td>

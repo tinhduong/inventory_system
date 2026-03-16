@@ -4,7 +4,7 @@ from django.utils import timezone
 from .models import SalesOrder, SalesOrderLine, PurchaseOrder, PurchaseOrderLine
 
 def generate_order_code(prefix, model_class):
-    today_str = timezone.now().strftime('%Y%m%d')
+    today_str = timezone.now().strftime('%y%m%d')
     # Tìm mã đơn hàng cao nhất trong ngày
     last_order = model_class.objects.filter(code__startswith=f"{prefix}{today_str}").order_by('-code').first()
     
