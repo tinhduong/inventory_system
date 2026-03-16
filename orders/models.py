@@ -40,9 +40,9 @@ class SalesOrder(models.Model):
     @property
     def debt_status_display(self):
         entry = self.debt_entry
-        if not entry:
+        if not entry or not entry.status:
             return "N/A"
-        return entry.get_status_display()
+        return entry.status.label
 
     def __str__(self):
         return self.code
@@ -93,9 +93,9 @@ class PurchaseOrder(models.Model):
     @property
     def debt_status_display(self):
         entry = self.debt_entry
-        if not entry:
+        if not entry or not entry.status:
             return "N/A"
-        return entry.get_status_display()
+        return entry.status.label
 
     def __str__(self):
         return self.code
