@@ -154,7 +154,7 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
                 float(entry.amount),
                 float(entry.paid_amount) if not entry.is_settlement else float(entry.amount),
                 float(entry.remaining_amount) if not entry.is_settlement else 0,
-                entry.get_status_display() if not entry.is_settlement else "Da tra"
+                (entry.status.label if entry.status else "N/A") if not entry.is_settlement else "Da tra"
             ]
             ws.append(row)
 
