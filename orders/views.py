@@ -14,6 +14,34 @@ class SalesListView(LoginRequiredMixin, ListView):
     context_object_name = 'orders'
     ordering = ['-created_at']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        payment_status = self.request.GET.get('payment_status')
+        
+        if payment_status == 'unpaid':
+            from django.db.models import Sum, Q, F
+            from debt.models import DebtEntry
+            
+            # Lấy các đơn đã xác nhận (vì chỉ đơn xác nhận mới có công nợ)
+            queryset = queryset.filter(status='CONFIRMED')
+            
+            # Lọc các đơn có DebtEntry chưa hoàn tất
+            # remaining = amount - Sum(payments__amount)
+            debt_qs = DebtEntry.objects.filter(sales_order__isnull=False, is_settlement=False)
+            debt_qs = debt_qs.annotate(total_paid=Sum('payments__amount'))
+            unpaid_debt_ids = debt_qs.filter(
+                Q(total_paid__isnull=True) | Q(total_paid__lt=F('amount'))
+            ).values_list('sales_order_id', flat=True)
+            
+            queryset = queryset.filter(id__in=unpaid_debt_ids)
+            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['payment_status'] = self.request.GET.get('payment_status', 'all')
+        return context
+
 class SalesDetailView(LoginRequiredMixin, DetailView):
     model = SalesOrder
     template_name = 'orders/sales_detail.html'
@@ -65,6 +93,31 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     template_name = 'orders/purchase_list.html'
     context_object_name = 'orders'
     ordering = ['-created_at']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        payment_status = self.request.GET.get('payment_status')
+        
+        if payment_status == 'unpaid':
+            from django.db.models import Sum, Q, F
+            from debt.models import DebtEntry
+            
+            queryset = queryset.filter(status='CONFIRMED')
+            
+            debt_qs = DebtEntry.objects.filter(purchase_order__isnull=False, is_settlement=False)
+            debt_qs = debt_qs.annotate(total_paid=Sum('payments__amount'))
+            unpaid_debt_ids = debt_qs.filter(
+                Q(total_paid__isnull=True) | Q(total_paid__lt=F('amount'))
+            ).values_list('purchase_order_id', flat=True)
+            
+            queryset = queryset.filter(id__in=unpaid_debt_ids)
+            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['payment_status'] = self.request.GET.get('payment_status', 'all')
+        return context
 
 class PurchaseDetailView(LoginRequiredMixin, DetailView):
     model = PurchaseOrder

@@ -3,7 +3,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>Đơn bán hàng</h3>
-    <a href="{% url 'orders:sales-create' %}" class="btn btn-primary">Tạo đơn mới</a>
+    <div class="d-flex gap-2">
+        <div class="btn-group me-2">
+            <a href="?payment_status=all" class="btn btn-sm btn-outline-secondary {% if payment_status == 'all' %}active{% endif %}">Tất cả</a>
+            <a href="?payment_status=unpaid" class="btn btn-sm btn-outline-secondary {% if payment_status == 'unpaid' %}active{% endif %}">Chưa hoàn tất thanh toán</a>
+        </div>
+        <a href="{% url 'orders:sales-create' %}" class="btn btn-primary">Tạo đơn mới</a>
+    </div>
 </div>
 <div class="card">
     <div class="card-body p-0">
