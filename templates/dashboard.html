@@ -101,7 +101,9 @@
                             <td>{{ order.customer.name }}</td>
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
-                            <td class="text-danger">{{ order.remaining_amount|floatformat:0|intcomma }}</td>
+                            <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
+                                {{ order.remaining_amount|floatformat:0|intcomma }}
+                            </td>
                             <td>
                                 <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                                     {{ order.get_status_display }}
@@ -138,7 +140,9 @@
                             <td>{{ order.supplier.name }}</td>
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
-                            <td class="text-danger">{{ order.remaining_amount|floatformat:0|intcomma }}</td>
+                            <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
+                                {{ order.remaining_amount|floatformat:0|intcomma }}
+                            </td>
                             <td>
                                 <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                                     {{ order.get_status_display }}

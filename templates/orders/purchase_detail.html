@@ -72,7 +72,7 @@
                 <hr>
                 <h6 class="text-secondary text-uppercase mb-3">Tình hình thanh toán</h6>
                 <p><strong>Tình trạng nợ:</strong> 
-                    <span class="badge {% if order.remaining_amount == 0 %}bg-success text-white{% elif order.remaining_amount < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
+                    <span class="badge {% if order.remaining_amount <= 0 %}bg-success text-white{% elif order.remaining_amount < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
                         {{ order.debt_status_display }}
                     </span>
                 </p>
