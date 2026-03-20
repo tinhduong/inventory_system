@@ -28,15 +28,19 @@
                                     <th>Sản phẩm</th>
                                     <th>Số lượng</th>
                                     <th>Đơn giá nhập</th>
+                                    <th>Thành tiền</th>
                                     <th>Xóa</th>
                                 </tr>
                             </thead>
                             <tbody id="line-items-body">
                                 {% for line_form in lines %}
                                 <tr class="line-item-row">
-                                    <td>{{ line_form.product }}</td>
-                                    <td>{{ line_form.quantity }}</td>
-                                    <td>{{ line_form.unit_price }}</td>
+                                    <td style="width: 40%;">{{ line_form.product }}</td>
+                                    <td style="width: 15%;">{{ line_form.quantity }}</td>
+                                    <td style="width: 20%;">{{ line_form.unit_price }}</td>
+                                    <td style="width: 20%;" class="text-end fw-bold">
+                                        <span class="line-total-display">0</span> đ
+                                    </td>
                                     <td class="text-center">
                                         {% if line_form.instance.pk %}
                                             {{ line_form.DELETE }}
@@ -56,9 +60,14 @@
                         </button>
                     </div>
                     
-                    <div class="mt-4 d-flex justify-content-between">
-                        <button type="submit" class="btn btn-success btn-lg px-5">Lưu đơn nhập</button>
-                        <a href="{% url 'orders:purchase-list' %}" class="btn btn-outline-secondary btn-lg">Hủy bỏ</a>
+                    <div class="mt-4 d-flex justify-content-between align-items-center">
+                        <div class="h4 mb-0 fw-bold">
+                            Tổng cộng: <span id="grand-total-display" class="text-success">0</span> đ
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-success btn-lg px-5">Lưu đơn nhập</button>
+                            <a href="{% url 'orders:purchase-list' %}" class="btn btn-outline-secondary btn-lg ms-2">Hủy bỏ</a>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -74,6 +83,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableBody = document.getElementById('line-items-body');
     const totalForms = document.getElementById('id_lines-TOTAL_FORMS');
 
+    // Utility to format number to VND format
+    function formatVND(value) {
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // Utility to get number from string like "1,000,000"
+    function parseVND(value) {
+        return parseFloat(value.replace(/,/g, '')) || 0;
+    }
+
+    function calculateRowTotal(row) {
+        const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+        const price = parseVND(row.querySelector('.price-input').value);
+        const total = qty * price;
+        row.querySelector('.line-total-display').textContent = formatVND(total);
+        return total;
+    }
+
+    function calculateGrandTotal() {
+        let grandTotal = 0;
+        const rows = tableBody.getElementsByClassName('line-item-row');
+        for (let row of rows) {
+            const deleteInput = row.querySelector('input[name$="-DELETE"]');
+            if (!deleteInput || !deleteInput.checked) {
+                grandTotal += calculateRowTotal(row);
+            }
+        }
+        document.getElementById('grand-total-display').textContent = formatVND(grandTotal);
+    }
+
     function updateRemoveButtons() {
         const rows = tableBody.getElementsByClassName('line-item-row');
         const removeBtns = tableBody.querySelectorAll('.remove-line-btn');
@@ -84,50 +123,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Add listener to existing rows on load
-    const existingBtns = tableBody.querySelectorAll('.remove-line-btn');
-    existingBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const row = btn.closest('.line-item-row');
-            row.remove();
-            totalForms.value = tableBody.getElementsByClassName('line-item-row').length;
-            updateRemoveButtons();
+    function bindRowEvents(row) {
+        const qtyInput = row.querySelector('.qty-input');
+        const priceInput = row.querySelector('.price-input');
+        
+        [qtyInput, priceInput].forEach(input => {
+            input.addEventListener('input', () => {
+                calculateRowTotal(row);
+                calculateGrandTotal();
+            });
         });
-    });
+
+        const removeBtn = row.querySelector('.remove-line-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                row.remove();
+                totalForms.value = tableBody.getElementsByClassName('line-item-row').length;
+                updateRemoveButtons();
+                calculateGrandTotal();
+            });
+        }
+    }
+
+    // Initial binding and calculation
+    const initialRows = tableBody.getElementsByClassName('line-item-row');
+    for (let row of initialRows) {
+        bindRowEvents(row);
+        calculateRowTotal(row);
+    }
+    calculateGrandTotal();
 
     addButton.addEventListener('click', function() {
         const rows = tableBody.getElementsByClassName('line-item-row');
         const rowCount = rows.length;
-        const firstRow = rows[0];
-        const newRow = firstRow.cloneNode(true);
+        const newRow = rows[0].cloneNode(true);
         
         // Reset inputs in the new row
         const inputs = newRow.querySelectorAll('input, select');
         inputs.forEach(input => {
-            if (input.tagName === 'SELECT') {
-                input.selectedIndex = 0;
-            } else {
-                input.value = '';
-            }
+            input.value = (input.tagName === 'SELECT') ? '' : (input.classList.contains('qty-input') ? '0' : '');
             
-            const name = input.getAttribute('name').replace('-0-', `-${rowCount}-`);
-            const id = input.getAttribute('id').replace('-0-', `-${rowCount}-`);
+            const name = input.getAttribute('name').replace(/-\d+-/, `-${rowCount}-`);
+            const id = input.getAttribute('id').replace(/-\d+-/, `-${rowCount}-`);
             input.setAttribute('name', name);
             input.setAttribute('id', id);
         });
 
-        const removeBtn = newRow.querySelector('.remove-line-btn');
-        if (removeBtn) {
-            removeBtn.style.visibility = 'visible';
-            removeBtn.addEventListener('click', function() {
-                newRow.remove();
-                totalForms.value = tableBody.getElementsByClassName('line-item-row').length;
-                updateRemoveButtons();
-            });
-        }
+        // Reset display
+        newRow.querySelector('.line-total-display').textContent = '0';
 
         tableBody.appendChild(newRow);
         totalForms.value = rowCount + 1;
+        
+        bindRowEvents(newRow);
         updateRemoveButtons();
     });
 
