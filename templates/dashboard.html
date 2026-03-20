@@ -9,6 +9,9 @@
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">
             <a href="?period=all" class="btn btn-sm btn-outline-secondary {% if current_period == 'all' %}active{% endif %}">Tất cả</a>
+            <a href="?period=yesterday" class="btn btn-sm btn-outline-secondary {% if current_period == 'yesterday' %}active{% endif %}">Hôm qua</a>
+            <a href="?period=today" class="btn btn-sm btn-outline-secondary {% if current_period == 'today' %}active{% endif %}">Hôm nay</a>
+            <a href="?period=7d" class="btn btn-sm btn-outline-secondary {% if current_period == '7d' %}active{% endif %}">7 ngày</a>
             <a href="?period=1m" class="btn btn-sm btn-outline-secondary {% if current_period == '1m' %}active{% endif %}">1 tháng</a>
             <a href="?period=3m" class="btn btn-sm btn-outline-secondary {% if current_period == '3m' %}active{% endif %}">3 tháng</a>
             <a href="?period=6m" class="btn btn-sm btn-outline-secondary {% if current_period == '6m' %}active{% endif %}">6 tháng</a>
