@@ -19,44 +19,59 @@
 
 <div class="row">
     <div class="col-md-2 mb-4">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h6 class="card-title">Sản phẩm</h6>
-                <h3 class="fw-bold">{{ product_count }}</h3>
+        <a href="{% url 'catalog:product-list' %}" class="text-decoration-none">
+            <div class="card text-white bg-primary h-100 shadow-sm border-0 hover-lift">
+                <div class="card-body text-center">
+                    <h6 class="card-title mb-2 opacity-75">Sản phẩm</h6>
+                    <h3 class="fw-bold mb-0">{{ product_count }}</h3>
+                    <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3 mb-4">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h6 class="card-title">Doanh thu bán</h6>
-                <h3 class="fw-bold">{{ total_sales|floatformat:0|intcomma }} đ</h3>
+        <a href="{% url 'orders:sales-list' %}" class="text-decoration-none">
+            <div class="card text-white bg-success h-100 shadow-sm border-0 hover-lift">
+                <div class="card-body text-center">
+                    <h6 class="card-title mb-2 opacity-75">Doanh thu bán</h6>
+                    <h3 class="fw-bold mb-0">{{ total_sales|floatformat:0|intcomma }} đ</h3>
+                    <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3 mb-4">
-        <div class="card text-white bg-danger">
-            <div class="card-body">
-                <h6 class="card-title">Chi phí nhập</h6>
-                <h3 class="fw-bold">{{ total_purchases|floatformat:0|intcomma }} đ</h3>
+        <a href="{% url 'orders:purchase-list' %}" class="text-decoration-none">
+            <div class="card text-white bg-danger h-100 shadow-sm border-0 hover-lift">
+                <div class="card-body text-center">
+                    <h6 class="card-title mb-2 opacity-75">Chi phí nhập</h6>
+                    <h3 class="fw-bold mb-0">{{ total_purchases|floatformat:0|intcomma }} đ</h3>
+                    <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-2 mb-4">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h6 class="card-title">Đối tác</h6>
-                <h3 class="fw-bold">{{ customer_count }}</h3>
+        <a href="{% url 'accounts:customer-list' %}" class="text-decoration-none">
+            <div class="card text-white bg-info h-100 shadow-sm border-0 hover-lift">
+                <div class="card-body text-center">
+                    <h6 class="card-title mb-2 opacity-75">Đối tác</h6>
+                    <h3 class="fw-bold mb-0">{{ customer_count }}</h3>
+                    <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-2 mb-4">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h6 class="card-title">Kho hàng</h6>
-                <h3 class="fw-bold">{{ warehouse_count }}</h3>
+        <a href="{% url 'catalog:warehouse-list' %}" class="text-decoration-none">
+            <div class="card text-white bg-warning h-100 shadow-sm border-0 hover-lift">
+                <div class="card-body text-center">
+                    <h6 class="card-title mb-2 opacity-75">Kho hàng</h6>
+                    <h3 class="fw-bold mb-0">{{ warehouse_count }}</h3>
+                    <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 
