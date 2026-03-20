@@ -158,6 +158,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const rowCount = rows.length;
         const newRow = rows[0].cloneNode(true);
         
+        // Clean up Select2 artifacts in the cloned row
+        const select2Containers = newRow.querySelectorAll('.select2-container');
+        select2Containers.forEach(container => container.remove());
+        
+        const selects = newRow.querySelectorAll('select');
+        selects.forEach(select => {
+            $(select).removeClass('select2-hidden-accessible');
+            $(select).removeAttr('data-select2-id');
+            $(select).find('option').removeAttr('data-select2-id');
+        });
+
         // Reset inputs in the new row
         const inputs = newRow.querySelectorAll('input, select');
         inputs.forEach(input => {

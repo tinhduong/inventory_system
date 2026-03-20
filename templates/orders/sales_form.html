@@ -157,9 +157,19 @@ document.addEventListener('DOMContentLoaded', function() {
     addButton.addEventListener('click', function() {
         const rows = tableBody.getElementsByClassName('line-item-row');
         const rowCount = rows.length;
-        // Clone from first row or a template if possible. Here we clone from first row.
         const newRow = rows[0].cloneNode(true);
         
+        // Clean up Select2 artifacts in the cloned row
+        const select2Containers = newRow.querySelectorAll('.select2-container');
+        select2Containers.forEach(container => container.remove());
+        
+        const selects = newRow.querySelectorAll('select');
+        selects.forEach(select => {
+            $(select).removeClass('select2-hidden-accessible');
+            $(select).removeAttr('data-select2-id');
+            $(select).find('option').removeAttr('data-select2-id');
+        });
+
         // Reset inputs in the new row
         const inputs = newRow.querySelectorAll('input, select');
         inputs.forEach(input => {
@@ -179,10 +189,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         bindRowEvents(newRow);
         updateRemoveButtons();
-        
-        // Re-apply money format listener from base.html if any
-        // Since base.html already handles .money-input, we might need to re-bind it
-        // but base.html uses MutationObserver so it should be fine.
     });
 
     updateRemoveButtons();
