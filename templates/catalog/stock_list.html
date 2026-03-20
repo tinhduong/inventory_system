@@ -11,7 +11,7 @@
     <div class="card-body p-4">
         <form method="get" class="row g-3 align-items-end">
             <div class="col-md-8">
-                <label class="form-label fw-bold text-muted small text-uppercase">Kho lọc dữ liệu</label>
+                <label class="form-label fw-bold text-muted small text-uppercase">Hãy chọn kho cần kiểm tra</label>
                 <select name="warehouse" class="form-select form-select-lg search-select" onchange="this.form.submit()">
                     <option value="">Tất cả kho hàng (Tổng hợp)</option>
                     {% for w in warehouses %}
@@ -21,7 +21,7 @@
             </div>
             <div class="col-md-4">
                 <a href="?" class="btn btn-lg btn-outline-secondary w-100">
-                    <i class="bi bi-arrow-clockwise me-1"></i> Xem lại từ đầu
+                    <i class="bi bi-x-circle me-1"></i> Xóa bộ lọc
                 </a>
             </div>
         </form>
