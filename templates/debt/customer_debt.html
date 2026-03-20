@@ -78,11 +78,9 @@
                 <a href="?days=90" class="btn btn-outline-secondary {% if current_days == '90' %}active{% endif %}">3 tháng</a>
                 <a href="?days=365" class="btn btn-outline-secondary {% if current_days == '365' %}active{% endif %}">1 năm</a>
             </div>
-            <!-- Temporarily hidden
             <a href="{% url 'debt:export-debt-history' customer.pk %}?days={{ current_days }}" class="btn btn-sm btn-success">
                 <i class="bi bi-file-earmark-excel me-1"></i> Xuất Excel
             </a>
-            -->
         </div>
     </div>
     <div class="card-body p-0">
