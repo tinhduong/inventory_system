@@ -22,3 +22,6 @@ class ProductForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'unit': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class ExcelImportForm(forms.Form):
+    file = forms.FileField(label="Chọn file Excel (.xlsx)")

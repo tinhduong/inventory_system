@@ -11,6 +11,8 @@ urlpatterns = [
     
     path('products/', views.ProductListView.as_view(), name='product-list'),
     path('products/create/', views.ProductCreateView.as_view(), name='product-create'),
+    path('products/export/', views.ExportProductsView.as_view(), name='product-export'),
+    path('products/import/', views.ImportProductsView.as_view(), name='product-import'),
     path('products/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product-update'),
     
     path('stock/', views.StockListView.as_view(), name='stock-list'),

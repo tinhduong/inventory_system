@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">Import danh mục sản phẩm từ Excel</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6 class="fw-bold"><i class="bi bi-info-circle"></i> Hướng dẫn file Excel:</h6>
+                    <ul class="mb-0 small">
+                        <li>Dòng đầu tiên là tiêu đề (được bỏ qua khi import).</li>
+                        <li>Cột 1: <strong>Mã SKU</strong> (Dùng để tìm kiếm và cập nhật nếu đã tồn tại).</li>
+                        <li>Cột 2: <strong>Tên sản phẩm</strong> (Bắt buộc).</li>
+                        <li>Cột 3: <strong>Mô tả</strong> (Tùy chọn).</li>
+                        <li>Cột 4: <strong>Đơn vị tính</strong> (Tùy chọn, mặc định là 'Cái').</li>
+                    </ul>
+                    <div class="mt-2">
+                         <a href="{% url 'catalog:product-export' %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download"></i> Tải về file mẫu (Dùng file Export hiện tại)
+                         </a>
+                    </div>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="mt-4">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">{{ form.file.label }}</label>
+                        {{ form.file }}
+                        {% if form.file.errors %}
+                            <div class="text-danger small mt-1">{{ form.file.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center">
+                            <i class="bi bi-upload me-2"></i> Bắt đầu Import
+                        </button>
+                        <a href="{% url 'catalog:product-list' %}" class="btn btn-outline-secondary">Hủy bỏ</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.http import HttpResponse
+from django.contrib import messages
+from django.views import View
+import openpyxl
+from openpyxl.styles import Font, Alignment, PatternFill
 from .models import Warehouse, Product, StockItem
-from .forms import WarehouseForm, ProductForm
+from .forms import WarehouseForm, ProductForm, ExcelImportForm
 
 class WarehouseListView(LoginRequiredMixin, ListView):
     model = Warehouse
@@ -74,3 +79,89 @@ class StockListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['warehouses'] = Warehouse.objects.all()
         return context
+
+class ExportProductsView(LoginRequiredMixin, View):
+    def get(self, request):
+        products = Product.objects.all().order_by('code')
+        
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Danh muc san pham"
+        
+        headers = ["Ma SKU", "Ten san pham", "Mo ta", "Don vi tinh"]
+        ws.append(headers)
+        
+        header_fill = PatternFill(start_color="3498db", end_color="3498db", fill_type="solid")
+        for col_num, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col_num)
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal="center")
+            
+        for product in products:
+            ws.append([
+                product.code,
+                product.name,
+                product.description or "",
+                product.unit
+            ])
+            
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                if cell.value and len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            ws.column_dimensions[column].width = max_length + 2
+            
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="DanhSachSanPham.xlsx"'
+        wb.save(response)
+        return response
+
+class ImportProductsView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = ExcelImportForm()
+        return render(request, 'catalog/product_import.html', {'form': form})
+        
+    def post(self, request):
+        form = ExcelImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_file = request.FILES['file']
+            try:
+                wb = openpyxl.load_workbook(excel_file)
+                ws = wb.active
+                
+                success_count = 0
+                error_count = 0
+                
+                # Bắt đầu từ row 2 để bỏ qua header
+                for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
+                    if not row[0]: continue # Bỏ qua dòng trống
+                    
+                    code = str(row[0]).strip()
+                    name = str(row[1]).strip() if row[1] else ""
+                    description = str(row[2]).strip() if row[2] else ""
+                    unit = str(row[3]).strip() if row[3] else "Cái"
+                    
+                    if not code or not name:
+                        error_count += 1
+                        continue
+                        
+                    # Cập nhật nếu đã tồn tại, ngược lại tạo mới
+                    obj, created = Product.objects.update_or_create(
+                        code=code,
+                        defaults={
+                            'name': name,
+                            'description': description,
+                            'unit': unit
+                        }
+                    )
+                    success_count += 1
+                    
+                messages.success(request, f"Import thành công: {success_count} sản phẩm. Lỗi: {error_count}")
+                return redirect('catalog:product-list')
+            except Exception as e:
+                messages.error(request, f"Lỗi xử lý file Excel: {str(e)}")
+        
+        return render(request, 'catalog/product_import.html', {'form': form})
