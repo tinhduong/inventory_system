@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label small fw-bold">Khách hàng</label>
-                <select name="customer" class="form-select form-select-sm search-select" onchange="this.form.submit()">
+                <select name="customer" class="form-select form-select-sm search-select" onchange="this.form.submit()" style="min-width: 250px;">
                     <option value="">Tất cả khách hàng</option>
                     {% for c in customers %}
                     <option value="{{ c.pk }}" {% if current_customer == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
