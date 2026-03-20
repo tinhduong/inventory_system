@@ -40,7 +40,7 @@
                         </td>
                         <td>
                             {% if order.status == 'CONFIRMED' %}
-                            <span class="badge {% if order.debt_remaining == 0 %}bg-success text-white{% elif order.debt_remaining < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
+                            <span class="badge {% if order.remaining_amount <= 0 %}bg-success text-white{% elif order.remaining_amount < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
                                 {{ order.debt_status_display }}
                             </span>
                             {% else %}
