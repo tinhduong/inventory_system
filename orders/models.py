@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from accounts.models import Customer
 from catalog.models import Warehouse, Product
 
@@ -17,21 +18,10 @@ class SalesOrder(models.Model):
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.DRAFT, verbose_name="Trạng thái")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    order_date = models.DateField(verbose_name="Ngày đặt hàng")
+    order_date = models.DateField(default=timezone.now, verbose_name="Ngày đặt hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
     paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
-
-    def save(self, *args, **kwargs):
-        if not self.code:
-            from orders.forms import generate_order_code
-            self.code = generate_order_code('SO', SalesOrder)
-        super().save(*args, **kwargs)
-
-    @property
-    def debt_entry(self):
-        from debt.models import DebtEntry
-        return DebtEntry.objects.filter(sales_order=self, is_settlement=False).first()
 
     @property
     def remaining_amount(self):
@@ -52,6 +42,17 @@ class SalesOrder(models.Model):
         if not entry or not entry.status:
             return "N/A"
         return entry.status.label
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            from orders.forms import generate_order_code
+            self.code = generate_order_code('SO', SalesOrder)
+        super().save(*args, **kwargs)
+
+    @property
+    def debt_entry(self):
+        from debt.models import DebtEntry
+        return DebtEntry.objects.filter(sales_order=self, is_settlement=False).first()
 
     def __str__(self):
         return self.code
@@ -79,21 +80,10 @@ class PurchaseOrder(models.Model):
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.DRAFT, verbose_name="Trạng thái")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    order_date = models.DateField(verbose_name="Ngày nhập hàng")
+    order_date = models.DateField(default=timezone.now, verbose_name="Ngày nhập hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
     paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
-
-    def save(self, *args, **kwargs):
-        if not self.code:
-            from orders.forms import generate_order_code
-            self.code = generate_order_code('PO', PurchaseOrder)
-        super().save(*args, **kwargs)
-
-    @property
-    def debt_entry(self):
-        from debt.models import DebtEntry
-        return DebtEntry.objects.filter(purchase_order=self, is_settlement=False).first()
 
     @property
     def remaining_amount(self):
@@ -112,6 +102,17 @@ class PurchaseOrder(models.Model):
         if not entry or not entry.status:
             return "N/A"
         return entry.status.label
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            from orders.forms import generate_order_code
+            self.code = generate_order_code('PO', PurchaseOrder)
+        super().save(*args, **kwargs)
+
+    @property
+    def debt_entry(self):
+        from debt.models import DebtEntry
+        return DebtEntry.objects.filter(purchase_order=self, is_settlement=False).first()
 
     def __str__(self):
         return self.code
