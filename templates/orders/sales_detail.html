@@ -61,8 +61,8 @@
                 <h6 class="text-secondary text-uppercase mb-3">Thông tin đơn hàng</h6>
                 <p><strong>Khách hàng:</strong> {{ order.customer.name }}</p>
                 <p><strong>Ngày đặt:</strong> {{ order.order_date }}</p>
-                <p><strong>Kho xuất:</strong> {{ order.warehouse.name }}</p>
-                <p><strong>Nhân viên:</strong> {{ order.employee.username }}</p>
+                <p><strong>Ngày tạo:</strong> {{ order.created_at|date:"d/m/Y" }}</p>
+                <p><strong>Đã thanh toán (Trả trước):</strong> <span class="text-success fw-bold">{{ order.paid_amount|floatformat:0|intcomma }} đ</span></p>
                 <p><strong>Trạng thái:</strong> 
                     <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                         {{ order.get_status_display }}
@@ -70,14 +70,14 @@
                 </p>
                 {% if order.status == 'CONFIRMED' %}
                 <hr>
-                <h6 class="text-secondary text-uppercase mb-3">Công nợ đơn hàng</h6>
+                <h6 class="text-secondary text-uppercase mb-3">Công nợ thực tế</h6>
                 <p><strong>Tình trạng:</strong> 
                     <span class="badge {% if order.debt_remaining == 0 %}bg-success text-white{% elif order.debt_remaining < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
                         {{ order.debt_status_display }}
                     </span>
                 </p>
-                <p><strong>Còn nợ:</strong> <span class="text-danger fw-bold">{{ order.debt_remaining|floatformat:0|intcomma }} đ</span></p>
-                <a href="{% url 'debt:customer-debt' order.customer.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                <p><strong>Số dư công nợ đơn:</strong> <span class="text-danger fw-bold">{{ order.debt_remaining|floatformat:0|intcomma }} đ</span></p>
+                <a href="{% url 'debt:customer-debt' order.customer.pk %}" class="btn btn-sm btn-outline-primary w-100 mb-2">
                     <i class="bi bi-wallet2"></i> Chi tiết công nợ đối tác
                 </a>
                 {% endif %}

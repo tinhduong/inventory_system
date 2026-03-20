@@ -19,11 +19,12 @@ def generate_order_code(prefix, model_class):
 class SalesOrderForm(forms.ModelForm):
     class Meta:
         model = SalesOrder
-        fields = ['warehouse', 'customer', 'order_date']
+        fields = ['warehouse', 'customer', 'order_date', 'paid_amount']
         widgets = {
             'order_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'warehouse': forms.Select(attrs={'class': 'form-control'}),
             'customer': forms.Select(attrs={'class': 'form-control'}),
+            'paid_amount': forms.TextInput(attrs={'class': 'form-control money-input'}),
         }
 
 SalesOrderLineFormSet = inlineformset_factory(
@@ -40,11 +41,12 @@ SalesOrderLineFormSet = inlineformset_factory(
 class PurchaseOrderForm(forms.ModelForm):
     class Meta:
         model = PurchaseOrder
-        fields = ['warehouse', 'supplier', 'order_date']
+        fields = ['warehouse', 'supplier', 'order_date', 'paid_amount']
         widgets = {
             'order_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'warehouse': forms.Select(attrs={'class': 'form-control'}),
             'supplier': forms.Select(attrs={'class': 'form-control'}),
+            'paid_amount': forms.TextInput(attrs={'class': 'form-control money-input'}),
         }
 
 PurchaseOrderLineFormSet = inlineformset_factory(

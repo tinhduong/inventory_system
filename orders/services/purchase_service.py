@@ -23,8 +23,8 @@ def confirm_purchase_order(order):
         order.status = OrderStatus.CONFIRMED
         order.save()
 
-        # 3. Create Debt Entry
-        DebtEntry.objects.create(
+        # 3. Create Primary Debt Entry
+        debt_entry = DebtEntry.objects.create(
             customer=order.supplier,
             account_type=AccountType.PAYABLE,
             purchase_order=order,
@@ -32,6 +32,18 @@ def confirm_purchase_order(order):
             is_settlement=False,
             note=f"Ghi nợ từ đơn hàng nhập {order.code}"
         )
+
+        # 4. Handle initial payment if any
+        if order.paid_amount > 0:
+            DebtEntry.objects.create(
+                customer=order.supplier,
+                account_type=AccountType.PAYABLE,
+                parent_entry=debt_entry,
+                purchase_order=order,
+                amount=order.paid_amount,
+                is_settlement=True,
+                note=f"Thanh toán lúc nhập đơn {order.code}"
+            )
 
 def cancel_purchase_order(order):
     if order.status != OrderStatus.CONFIRMED:

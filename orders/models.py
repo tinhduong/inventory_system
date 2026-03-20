@@ -19,6 +19,7 @@ class SalesOrder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     order_date = models.DateField(verbose_name="Ngày đặt hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
+    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def save(self, *args, **kwargs):
@@ -72,6 +73,7 @@ class PurchaseOrder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     order_date = models.DateField(verbose_name="Ngày nhập hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
+    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def save(self, *args, **kwargs):
