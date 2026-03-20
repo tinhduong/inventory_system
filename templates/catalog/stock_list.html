@@ -3,42 +3,58 @@
 {% block title %}Tồn kho{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+<div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
         <h5 class="mb-0 fw-bold">Báo cáo tồn kho</h5>
         <form class="d-flex" method="get">
-            <select name="warehouse" class="form-select form-select-sm me-2">
-                <option value="">Tất cả kho</option>
+            <select name="warehouse" class="form-select form-select-sm search-select" onchange="this.form.submit()">
+                <option value="">Tất cả kho hàng</option>
                 {% for w in warehouses %}
-                <option value="{{ w.id }}">{{ w.name }}</option>
+                <option value="{{ w.id }}" {% if current_warehouse == w.id|stringformat:"i" %}selected{% endif %}>{{ w.name }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="btn btn-sm btn-primary">Lọc</button>
+            {% if request.GET.warehouse %}
+            <a href="?" class="btn btn-sm btn-outline-secondary ms-2">Xóa lọc</a>
+            {% endif %}
         </form>
     </div>
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>Sản phẩm</th>
-                    <th>Kho</th>
-                    <th>Số lượng</th>
-                    <th>Đơn vị</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stock in stocks %}
-                <tr>
-                    <td>{{ stock.product.name }}</td>
-                    <td>{{ stock.warehouse.name }}</td>
-                    <td class="fw-bold">{{ stock.quantity|floatformat:0 }}</td>
-                    <td>{{ stock.product.unit }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="4" class="text-center">Trống</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Sản phẩm</th>
+                        <th>Kho hàng</th>
+                        <th class="text-end">Số lượng</th>
+                        <th>Đơn vị</th>
+                        <th class="text-center">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr>
+                        <td class="ps-3 fw-medium text-primary">{{ stock.product.name }}</td>
+                        <td>{{ stock.warehouse.name }}</td>
+                        <td class="text-end fw-bold">{{ stock.quantity|floatformat:0 }}</td>
+                        <td>{{ stock.product.unit }}</td>
+                        <td class="text-center">
+                            {% if stock.quantity <= 5 %}
+                                <span class="badge bg-danger">Sắp hết hàng</span>
+                            {% elif stock.quantity <= 15 %}
+                                <span class="badge bg-warning text-dark">Sắp cần nhập</span>
+                            {% else %}
+                                <span class="badge bg-success opacity-75">Sẵn hàng</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Không tìm thấy dữ liệu tồn kho nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -78,6 +78,7 @@ class StockListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['warehouses'] = Warehouse.objects.all()
+        context['current_warehouse'] = self.request.GET.get('warehouse', '')
         return context
 
 class ExportProductsView(LoginRequiredMixin, View):
