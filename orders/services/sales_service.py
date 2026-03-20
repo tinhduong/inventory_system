@@ -63,13 +63,15 @@ def cancel_sales_order(order):
         order.status = OrderStatus.CANCELLED
         order.save()
 
-        # 3. Handle Debt (simple approach: create a decrease entry or delete the original)
-        # Here we create a settlement-like entry to offset
-        DebtEntry.objects.create(
-            customer=order.customer,
-            account_type=AccountType.RECEIVABLE,
-            sales_order=order,
-            amount=order.total_amount,
-            is_settlement=True,
-            note=f"Đối trừ do hủy đơn hàng {order.code}"
-        )
+        # 3. Handle Debt
+        debt_entry = DebtEntry.objects.filter(sales_order=order, is_settlement=False).first()
+        if debt_entry:
+            DebtEntry.objects.create(
+                customer=order.customer,
+                account_type=AccountType.RECEIVABLE,
+                parent_entry=debt_entry,
+                sales_order=order,
+                amount=debt_entry.remaining_amount,
+                is_settlement=True,
+                note=f"Đối trừ do hủy đơn hàng bán {order.code}"
+            )

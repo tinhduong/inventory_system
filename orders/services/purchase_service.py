@@ -62,12 +62,25 @@ def cancel_purchase_order(order):
         order.status = OrderStatus.CANCELLED
         order.save()
 
-        # 3. Handle Debt (offset entry)
-        DebtEntry.objects.create(
-            customer=order.supplier,
-            account_type=AccountType.PAYABLE,
-            purchase_order=order,
-            amount=order.total_amount,
-            is_settlement=True,
-            note=f"Đối trừ do hủy đơn hàng nhập {order.code}"
-        )
+        # 3. Handle Debt
+        debt_entry = DebtEntry.objects.filter(purchase_order=order, is_settlement=False).first()
+        if debt_entry:
+            DebtEntry.objects.create(
+                customer=order.supplier,
+                account_type=AccountType.PAYABLE,
+                parent_entry=debt_entry,
+                purchase_order=order,
+                amount=debt_entry.remaining_amount,
+                is_settlement=True,
+                note=f"Đối trừ do hủy đơn hàng nhập {order.code}"
+            )
+        else:
+            # Fallback if debt entry is not found for some reason (unlikely)
+            DebtEntry.objects.create(
+                customer=order.supplier,
+                account_type=AccountType.PAYABLE,
+                purchase_order=order,
+                amount=order.total_amount,
+                is_settlement=True,
+                note=f"Đối trừ do hủy đơn hàng nhập {order.code}"
+            )

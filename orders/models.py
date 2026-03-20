@@ -25,6 +25,8 @@ class SalesOrder(models.Model):
 
     @property
     def remaining_amount(self):
+        if self.status == OrderStatus.CANCELLED:
+            return 0
         # Ưu tiên lấy từ công nợ nếu đã xác nhận
         if self.status == OrderStatus.CONFIRMED:
             entry = self.debt_entry
@@ -33,11 +35,16 @@ class SalesOrder(models.Model):
 
     @property
     def current_paid_amount(self):
-        # Tổng tiền đã thanh toán = Tổng tiền - Số tiền còn nợ
+        if self.status == OrderStatus.CANCELLED:
+            # Nếu hủy, tiền "đã trả" coi như là 0 trên chế độ xem đơn hàng 
+            # (Thực tế tiền có thể đã vào sổ nợ như một khoản dư)
+            return 0
         return self.total_amount - self.remaining_amount
 
     @property
     def debt_status_display(self):
+        if self.status == OrderStatus.CANCELLED:
+            return "Đã hủy"
         entry = self.debt_entry
         if not entry or not entry.status:
             return "N/A"
@@ -87,6 +94,8 @@ class PurchaseOrder(models.Model):
 
     @property
     def remaining_amount(self):
+        if self.status == OrderStatus.CANCELLED:
+            return 0
         if self.status == OrderStatus.CONFIRMED:
             entry = self.debt_entry
             return entry.remaining_amount if entry else 0
@@ -94,10 +103,14 @@ class PurchaseOrder(models.Model):
 
     @property
     def current_paid_amount(self):
+        if self.status == OrderStatus.CANCELLED:
+            return 0
         return self.total_amount - self.remaining_amount
 
     @property
     def debt_status_display(self):
+        if self.status == OrderStatus.CANCELLED:
+            return "Đã hủy"
         entry = self.debt_entry
         if not entry or not entry.status:
             return "N/A"
