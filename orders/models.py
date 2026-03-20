@@ -22,6 +22,10 @@ class SalesOrder(models.Model):
     paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
 
+    @property
+    def remaining_amount(self):
+        return self.total_amount - self.paid_amount
+
     def save(self, *args, **kwargs):
         if not self.code:
             from orders.forms import generate_order_code
@@ -75,6 +79,10 @@ class PurchaseOrder(models.Model):
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
     paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
+
+    @property
+    def remaining_amount(self):
+        return self.total_amount - self.paid_amount
 
     def save(self, *args, **kwargs):
         if not self.code:

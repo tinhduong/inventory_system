@@ -88,7 +88,9 @@
                         <tr>
                             <th>Mã đơn</th>
                             <th>Khách hàng</th>
-                            <th>Tổng tiền</th>
+                            <th>Tổng (đ)</th>
+                            <th>Đã trả (đ)</th>
+                            <th>Còn thiếu (đ)</th>
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
@@ -97,7 +99,9 @@
                         <tr>
                             <td><a href="{% url 'orders:sales-detail' order.pk %}" class="text-decoration-none">{{ order.code }}</a></td>
                             <td>{{ order.customer.name }}</td>
-                            <td>{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                            <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
+                            <td class="text-success">{{ order.paid_amount|floatformat:0|intcomma }}</td>
+                            <td class="text-danger">{{ order.remaining_amount|floatformat:0|intcomma }}</td>
                             <td>
                                 <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                                     {{ order.get_status_display }}
@@ -105,7 +109,7 @@
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="4" class="text-center">Chưa có dữ liệu</td></tr>
+                        <tr><td colspan="6" class="text-center">Chưa có dữ liệu</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -121,7 +125,9 @@
                         <tr>
                             <th>Mã đơn</th>
                             <th>Nhà cung cấp</th>
-                            <th>Tổng tiền</th>
+                            <th>Tổng (đ)</th>
+                            <th>Đã trả (đ)</th>
+                            <th>Còn thiếu (đ)</th>
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
@@ -130,7 +136,9 @@
                         <tr>
                             <td><a href="{% url 'orders:purchase-detail' order.pk %}" class="text-decoration-none">{{ order.code }}</a></td>
                             <td>{{ order.supplier.name }}</td>
-                            <td>{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                            <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
+                            <td class="text-success">{{ order.paid_amount|floatformat:0|intcomma }}</td>
+                            <td class="text-danger">{{ order.remaining_amount|floatformat:0|intcomma }}</td>
                             <td>
                                 <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                                     {{ order.get_status_display }}
@@ -138,7 +146,7 @@
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="4" class="text-center">Chưa có dữ liệu</td></tr>
+                        <tr><td colspan="6" class="text-center">Chưa có dữ liệu</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
