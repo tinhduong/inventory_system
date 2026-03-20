@@ -3,10 +3,32 @@ from django.views.generic import ListView, DetailView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
+from django.utils import timezone
+from datetime import timedelta
 from .models import SalesOrder, PurchaseOrder, OrderStatus
 from .forms import SalesOrderForm, SalesOrderLineFormSet, PurchaseOrderForm, PurchaseOrderLineFormSet
 from .services.sales_service import confirm_sales_order
 from .services.purchase_service import confirm_purchase_order
+from accounts.models import Customer
+
+def get_period_filter(period):
+    today = timezone.now().date()
+    if period == 'today':
+        return today, today
+    elif period == 'yesterday':
+        yesterday = today - timedelta(days=1)
+        return yesterday, yesterday
+    elif period == '7d':
+        return today - timedelta(days=7), today
+    elif period == '1m':
+        return today - timedelta(days=30), today
+    elif period == '3m':
+        return today - timedelta(days=90), today
+    elif period == '6m':
+        return today - timedelta(days=180), today
+    elif period == '1y':
+        return today - timedelta(days=365), today
+    return None, None
 
 class SalesListView(LoginRequiredMixin, ListView):
     model = SalesOrder
@@ -16,30 +38,42 @@ class SalesListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        payment_status = self.request.GET.get('payment_status')
         
+        # 1. Filter by Payment Status (Unpaid)
+        payment_status = self.request.GET.get('payment_status')
         if payment_status == 'unpaid':
             from django.db.models import Sum, Q, F
             from debt.models import DebtEntry
-            
-            # Lấy các đơn đã xác nhận (vì chỉ đơn xác nhận mới có công nợ)
-            queryset = queryset.filter(status='CONFIRMED')
-            
-            # Lọc các đơn có DebtEntry chưa hoàn tất
-            # remaining = amount - Sum(payments__amount)
+            queryset = queryset.filter(status=OrderStatus.CONFIRMED)
             debt_qs = DebtEntry.objects.filter(sales_order__isnull=False, is_settlement=False)
             debt_qs = debt_qs.annotate(total_paid=Sum('payments__amount'))
             unpaid_debt_ids = debt_qs.filter(
                 Q(total_paid__isnull=True) | Q(total_paid__lt=F('amount'))
             ).values_list('sales_order_id', flat=True)
-            
             queryset = queryset.filter(id__in=unpaid_debt_ids)
-            
+
+        # 2. Filter by Period
+        period = self.request.GET.get('period')
+        start_date, end_date = get_period_filter(period)
+        if start_date and end_date:
+            if start_date == end_date:
+                queryset = queryset.filter(order_date=start_date)
+            else:
+                queryset = queryset.filter(order_date__range=[start_date, end_date])
+
+        # 3. Filter by Customer
+        customer_id = self.request.GET.get('customer')
+        if customer_id:
+            queryset = queryset.filter(customer_id=customer_id)
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['payment_status'] = self.request.GET.get('payment_status', 'all')
+        context['current_period'] = self.request.GET.get('period', 'all')
+        context['current_customer'] = self.request.GET.get('customer', '')
+        context['customers'] = Customer.objects.all().order_by('name')
         return context
 
 class SalesDetailView(LoginRequiredMixin, DetailView):
@@ -87,7 +121,6 @@ def confirm_sales_view(request, pk):
         messages.error(request, f"Lỗi khi xác nhận: {str(e)}")
     return redirect('orders:sales-detail', pk=pk)
 
-# Purchase views are similar... I'll implement them below
 class PurchaseListView(LoginRequiredMixin, ListView):
     model = PurchaseOrder
     template_name = 'orders/purchase_list.html'
@@ -96,27 +129,42 @@ class PurchaseListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        payment_status = self.request.GET.get('payment_status')
         
+        # 1. Filter by Payment Status (Unpaid)
+        payment_status = self.request.GET.get('payment_status')
         if payment_status == 'unpaid':
             from django.db.models import Sum, Q, F
             from debt.models import DebtEntry
-            
-            queryset = queryset.filter(status='CONFIRMED')
-            
+            queryset = queryset.filter(status=OrderStatus.CONFIRMED)
             debt_qs = DebtEntry.objects.filter(purchase_order__isnull=False, is_settlement=False)
             debt_qs = debt_qs.annotate(total_paid=Sum('payments__amount'))
             unpaid_debt_ids = debt_qs.filter(
                 Q(total_paid__isnull=True) | Q(total_paid__lt=F('amount'))
             ).values_list('purchase_order_id', flat=True)
-            
             queryset = queryset.filter(id__in=unpaid_debt_ids)
-            
+
+        # 2. Filter by Period
+        period = self.request.GET.get('period')
+        start_date, end_date = get_period_filter(period)
+        if start_date and end_date:
+            if start_date == end_date:
+                queryset = queryset.filter(order_date=start_date)
+            else:
+                queryset = queryset.filter(order_date__range=[start_date, end_date])
+
+        # 3. Filter by Supplier
+        supplier_id = self.request.GET.get('supplier')
+        if supplier_id:
+            queryset = queryset.filter(supplier_id=supplier_id)
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['payment_status'] = self.request.GET.get('payment_status', 'all')
+        context['current_period'] = self.request.GET.get('period', 'all')
+        context['current_supplier'] = self.request.GET.get('supplier', '')
+        context['suppliers'] = Customer.objects.all().order_by('name')
         return context
 
 class PurchaseDetailView(LoginRequiredMixin, DetailView):
