@@ -70,15 +70,20 @@ class StockListView(LoginRequiredMixin, ListView):
     
     def get_queryset(self):
         qs = super().get_queryset()
-        warehouse_id = self.request.GET.get('warehouse')
-        if warehouse_id:
-            qs = qs.filter(warehouse_id=warehouse_id)
+        self.warehouse_id = self.request.GET.get('warehouse')
+        if not self.warehouse_id:
+            first_w = Warehouse.objects.first()
+            if first_w:
+                self.warehouse_id = str(first_w.id)
+        
+        if self.warehouse_id:
+            qs = qs.filter(warehouse_id=self.warehouse_id)
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['warehouses'] = Warehouse.objects.all()
-        context['current_warehouse'] = self.request.GET.get('warehouse', '')
+        context['current_warehouse'] = self.warehouse_id
         return context
 
 class ExportProductsView(LoginRequiredMixin, View):

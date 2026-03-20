@@ -3,20 +3,34 @@
 {% block title %}Tồn kho{% endblock %}
 
 {% block content %}
-<div class="card shadow-sm">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-        <h5 class="mb-0 fw-bold">Báo cáo tồn kho</h5>
-        <form class="d-flex" method="get">
-            <select name="warehouse" class="form-select form-select-sm search-select" onchange="this.form.submit()" style="min-width: 300px;">
-                <option value="">Tất cả kho hàng</option>
-                {% for w in warehouses %}
-                <option value="{{ w.id }}" {% if current_warehouse == w.id|stringformat:"i" %}selected{% endif %}>{{ w.name }}</option>
-                {% endfor %}
-            </select>
-            {% if request.GET.warehouse %}
-            <a href="?" class="btn btn-sm btn-outline-secondary ms-2">Xóa lọc</a>
-            {% endif %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Báo cáo tồn kho</h3>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <label class="form-label fw-bold text-muted small text-uppercase">Kho lọc dữ liệu</label>
+                <select name="warehouse" class="form-select form-select-lg search-select" onchange="this.form.submit()">
+                    <option value="">Tất cả kho hàng (Tổng hợp)</option>
+                    {% for w in warehouses %}
+                    <option value="{{ w.id }}" {% if current_warehouse == w.id|stringformat:"s" %}selected{% endif %}>{{ w.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <a href="?" class="btn btn-lg btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Xem lại từ đầu
+                </a>
+            </div>
         </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold">Chi tiết tồn kho</h5>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -49,7 +63,10 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">Không tìm thấy dữ liệu tồn kho nào.</td>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                            Không tìm thấy dữ liệu tồn kho nào phù hợp.
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
