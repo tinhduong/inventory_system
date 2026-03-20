@@ -70,13 +70,14 @@
                 </p>
                 {% if order.status == 'CONFIRMED' %}
                 <hr>
-                <h6 class="text-secondary text-uppercase mb-3">Công nợ thực tế</h6>
-                <p><strong>Tình trạng:</strong> 
-                    <span class="badge {% if order.debt_remaining == 0 %}bg-success text-white{% elif order.debt_remaining < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
+                <h6 class="text-secondary text-uppercase mb-3">Tình hình thanh toán</h6>
+                <p><strong>Tình trạng nợ:</strong> 
+                    <span class="badge {% if order.remaining_amount == 0 %}bg-success text-white{% elif order.remaining_amount < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
                         {{ order.debt_status_display }}
                     </span>
                 </p>
-                <p><strong>Số dư công nợ đơn:</strong> <span class="text-danger fw-bold">{{ order.debt_remaining|floatformat:0|intcomma }} đ</span></p>
+                <p><strong>Tổng đã trả:</strong> <span class="text-success fw-bold">{{ order.current_paid_amount|floatformat:0|intcomma }} đ</span></p>
+                <p><strong>Số nợ còn lại:</strong> <span class="text-danger fw-bold">{{ order.remaining_amount|floatformat:0|intcomma }} đ</span></p>
                 <a href="{% url 'debt:customer-debt' order.supplier.pk %}" class="btn btn-sm btn-outline-primary w-100">
                     <i class="bi bi-wallet2"></i> Chi tiết công nợ đối tác
                 </a>

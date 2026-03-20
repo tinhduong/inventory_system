@@ -19,12 +19,8 @@ class SalesOrder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     order_date = models.DateField(verbose_name="Ngày đặt hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
-    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán")
+    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
-
-    @property
-    def remaining_amount(self):
-        return self.total_amount - self.paid_amount
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -38,9 +34,17 @@ class SalesOrder(models.Model):
         return DebtEntry.objects.filter(sales_order=self, is_settlement=False).first()
 
     @property
-    def debt_remaining(self):
-        entry = self.debt_entry
-        return entry.remaining_amount if entry else 0
+    def remaining_amount(self):
+        # Ưu tiên lấy từ công nợ nếu đã xác nhận
+        if self.status == OrderStatus.CONFIRMED:
+            entry = self.debt_entry
+            return entry.remaining_amount if entry else 0
+        return self.total_amount - self.paid_amount
+
+    @property
+    def current_paid_amount(self):
+        # Tổng tiền đã thanh toán = Tổng tiền - Số tiền còn nợ
+        return self.total_amount - self.remaining_amount
 
     @property
     def debt_status_display(self):
@@ -77,12 +81,8 @@ class PurchaseOrder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     order_date = models.DateField(verbose_name="Ngày nhập hàng")
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
-    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán")
+    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
-
-    @property
-    def remaining_amount(self):
-        return self.total_amount - self.paid_amount
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -96,9 +96,15 @@ class PurchaseOrder(models.Model):
         return DebtEntry.objects.filter(purchase_order=self, is_settlement=False).first()
 
     @property
-    def debt_remaining(self):
-        entry = self.debt_entry
-        return entry.remaining_amount if entry else 0
+    def remaining_amount(self):
+        if self.status == OrderStatus.CONFIRMED:
+            entry = self.debt_entry
+            return entry.remaining_amount if entry else 0
+        return self.total_amount - self.paid_amount
+
+    @property
+    def current_paid_amount(self):
+        return self.total_amount - self.remaining_amount
 
     @property
     def debt_status_display(self):
