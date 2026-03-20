@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label small fw-bold">Nhà cung cấp</label>
-                <select name="supplier" class="form-select form-select-sm search-select" onchange="this.form.submit()" style="min-width: 250px;">
+                <select name="supplier" class="form-select form-select-sm search-select" onchange="this.form.submit()" style="min-width: 300px;">
                     <option value="">Tất cả nhà cung cấp</option>
                     {% for s in suppliers %}
                     <option value="{{ s.pk }}" {% if current_supplier == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>

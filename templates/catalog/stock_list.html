@@ -7,7 +7,7 @@
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
         <h5 class="mb-0 fw-bold">Báo cáo tồn kho</h5>
         <form class="d-flex" method="get">
-            <select name="warehouse" class="form-select form-select-sm search-select" onchange="this.form.submit()" style="min-width: 250px;">
+            <select name="warehouse" class="form-select form-select-sm search-select" onchange="this.form.submit()" style="min-width: 300px;">
                 <option value="">Tất cả kho hàng</option>
                 {% for w in warehouses %}
                 <option value="{{ w.id }}" {% if current_warehouse == w.id|stringformat:"i" %}selected{% endif %}>{{ w.name }}</option>
