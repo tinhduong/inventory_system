@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load humanize %}
 {% block content %}
 <div class="card shadow-sm mx-auto" style="max-width: 600px;">
-    <div class="card-header bg-white fw-bold">Ghi nhận Thanh toán / Thu nợ</div>
+    <div class="card-header bg-white fw-bold">Ghi nhận Thanh toán / Thu nợ {% if current_customer %}cho {{ current_customer.name }}{% endif %}</div>
     <div class="card-body">
         <form method="post">
             {% csrf_token %}
@@ -9,10 +10,20 @@
             <div class="mb-3">
                 <label class="form-label fw-bold">{{ field.label }}</label>
                 {{ field }}
+                
+                {% if field.name == 'amount_paid' and abs_net_balance is not None %}
+                <div class="form-text text-primary">
+                    <i class="bi bi-info-circle me-1"></i> Số dư hiện tại 
+                    {% if net_balance > 0 %}(Phải thu): {% else %}(Phải trả): {% endif %}
+                    <strong>{{ abs_net_balance|floatformat:0|intcomma }} đ</strong>
+                </div>
+                {% endif %}
+                
                 {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
             </div>
             {% endfor %}
             <button type="submit" class="btn btn-warning w-100">Xác nhận thanh toán</button>
+            <a href="{% if current_customer %}{% url 'debt:customer-debt' current_customer.pk %}{% else %}{% url 'debt:overview' %}{% endif %}" class="btn btn-link w-100 text-muted mt-2">Hủy bỏ</a>
         </form>
     </div>
 </div>

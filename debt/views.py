@@ -256,6 +256,39 @@ class SettlementCreateView(LoginRequiredMixin, CreateView):
     template_name = 'debt/settlement_form.html'
     success_url = '/debt/overview/'
 
+    def get_initial(self):
+        initial = super().get_initial()
+        customer_id = self.request.GET.get('customer')
+        account_type = self.request.GET.get('account_type')
+        if customer_id:
+            initial['customer'] = customer_id
+        if account_type:
+            initial['account_type'] = account_type
+        initial['payment_date'] = date.today()
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        customer_id = self.request.GET.get('customer')
+        if customer_id:
+            customer = get_object_or_404(Customer, pk=customer_id)
+            context['current_customer'] = customer
+            
+            # Calculate debts
+            entries = DebtEntry.objects.filter(customer=customer)
+            # Receivable
+            tr = entries.filter(account_type=AccountType.RECEIVABLE, is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+            pr = entries.filter(account_type=AccountType.RECEIVABLE, is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+            # Payable
+            tp = entries.filter(account_type=AccountType.PAYABLE, is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+            pp = entries.filter(account_type=AccountType.PAYABLE, is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+            
+            # Netting logic same as detail view
+            net = round((tr - pr) - (tp - pp), 0)
+            context['net_balance'] = net
+            context['abs_net_balance'] = abs(net)
+        return context
+
     def form_valid(self, form):
         response = super().form_valid(form)
         # Create a DebtEntry to offset
