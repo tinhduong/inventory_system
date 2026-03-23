@@ -70,9 +70,17 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            <a href="{% url 'debt:customer-debt' item.pk %}" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();">
-                                <i class="bi bi-clock-history"></i> Chi tiết
-                            </a>
+                            <div class="btn-group">
+                                <a href="{% url 'debt:customer-debt' item.pk %}" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();">
+                                    <i class="bi bi-clock-history"></i> Chi tiết
+                                </a>
+                                <a href="{% url 'debt:settlement-create' %}?customer={{ item.pk }}&account_type={% if item.balance > 0 %}RECEIVABLE{% else %}PAYABLE{% endif %}" 
+                                   class="btn btn-sm btn-warning" 
+                                   target="_blank"
+                                   onclick="event.stopPropagation();">
+                                    <i class="bi bi-cash-stack"></i> Quyết toán
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
