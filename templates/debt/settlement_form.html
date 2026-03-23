@@ -15,7 +15,7 @@
                 <div class="form-text text-primary" id="balanceInfo">
                     <i class="bi bi-info-circle me-1"></i> Số dư hiện tại 
                     {% if net_balance > 0 %}(Khác nợ): {% else %}(Mình nợ): {% endif %}
-                    <strong id="maxBalance" data-value="{{ abs_net_balance }}">{{ abs_net_balance|floatformat:0|intcomma }} đ</strong>
+                    <strong id="maxBalance" data-value="{{ abs_net_balance|floatformat:0 }}">{{ abs_net_balance|floatformat:0|intcomma }} đ</strong>
                 </div>
                 <div id="maxAlert" class="form-text text-danger d-none mt-1 animate__animated animate__shakeX">
                     <i class="bi bi-exclamation-circle-fill me-1"></i> Chỉ có thể thanh toán tối đa theo số dư nợ hiện tại.
@@ -49,16 +49,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxAlert = document.getElementById('maxAlert');
     
     if (amountInput && maxBalanceEl) {
-        const maxBalance = parseFloat(maxBalanceEl.getAttribute('data-value'));
+        // Loại bỏ mọi ký tự không phải số trước khi parse để tránh lỗi do locale (dấu phẩy/chấm)
+        let maxBalanceStr = maxBalanceEl.getAttribute('data-value').replace(/[^0-9]/g, '');
+        const maxBalance = parseInt(maxBalanceStr) || 0;
         
         amountInput.addEventListener('input', function() {
-            // Lấy giá trị số (loại bỏ dấu phẩy/chấm nếu có do moneymask)
             let rawValue = this.value.replace(/[^0-9]/g, '');
-            let currentVal = parseFloat(rawValue);
+            let currentVal = parseInt(rawValue) || 0;
             
             if (currentVal > maxBalance) {
-                // Tự động đưa về mức tối đa
                 this.value = maxBalance;
+                // Phát sự kiện để các plugin format tiền tệ (nếu có) cập nhật lại hiển thị
+                this.dispatchEvent(new Event('change', { bubbles: true }));
                 // Nếu trang web có sử dụng plugin định dạng tiền tệ như jQuery MaskMoney, 
                 // bạn có thể cần kích hoạt event 'change' hoặc 'blur' để nó tự format lại.
                 
