@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, DecimalField
+from django.db.models.functions import Coalesce
 from django.contrib import messages
 from .models import DebtEntry, Settlement, AccountType, DebtStatus
 from .forms import SettlementForm, EntryPaymentForm
@@ -19,33 +20,28 @@ class DebtOverviewView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # 1. Tính Phải thu (Tổng hệ thống)
-        rec = DebtEntry.objects.filter(account_type=AccountType.RECEIVABLE)
-        total_rec = rec.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        paid_rec = rec.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        context['total_receivable'] = total_rec - paid_rec
-
-        # 2. Tính Phải trả (Tổng hệ thống)
-        pay = DebtEntry.objects.filter(account_type=AccountType.PAYABLE)
-        total_pay = pay.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        paid_pay = pay.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        context['total_payable'] = total_pay - paid_pay
-
-        # 3. Tính toán nợ cho từng đối tác để tìm TOP và hỗ trợ search
-        customers = Customer.objects.all()
+        # Tính toán dư nợ bù trừ (Netting) cho từng đối tác để tìm TOP và hỗ trợ search
+        customers = Customer.objects.annotate(
+            t_rec=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
+            p_rec=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
+            t_pay=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
+            p_pay=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
+        )
+        
         customer_list = []
+        system_total_rec = 0
+        system_total_pay = 0
+        
         for c in customers:
-            entries = DebtEntry.objects.filter(customer=c)
-            # Thu
-            r = entries.filter(account_type=AccountType.RECEIVABLE)
-            tr = r.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-            pr = r.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
-            # Trả
-            p = entries.filter(account_type=AccountType.PAYABLE)
-            tp = p.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-            pp = p.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
+            # Dư nợ thuần sau khi bù trừ cho từng đối tác
+            balance = round((c.t_rec - c.p_rec) - (c.t_pay - c.p_pay), 0)
             
-            balance = (tr - pr) - (tp - pp)
+            # Tính tổng hệ thống dựa trên dư nợ thuần ròng thực tế của từng người
+            if balance > 0:
+                system_total_rec += balance
+            elif balance < 0:
+                system_total_pay += abs(balance)
+                
             customer_list.append({
                 'obj': c,
                 'balance': balance,
@@ -54,6 +50,9 @@ class DebtOverviewView(LoginRequiredMixin, TemplateView):
         
         # Sắp xếp theo dư nợ tuyệt đối giảm dần
         customer_list.sort(key=lambda x: x['abs_balance'], reverse=True)
+        
+        context['total_receivable'] = system_total_rec
+        context['total_payable'] = system_total_pay
         context['customer_list'] = customer_list
         return context
 
@@ -82,30 +81,32 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         customer_id = self.kwargs['customer_id']
         context['customer'] = Customer.objects.get(pk=customer_id)
         
+        # 1. Lấy tất cả entries liên quan đến đối tác
         entries = DebtEntry.objects.filter(customer_id=customer_id)
         
-        # Áp dụng bộ lọc thời gian cho cả card tổng hợp
+        # Áp dụng bộ lọc thời gian cho tính toán tổng hợp
         days = self.request.GET.get('days')
+        summary_entries = entries
         if days and days.isdigit():
             start_date = date.today() - timedelta(days=int(days))
-            entries = entries.filter(entry_date__date__gte=start_date)
+            summary_entries = entries.filter(entry_date__date__gte=start_date)
+
+        # Tính toán dư nợ thô để bù trừ
+        r_entries = summary_entries.filter(account_type=AccountType.RECEIVABLE)
+        t_rec = r_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        p_rec = r_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         
-        # 1. Tính Phải thu (Khách nợ mình)
-        rec_entries = entries.filter(account_type=AccountType.RECEIVABLE)
-        t_rec = rec_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        p_rec = rec_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        # Số tiền khách thực sự còn nợ (Nếu < 0 là khách trả dư)
-        context['receivable_balance'] = round(t_rec - p_rec, 0)
+        p_entries = summary_entries.filter(account_type=AccountType.PAYABLE)
+        t_pay = p_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        p_pay = p_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         
-        # 2. Tính Phải trả (Mình nợ họ)
-        pay_entries = entries.filter(account_type=AccountType.PAYABLE)
-        t_pay = pay_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        p_pay = pay_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        # Số tiền mình thực sự còn nợ (Nếu < 0 là mình trả dư)
-        context['payable_balance'] = round(t_pay - p_pay, 0)
+        # Số dư tổng (Net) - Làm tròn về số nguyên
+        net = round((t_rec - p_rec) - (t_pay - p_pay), 0)
         
-        # 3. Số dư tổng cuối cùng
-        context['net_balance'] = context['receivable_balance'] - context['payable_balance']
+        # Bù trừ công nợ (Netting): Chỉ hiện số nợ ở một phía cuối cùng trong Summary Cards
+        context['receivable_balance'] = max(0, net)
+        context['payable_balance'] = abs(net) if net < 0 else 0
+        context['net_balance'] = net
         
         # Draft orders check
         from orders.models import SalesOrder, PurchaseOrder, OrderStatus

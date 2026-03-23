@@ -39,11 +39,7 @@
             <div class="card-body">
                 <h6 class="text-primary mb-1">Họ nợ mình <small>(Từ đơn bán)</small></h6>
                 <h4 class="fw-bold mb-0 text-primary">
-                    {% if receivable_balance < 0 %}
-                        {{ receivable_balance|floatformat:0|cut:"-"|intcomma }} <small class="fw-normal text-muted">(Thu dư)</small>
-                    {% else %}
-                        {{ receivable_balance|floatformat:0|intcomma }}
-                    {% endif %} đ
+                    {{ receivable_balance|floatformat:0|intcomma }} đ
                 </h4>
             </div>
         </div>
@@ -53,17 +49,13 @@
             <div class="card-body">
                 <h6 class="text-danger mb-1">Mình nợ họ <small>(Từ đơn nhập)</small></h6>
                 <h4 class="fw-bold mb-0 text-danger">
-                    {% if payable_balance < 0 %}
-                        {{ payable_balance|floatformat:0|cut:"-"|intcomma }} <small class="fw-normal text-muted">(Trả dư)</small>
-                    {% else %}
-                        {{ payable_balance|floatformat:0|intcomma }}
-                    {% endif %} đ
+                    {{ payable_balance|floatformat:0|intcomma }} đ
                 </h4>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm {% if net_balance >= 0 %}bg-primary text-white{% else %}bg-danger text-white{% endif %}">
+        <div class="card shadow-sm {% if net_balance > 0 %}bg-primary text-white{% elif net_balance < 0 %}bg-danger text-white{% else %}bg-success text-white{% endif %}">
             <div class="card-body">
                 <h6 class="mb-1">
                     {% if net_balance > 0 %}TỔNG CẦN THU (Họ nợ mình)
