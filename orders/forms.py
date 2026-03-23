@@ -3,10 +3,12 @@ from django.forms import inlineformset_factory
 from django.utils import timezone
 from .models import SalesOrder, SalesOrderLine, PurchaseOrder, PurchaseOrderLine
 
-def generate_order_code(prefix, model_class):
-    today_str = timezone.now().strftime('%y%m%d')
-    # Tìm mã đơn hàng cao nhất trong ngày
-    last_order = model_class.objects.filter(code__startswith=f"{prefix}{today_str}").order_by('-code').first()
+def generate_order_code(prefix, model_class, date=None):
+    if not date:
+        date = timezone.now()
+    date_str = date.strftime('%y%m%d')
+    # Tìm mã đơn hàng cao nhất trong ngày đó
+    last_order = model_class.objects.filter(code__startswith=f"{prefix}{date_str}").order_by('-code').first()
     
     if last_order:
         last_num = int(last_order.code.split('-')[-1])
@@ -14,7 +16,7 @@ def generate_order_code(prefix, model_class):
     else:
         new_num = 1
         
-    return f"{prefix}{today_str}-{new_num:03d}"
+    return f"{prefix}{date_str}-{new_num:03d}"
 
 class SalesOrderForm(forms.ModelForm):
     class Meta:

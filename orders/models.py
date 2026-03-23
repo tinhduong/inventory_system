@@ -53,7 +53,7 @@ class SalesOrder(models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             from orders.forms import generate_order_code
-            self.code = generate_order_code('SO', SalesOrder)
+            self.code = generate_order_code('SO', SalesOrder, self.order_date)
         super().save(*args, **kwargs)
 
     @property
@@ -122,7 +122,7 @@ class PurchaseOrder(models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             from orders.forms import generate_order_code
-            self.code = generate_order_code('PO', PurchaseOrder)
+            self.code = generate_order_code('PO', PurchaseOrder, self.order_date)
         super().save(*args, **kwargs)
 
     @property
