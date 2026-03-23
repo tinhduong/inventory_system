@@ -134,8 +134,8 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
         ws = wb.active
         ws.title = "Lich su cong no"
 
-        # Định dạng header
-        headers = ["Ngay ghi", "Noi dung / Chung tu", "Ma don", "No goc", "Da tra", "Con lai", "Trang thai"]
+        # Định dạng header mới theo kiểu sổ cái
+        headers = ["Ngày ghi", "Nội dung / Chứng từ", "Mã đơn", "Phát sinh Nợ (Thu/Mình trả)", "Phát sinh Có (Chi/Họ trả)", "Số tiền đã trả", "Còn nợ mình", "Mình còn nợ"]
         ws.append(headers)
         
         header_fill = PatternFill(start_color="3498db", end_color="3498db", fill_type="solid")
@@ -147,34 +147,42 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
 
         # Thêm dữ liệu
         for entry in qs:
-            # Quy ước: RECEIVABLE (Bán) là dương (+), PAYABLE (Nhập) là âm (-)
-            sign = 1 if entry.account_type == AccountType.RECEIVABLE else -1
+            # Debit (Nợ): Bán hàng, Hoặc mình trả tiền NCC
+            # Credit (Có): Nhập hàng, Hoặc khách trả tiền mình
             
+            debit = 0
+            credit = 0
+            paid = 0
+            rem_rec = 0
+            rem_pay = 0
+
             if entry.is_settlement:
-                # Đối với phiếu thu/chi tự do (không gắn đơn), số tiền này làm giảm nợ
-                # Thu nợ (REC) -> Giảm số dương -> Âm
-                # Trả nợ (PAY) -> Giảm số âm -> Dương
-                amt_sign = sign * -1
-                row = [
-                    entry.created_at.strftime("%d/%m/%Y %H:%M"),
-                    f"[Phiếu { 'Thu' if entry.account_type == AccountType.RECEIVABLE else 'Chi' }] {entry.note}",
-                    "",
-                    0, 
-                    float(entry.amount) * sign, # Hiển thị số tiền đã thực hiện
-                    float(entry.amount) * amt_sign,
-                    "Đã hoàn tất"
-                ]
+                # Phiếu thu/chi tự do
+                if entry.account_type == AccountType.RECEIVABLE: # Thu tiền khách -> Có
+                    credit = float(entry.amount)
+                else: # Trả tiền NCC -> Nợ
+                    debit = float(entry.amount)
             else:
-                # Đối với đơn hàng nợ gốc
-                row = [
-                    entry.created_at.strftime("%d/%m/%Y %H:%M"),
-                    entry.note,
-                    entry.sales_order.code if entry.sales_order else (entry.purchase_order.code if entry.purchase_order else ""),
-                    float(entry.amount) * sign,
-                    float(entry.paid_amount) * sign,
-                    float(entry.remaining_amount) * sign,
-                    (entry.status.label if entry.status else "N/A")
-                ]
+                # Đơn hàng
+                if entry.account_type == AccountType.RECEIVABLE: # Bán hàng -> Nợ
+                    debit = float(entry.amount)
+                    paid = float(entry.paid_amount)
+                    rem_rec = float(entry.remaining_amount)
+                else: # Nhập hàng -> Có
+                    credit = float(entry.amount)
+                    paid = float(entry.paid_amount)
+                    rem_pay = float(entry.remaining_amount)
+
+            row = [
+                entry.created_at.strftime("%d/%m/%Y %H:%M"),
+                entry.note,
+                entry.sales_order.code if entry.sales_order else (entry.purchase_order.code if entry.purchase_order else ""),
+                debit,
+                credit,
+                paid,
+                rem_rec,
+                rem_pay
+            ]
             ws.append(row)
 
         # Điều chỉnh độ rộng cột
