@@ -157,13 +157,13 @@
                         
                         <div class="sidebar-heading">Danh mục</div>
                         <a href="{% url 'catalog:warehouse-list' %}" class="{% if '/warehouses/' in request.path %}active{% endif %}">
-                            <i class="bi bi-house"></i> Kho
+                            <i class="bi bi-house"></i> Quản lý kho
                         </a>
                         <a href="{% url 'catalog:product-list' %}" class="{% if '/products/' in request.path %}active{% endif %}">
-                            <i class="bi bi-box"></i> Sản phẩm
+                            <i class="bi bi-box"></i> Quản lý sản phẩm
                         </a>
                         <a href="{% url 'catalog:stock-list' %}" class="{% if '/stock/' in request.path %}active{% endif %}">
-                            <i class="bi bi-stack"></i> Tồn kho
+                            <i class="bi bi-stack"></i> Báo cáo tồn kho
                         </a>
         
                         <div class="sidebar-heading">Giao dịch</div>
