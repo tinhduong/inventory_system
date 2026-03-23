@@ -23,7 +23,7 @@
             </div>
             {% endfor %}
             <button type="submit" class="btn btn-warning w-100">Xác nhận thanh toán</button>
-            <a href="{% if current_customer %}{% url 'debt:customer-debt' current_customer.pk %}{% else %}{% url 'debt:overview' %}{% endif %}" class="btn btn-link w-100 text-muted mt-2">Hủy bỏ</a>
+            <button type="button" onclick="window.close()" class="btn btn-link w-100 text-muted mt-2">Hủy bỏ</button>
         </form>
     </div>
 </div>

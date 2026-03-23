@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, Q, DecimalField
-from django.db.models.functions import Coalesce
+from django.db.models import Sum, Q, DecimalField, F, ExpressionWrapper, Case, When
+from django.db.models.functions import Coalesce, Abs
 from django.contrib import messages
 from .models import DebtEntry, Settlement, AccountType, DebtStatus
 from .forms import SettlementForm, EntryPaymentForm
@@ -14,46 +15,47 @@ from datetime import date, timedelta
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
 
-class DebtOverviewView(LoginRequiredMixin, TemplateView):
+class DebtOverviewView(LoginRequiredMixin, ListView):
     template_name = 'debt/overview.html'
+    context_object_name = 'customer_list'
+    paginate_by = 50
+
+    def get_queryset(self):
+        # 1. Annotate net balances per customer in the database
+        queryset = Customer.objects.annotate(
+            t_rec_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
+            p_rec_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
+            t_pay_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
+            p_pay_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
+        ).annotate(
+            balance=ExpressionWrapper(
+                (F('t_rec_raw') - F('p_rec_raw')) - (F('t_pay_raw') - F('p_pay_raw')),
+                output_field=DecimalField()
+            )
+        ).annotate(
+            abs_balance=Abs('balance')
+        ).order_by('-abs_balance')
+        
+        # 2. Server-side search
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(name__icontains=q)
+            
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Tính toán dư nợ bù trừ (Netting) cho từng đối tác để tìm TOP và hỗ trợ search
-        customers = Customer.objects.annotate(
-            t_rec=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
-            p_rec=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
-            t_pay=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
-            p_pay=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
+        # Calculate system totals from the full filtered queryset
+        qs_for_totals = self.get_queryset()
+        totals = qs_for_totals.aggregate(
+            total_rec=Sum(Case(When(balance__gt=0, then=F('balance')), default=0, output_field=DecimalField())),
+            total_pay=Sum(Case(When(balance__lt=0, then=Abs(F('balance'))), default=0, output_field=DecimalField())),
         )
         
-        customer_list = []
-        system_total_rec = 0
-        system_total_pay = 0
-        
-        for c in customers:
-            # Dư nợ thuần sau khi bù trừ cho từng đối tác
-            balance = round((c.t_rec - c.p_rec) - (c.t_pay - c.p_pay), 0)
-            
-            # Tính tổng hệ thống dựa trên dư nợ thuần ròng thực tế của từng người
-            if balance > 0:
-                system_total_rec += balance
-            elif balance < 0:
-                system_total_pay += abs(balance)
-                
-            customer_list.append({
-                'obj': c,
-                'balance': balance,
-                'abs_balance': abs(balance)
-            })
-        
-        # Sắp xếp theo dư nợ tuyệt đối giảm dần
-        customer_list.sort(key=lambda x: x['abs_balance'], reverse=True)
-        
-        context['total_receivable'] = system_total_rec
-        context['total_payable'] = system_total_pay
-        context['customer_list'] = customer_list
+        context['total_receivable'] = totals['total_rec'] or 0
+        context['total_payable'] = totals['total_pay'] or 0
+        context['search_query'] = self.request.GET.get('q', '')
         return context
 
 class CustomerDebtDetailView(LoginRequiredMixin, ListView):
@@ -289,6 +291,9 @@ class SettlementCreateView(LoginRequiredMixin, CreateView):
             context['abs_net_balance'] = abs(net)
         return context
 
+    def get_success_url(self):
+        return reverse_lazy('debt:settlement-success')
+
     def form_valid(self, form):
         response = super().form_valid(form)
         # Create a DebtEntry to offset
@@ -301,3 +306,6 @@ class SettlementCreateView(LoginRequiredMixin, CreateView):
             entry_date=self.object.payment_date
         )
         return response
+
+class SettlementSuccessView(LoginRequiredMixin, TemplateView):
+    template_name = "debt/settlement_success.html"
