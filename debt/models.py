@@ -30,7 +30,8 @@ class DebtEntry(models.Model):
         if self.is_settlement: return 0
         # Optimization: Use prefetched payments to avoid N+1 query per row in list views
         if hasattr(self, 'prefetched_payments'):
-            return sum(float(p.amount) for p in self.prefetched_payments)
+            # p.amount is already Decimal from the DB, just sum them up
+            return sum((p.amount for p in self.prefetched_payments), 0)
         return self.payments.aggregate(models.Sum('amount'))['amount__sum'] or 0
 
     @property
