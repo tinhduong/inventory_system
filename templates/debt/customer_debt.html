@@ -14,7 +14,7 @@
         {% if draft_sales %}<strong>{{ draft_sales }} đơn bán</strong>{% endif %}
         {% if draft_sales and draft_purchases %} và {% endif %}
         {% if draft_purchases %}<strong>{{ draft_purchases }} đơn nhập</strong>{% endif %} 
-        đang ở trạng thái <strong>Nháp</strong>. Các đơn này chưa được tính vào công nợ gốc, có thể dẫn đến lệch số dư bên dưới.
+        đang ở trạng thái <strong>Nháp</strong>. Các đơn này chưa được tính vào công nợ gốc, khi chuyển trạng thái thành xác nhận có thể dẫn đến thay đổi số dư bên dưới.
     </div>
 </div>
 {% endif %}
