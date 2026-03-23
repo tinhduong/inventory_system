@@ -4,7 +4,7 @@
 <div class="card shadow-sm mx-auto" style="max-width: 600px;">
     <div class="card-header bg-white fw-bold">Ghi nhận Thanh toán / Thu nợ {% if current_customer %}cho {{ current_customer.name }}{% endif %}</div>
     <div class="card-body">
-        <form method="post">
+        <form method="post" id="settlementForm">
             {% csrf_token %}
             {% for field in form %}
             <div class="mb-3">
@@ -12,19 +12,77 @@
                 {{ field }}
                 
                 {% if field.name == 'amount_paid' and abs_net_balance is not None %}
-                <div class="form-text text-primary">
+                <div class="form-text text-primary" id="balanceInfo">
                     <i class="bi bi-info-circle me-1"></i> Số dư hiện tại 
-                    {% if net_balance > 0 %}(Phải thu): {% else %}(Phải trả): {% endif %}
-                    <strong>{{ abs_net_balance|floatformat:0|intcomma }} đ</strong>
+                    {% if net_balance > 0 %}(Khác nợ): {% else %}(Mình nợ): {% endif %}
+                    <strong id="maxBalance" data-value="{{ abs_net_balance }}">{{ abs_net_balance|floatformat:0|intcomma }} đ</strong>
+                </div>
+                <div id="maxAlert" class="form-text text-danger d-none mt-1 animate__animated animate__shakeX">
+                    <i class="bi bi-exclamation-circle-fill me-1"></i> Chỉ có thể thanh toán tối đa theo số dư nợ hiện tại.
                 </div>
                 {% endif %}
                 
                 {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                
+                {% for error in field.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
             {% endfor %}
-            <button type="submit" class="btn btn-warning w-100">Xác nhận thanh toán</button>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-warning w-100 fw-bold">Xác nhận thanh toán</button>
             <button type="button" onclick="window.close()" class="btn btn-link w-100 text-muted mt-2">Hủy bỏ</button>
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.querySelector('input[name="amount_paid"]');
+    const maxBalanceEl = document.getElementById('maxBalance');
+    const maxAlert = document.getElementById('maxAlert');
+    
+    if (amountInput && maxBalanceEl) {
+        const maxBalance = parseFloat(maxBalanceEl.getAttribute('data-value'));
+        
+        amountInput.addEventListener('input', function() {
+            // Lấy giá trị số (loại bỏ dấu phẩy/chấm nếu có do moneymask)
+            let rawValue = this.value.replace(/[^0-9]/g, '');
+            let currentVal = parseFloat(rawValue);
+            
+            if (currentVal > maxBalance) {
+                // Tự động đưa về mức tối đa
+                this.value = maxBalance;
+                // Nếu trang web có sử dụng plugin định dạng tiền tệ như jQuery MaskMoney, 
+                // bạn có thể cần kích hoạt event 'change' hoặc 'blur' để nó tự format lại.
+                
+                // Hiển thị thông báo
+                maxAlert.classList.remove('d-none');
+                
+                // Rung khung nhập liệu để báo lỗi
+                amountInput.classList.add('is-invalid');
+            } else {
+                maxAlert.classList.add('d-none');
+                amountInput.classList.remove('is-invalid');
+            }
+        });
+
+        // Xử lý khi người dùng dán hoặc hoàn tất nhập liệu
+        amountInput.addEventListener('change', function() {
+            let rawValue = this.value.replace(/[^0-9]/g, '');
+            let currentVal = parseFloat(rawValue);
+            if (currentVal > maxBalance) {
+                this.value = maxBalance;
+                maxAlert.classList.remove('d-none');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

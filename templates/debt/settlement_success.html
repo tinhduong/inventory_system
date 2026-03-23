@@ -1,22 +1,55 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container text-center py-5">
-    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+    <div class="card shadow-sm mx-auto" style="max-width: 500px; border-radius: 12px; border: none;">
         <div class="card-body py-5">
-            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-            <h3 class="mt-4">Giao dịch thành công!</h3>
-            <p class="text-muted">Đang đóng tab và quay lại trang chi tiết...</p>
-            <script>
-                // Refresh parent if possible and close current tab
-                if (window.opener) {
-                    window.opener.location.reload();
-                }
-                setTimeout(function() {
-                    window.close();
-                }, 1000);
-            </script>
-            <button onclick="window.close()" class="btn btn-primary mt-3">Đóng ngay</button>
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill text-success bounceIn" style="font-size: 5rem; display: inline-block;"></i>
+            </div>
+            
+            <h3 class="fw-bold text-dark">Giao dịch thành công!</h3>
+            <p class="text-muted mb-4 px-4">Đã ghi nhận toàn bộ thông tin thanh toán. Đang tự động đóng cửa sổ và cập nhật dữ liệu ở tab trước...</p>
+            
+            <div class="spinner-border text-primary mb-4" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+
+            <div class="d-grid gap-2 px-5">
+                <button onclick="window.close()" class="btn btn-primary btn-lg py-3 rounded-pill fw-bold border-0 shadow-sm" style="background: linear-gradient(45deg, #0d6efd, #0099ff);">
+                    <i class="bi bi-x-circle me-1"></i> Đóng cửa sổ ngay
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+.bounceIn { animation: bounceIn 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000); }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Cố gắng refresh tab mẹ (tab chi tiết công nợ)
+    try {
+        if (window.opener && !window.opener.closed) {
+            // Tải lại trang mẹ
+            window.opener.location.reload();
+            console.log("Opener reloaded successfully");
+        }
+    } catch (e) {
+        console.warn("Could not refresh opener tab: ", e);
+    }
+
+    // 2. Tự động đóng tab hiện tại sau 2 giây (để người dùng thấy thông báo thành công)
+    setTimeout(function() {
+        window.close();
+    }, 2000);
+});
+</script>
 {% endblock %}
