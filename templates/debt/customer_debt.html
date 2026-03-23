@@ -90,11 +90,12 @@
                     <tr>
                         <th style="width: 12%">Ngày ghi</th>
                         <th>Nội dung / Chứng từ</th>
-                        <th class="text-end" style="width: 15%">Ghi Nợ (Thu+)</th>
-                        <th class="text-end" style="width: 15%">Ghi Có (Chi+)</th>
-                        <th class="text-end" style="width: 15%">Khoản phải thu</th>
-                        <th class="text-end" style="width: 15%">Khoản phải chi</th>
-                        <th class="text-center" style="width: 8%">Thao tác</th>
+                        <th class="text-end" style="width: 12%">Đơn mua</th>
+                        <th class="text-end" style="width: 12%">Đơn bán</th>
+                        <th class="text-end" style="width: 12%">Đã trả/thu</th>
+                        <th class="text-end" style="width: 12%">Phải thu</th>
+                        <th class="text-end" style="width: 12%">Phải chi</th>
+                        <th class="text-center" style="width: 8%">T.tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,41 +104,24 @@
                     <tr class="{% if entry.status == 'PAID' %}table-light opacity-75{% endif %}">
                         <td class="text-muted small">{{ entry.created_at|date:"d/m/Y H:i" }}</td>
                         <td>
-                            <div class="fw-medium">
-                                {% if entry.account_type == 'RECEIVABLE' %}
-                                    <span class="text-primary small">●</span> Bán:
-                                {% else %}
-                                    <span class="text-danger small">●</span> Nhập:
-                                {% endif %}
-                                {{ entry.note }}
-                            </div>
+                            <div class="fw-medium">{{ entry.note }}</div>
                             <div class="d-flex gap-2 align-items-center mt-1">
                                 {% if entry.sales_order %}
-                                    <a href="{% url 'orders:sales-detail' entry.sales_order.pk %}" class="badge bg-light text-dark border text-decoration-none">{{ entry.sales_order.code }}</a>
+                                    <a href="{% url 'orders:sales-detail' entry.sales_order.pk %}" class="badge bg-primary-subtle text-primary text-decoration-none">SO: {{ entry.sales_order.code }}</a>
                                 {% elif entry.purchase_order %}
-                                    <a href="{% url 'orders:purchase-detail' entry.purchase_order.pk %}" class="badge bg-light text-dark border text-decoration-none">{{ entry.purchase_order.code }}</a>
+                                    <a href="{% url 'orders:purchase-detail' entry.purchase_order.pk %}" class="badge bg-danger-subtle text-danger text-decoration-none">PO: {{ entry.purchase_order.code }}</a>
                                 {% endif %}
-                                
-                                {% if entry.status == 'PAID' %}
-                                    <span class="badge bg-success-subtle text-success small">Đã trả</span>
-                                {% elif entry.status == 'PARTIAL' %}
-                                    <span class="badge bg-warning-subtle text-warning-emphasis small">Còn nợ ít</span>
-                                {% endif %}
+                                {% if entry.status == 'PAID' %}<span class="badge bg-success-subtle text-success small">Xong</span>{% endif %}
                             </div>
                         </td>
-                        <td class="text-end">
-                            {% if entry.account_type == 'RECEIVABLE' %}
-                                {{ entry.amount|floatformat:0|intcomma }}
-                            {% else %}
-                                <span class="text-muted small">{{ entry.paid_amount|floatformat:0|intcomma }}</span>
-                            {% endif %}
+                        <td class="text-end text-danger">
+                            {% if entry.account_type == 'PAYABLE' %}{{ entry.amount|floatformat:0|intcomma }}{% else %}0{% endif %}
                         </td>
-                        <td class="text-end">
-                            {% if entry.account_type == 'PAYABLE' %}
-                                {{ entry.amount|floatformat:0|intcomma }}
-                            {% else %}
-                                <span class="text-muted small">{{ entry.paid_amount|floatformat:0|intcomma }}</span>
-                            {% endif %}
+                        <td class="text-end text-primary">
+                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.amount|floatformat:0|intcomma }}{% else %}0{% endif %}
+                        </td>
+                        <td class="text-end text-success">
+                            {{ entry.paid_amount|floatformat:0|intcomma }}
                         </td>
                         <td class="text-end fw-bold text-primary">
                             {% if entry.account_type == 'RECEIVABLE' %}{{ entry.remaining_amount|floatformat:0|intcomma }}{% else %}0{% endif %}
@@ -154,21 +138,18 @@
                         </td>
                     </tr>
                     {% else %}
-                    {# Đây là khoản thanh toán độc lập (không gắn với đơn hàng nào) #}
+                    {# Phiếu thanh toán tự do #}
                     <tr class="table-info-subtle">
                         <td class="text-muted small">{{ entry.created_at|date:"d/m/Y H:i" }}</td>
                         <td colspan="2">
-                            <span class="badge bg-primary-subtle text-primary border-primary me-1">{% if entry.account_type == 'RECEIVABLE' %}Thu tiền{% else %}Chi tiền{% endif %}</span>
-                            <span class="fw-medium">{{ entry.note }}</span>
+                            <i class="bi bi-wallet2 me-1"></i> {{ entry.note }}
+                            <span class="badge bg-light text-dark border ms-1">{% if entry.account_type == 'RECEIVABLE' %}Thu{% else %}Chi{% endif %}</span>
                         </td>
-                        <td class="text-end">
-                            {% if entry.account_type == 'PAYABLE' %}{{ entry.amount|floatformat:0|intcomma }}{% else %}-{% endif %}
-                        </td>
-                        <td class="text-end">
-                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.amount|floatformat:0|intcomma }}{% else %}-{% endif %}
-                        </td>
-                        <td class="text-end text-muted">0</td>
-                        <td class="text-end text-muted">0</td>
+                        <td class="text-end">0</td>
+                        <td class="text-end">0</td>
+                        <td class="text-end text-success fw-bold">{{ entry.amount|floatformat:0|intcomma }}</td>
+                        <td class="text-end">0</td>
+                        <td class="text-end">0</td>
                         <td class="text-center"><i class="bi bi-clock-history text-muted"></i></td>
                     </tr>
                     {% endif %}
