@@ -69,21 +69,27 @@ class StockListView(LoginRequiredMixin, ListView):
     context_object_name = 'stocks'
     
     def get_queryset(self):
-        qs = super().get_queryset()
+        from django.db.models import Sum
+        from django.db.models.functions import Coalesce
+        
         self.warehouse_id = self.request.GET.get('warehouse')
-        if not self.warehouse_id:
-            first_w = Warehouse.objects.first()
-            if first_w:
-                self.warehouse_id = str(first_w.id)
         
         if self.warehouse_id:
-            qs = qs.filter(warehouse_id=self.warehouse_id)
-        return qs
+            # Nếu có chọn kho cụ thể
+            return StockItem.objects.filter(
+                warehouse_id=self.warehouse_id
+            ).select_related('product', 'warehouse').order_by('product__name')
+        else:
+            # "Tất cả kho" hoặc chưa chọn (mặc định cho xem tất cả)
+            return Product.objects.annotate(
+                total_quantity=Coalesce(Sum('stocks__quantity'), 0)
+            ).filter(total_quantity__gt=0).order_by('name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['warehouses'] = Warehouse.objects.all()
-        context['current_warehouse'] = self.warehouse_id
+        # Đảm bảo current_warehouse là string để so sánh trong template
+        context['current_warehouse'] = self.warehouse_id if self.warehouse_id else ""
         return context
 
 class ExportProductsView(LoginRequiredMixin, View):

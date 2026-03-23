@@ -13,7 +13,7 @@
             <div class="col-md-12">
                 <label class="form-label fw-bold text-muted small text-uppercase">Hãy chọn kho cần kiểm tra</label>
                 <select name="warehouse" class="form-select form-select-lg search-select" data-allow-clear="false" onchange="this.form.submit()">
-                    <option value="">Tất cả kho hàng (Tổng hợp)</option>
+                    <option value="" {% if not current_warehouse %}selected{% endif %}>Tất cả kho hàng (Tổng hợp)</option>
                     {% for w in warehouses %}
                     <option value="{{ w.id }}" {% if current_warehouse == w.id|stringformat:"s" %}selected{% endif %}>{{ w.name }}</option>
                     {% endfor %}
@@ -42,19 +42,35 @@
                 <tbody>
                     {% for stock in stocks %}
                     <tr>
-                        <td class="ps-3 fw-medium text-primary">{{ stock.product.name }}</td>
-                        <td>{{ stock.warehouse.name }}</td>
-                        <td class="text-end fw-bold">{{ stock.quantity|floatformat:0 }}</td>
-                        <td>{{ stock.product.unit }}</td>
-                        <td class="text-center">
-                            {% if stock.quantity <= 5 %}
-                                <span class="badge bg-danger">Sắp hết hàng</span>
-                            {% elif stock.quantity <= 15 %}
-                                <span class="badge bg-warning text-dark">Sắp cần nhập</span>
-                            {% else %}
-                                <span class="badge bg-success opacity-75">Sẵn hàng</span>
-                            {% endif %}
-                        </td>
+                        {% if current_warehouse %}
+                            <td class="ps-3 fw-medium text-primary">{{ stock.product.name }}</td>
+                            <td>{{ stock.warehouse.name }}</td>
+                            <td class="text-end fw-bold">{{ stock.quantity|floatformat:0 }}</td>
+                            <td>{{ stock.product.unit }}</td>
+                            <td class="text-center">
+                                {% if stock.quantity <= 5 %}
+                                    <span class="badge bg-danger">Sắp hết hàng</span>
+                                {% elif stock.quantity <= 15 %}
+                                    <span class="badge bg-warning text-dark">Sắp cần nhập</span>
+                                {% else %}
+                                    <span class="badge bg-success opacity-75">Sẵn hàng</span>
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td class="ps-3 fw-medium text-primary">{{ stock.name }}</td>
+                            <td><span class="badge bg-secondary">Tất cả kho</span></td>
+                            <td class="text-end fw-bold">{{ stock.total_quantity|floatformat:0 }}</td>
+                            <td>{{ stock.unit }}</td>
+                            <td class="text-center">
+                                {% if stock.total_quantity <= 5 %}
+                                    <span class="badge bg-danger">Sắp hết hàng</span>
+                                {% elif stock.total_quantity <= 15 %}
+                                    <span class="badge bg-warning text-dark">Sắp cần nhập</span>
+                                {% else %}
+                                    <span class="badge bg-success opacity-75">Sẵn hàng</span>
+                                {% endif %}
+                            </td>
+                        {% endif %}
                     </tr>
                     {% empty %}
                     <tr>
