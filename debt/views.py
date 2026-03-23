@@ -4,7 +4,7 @@ from django.views import View
 from django.views.generic import ListView, TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum, Q, DecimalField, F, ExpressionWrapper, Case, When
-from django.db.models.functions import Coalesce, Abs
+from django.db.models.functions import Coalesce, Abs, Round
 from django.contrib import messages
 from .models import DebtEntry, Settlement, AccountType, DebtStatus
 from .forms import SettlementForm, EntryPaymentForm
@@ -28,10 +28,10 @@ class DebtOverviewView(LoginRequiredMixin, ListView):
             t_pay_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
             p_pay_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
         ).annotate(
-            balance=ExpressionWrapper(
+            balance=Round(ExpressionWrapper(
                 (F('t_rec_raw') - F('p_rec_raw')) - (F('t_pay_raw') - F('p_pay_raw')),
                 output_field=DecimalField()
-            )
+            ), 0)
         ).annotate(
             abs_balance=Abs('balance')
         ).order_by('-abs_balance')
@@ -46,9 +46,20 @@ class DebtOverviewView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Calculate system totals from the full filtered queryset
-        qs_for_totals = self.get_queryset()
-        totals = qs_for_totals.aggregate(
+        # Calculate system totals from the full UNFILTERED queryset to show system-wide totals in cards
+        all_customers_annotated = Customer.objects.annotate(
+            t_rec_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
+            p_rec_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.RECEIVABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
+            t_pay_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=False)), 0, output_field=DecimalField()),
+            p_pay_raw=Coalesce(Sum('debt_entries__amount', filter=Q(debt_entries__account_type=AccountType.PAYABLE, debt_entries__is_settlement=True)), 0, output_field=DecimalField()),
+        ).annotate(
+            balance=Round(ExpressionWrapper(
+                (F('t_rec_raw') - F('p_rec_raw')) - (F('t_pay_raw') - F('p_pay_raw')),
+                output_field=DecimalField()
+            ), 0)
+        )
+        
+        totals = all_customers_annotated.aggregate(
             total_rec=Sum(Case(When(balance__gt=0, then=F('balance')), default=0, output_field=DecimalField())),
             total_pay=Sum(Case(When(balance__lt=0, then=Abs(F('balance'))), default=0, output_field=DecimalField())),
         )
