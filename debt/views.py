@@ -135,7 +135,7 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
         ws.title = "Lich su cong no"
 
         # Định dạng header mới theo kiểu sổ cái
-        headers = ["Ngày ghi", "Nội dung / Chứng từ", "Mã đơn", "Phát sinh Nợ (Thu/Mình trả)", "Phát sinh Có (Chi/Họ trả)", "Số tiền đã trả", "Còn nợ mình", "Mình còn nợ"]
+        headers = ["Ngày ghi", "Nội dung / Chứng từ", "Mã đơn", "Phát sinh Nợ (Thu/Mình trả)", "Phát sinh Có (Chi/Họ trả)", "Số tiền đã trả", "Khoản phải thu", "Khoản phải chi"]
         ws.append(headers)
         
         header_fill = PatternFill(start_color="3498db", end_color="3498db", fill_type="solid")
