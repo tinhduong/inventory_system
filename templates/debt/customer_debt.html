@@ -128,10 +128,10 @@
                                 </div>
                             {% endif %}
                         </td>
-                        <td class="text-end">{{ entry.amount|floatformat:0|intcomma }} đ</td>
-                        <td class="text-end text-success">{{ entry.paid_amount|floatformat:0|intcomma }} đ</td>
+                        <td class="text-end">{% if entry.account_type == 'PAYABLE' %}-{% endif %}{{ entry.amount|floatformat:0|intcomma }} đ</td>
+                        <td class="text-end text-success">{% if entry.account_type == 'PAYABLE' %}-{% endif %}{{ entry.paid_amount|floatformat:0|intcomma }} đ</td>
                         <td class="text-end fw-bold {% if entry.remaining_amount > 0 %}text-danger{% endif %}">
-                            {{ entry.remaining_amount|floatformat:0|intcomma }} đ
+                            {% if entry.account_type == 'PAYABLE' %}-{% endif %}{{ entry.remaining_amount|floatformat:0|intcomma }} đ
                         </td>
                         <td class="text-center">
                             {% if entry.status == 'PAID' %}
@@ -159,7 +159,9 @@
                             <span class="fw-medium text-success">{{ entry.note }}</span>
                             <div class="small text-muted italic">(Khoản thanh toán tự do)</div>
                         </td>
-                        <td class="text-end text-success fw-bold">-{{ entry.amount|floatformat:0|intcomma }} đ</td>
+                        <td class="text-end text-success fw-bold">
+                            {% if entry.account_type == 'RECEIVABLE' %}-{% else %}+{% endif %}{{ entry.amount|floatformat:0|intcomma }} đ
+                        </td>
                         <td class="text-end text-muted">---</td>
                         <td class="text-center">
                              <span class="badge bg-success">Đã trả</span>

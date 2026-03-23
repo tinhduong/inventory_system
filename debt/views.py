@@ -147,15 +147,34 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
 
         # Thêm dữ liệu
         for entry in qs:
-            row = [
-                entry.created_at.strftime("%d/%m/%Y %H:%M"),
-                entry.note,
-                entry.sales_order.code if entry.sales_order else (entry.purchase_order.code if entry.purchase_order else ""),
-                float(entry.amount),
-                float(entry.paid_amount) if not entry.is_settlement else float(entry.amount),
-                float(entry.remaining_amount) if not entry.is_settlement else 0,
-                (entry.status.label if entry.status else "N/A") if not entry.is_settlement else "Da tra"
-            ]
+            # Quy ước: RECEIVABLE (Bán) là dương (+), PAYABLE (Nhập) là âm (-)
+            sign = 1 if entry.account_type == AccountType.RECEIVABLE else -1
+            
+            if entry.is_settlement:
+                # Đối với phiếu thu/chi tự do (không gắn đơn), số tiền này làm giảm nợ
+                # Thu nợ (REC) -> Giảm số dương -> Âm
+                # Trả nợ (PAY) -> Giảm số âm -> Dương
+                amt_sign = sign * -1
+                row = [
+                    entry.created_at.strftime("%d/%m/%Y %H:%M"),
+                    f"[Phiếu { 'Thu' if entry.account_type == AccountType.RECEIVABLE else 'Chi' }] {entry.note}",
+                    "",
+                    0, 
+                    float(entry.amount) * sign, # Hiển thị số tiền đã thực hiện
+                    float(entry.amount) * amt_sign,
+                    "Đã hoàn tất"
+                ]
+            else:
+                # Đối với đơn hàng nợ gốc
+                row = [
+                    entry.created_at.strftime("%d/%m/%Y %H:%M"),
+                    entry.note,
+                    entry.sales_order.code if entry.sales_order else (entry.purchase_order.code if entry.purchase_order else ""),
+                    float(entry.amount) * sign,
+                    float(entry.paid_amount) * sign,
+                    float(entry.remaining_amount) * sign,
+                    (entry.status.label if entry.status else "N/A")
+                ]
             ws.append(row)
 
         # Điều chỉnh độ rộng cột
