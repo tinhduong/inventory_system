@@ -84,6 +84,12 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         
         entries = DebtEntry.objects.filter(customer_id=customer_id)
         
+        # Áp dụng bộ lọc thời gian cho cả card tổng hợp
+        days = self.request.GET.get('days')
+        if days and days.isdigit():
+            start_date = date.today() - timedelta(days=int(days))
+            entries = entries.filter(entry_date__date__gte=start_date)
+        
         # 1. Tính Phải thu (Khách nợ mình)
         rec_entries = entries.filter(account_type=AccountType.RECEIVABLE)
         t_rec = rec_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
