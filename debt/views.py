@@ -8,6 +8,7 @@ from .models import DebtEntry, Settlement, AccountType, DebtStatus
 from .forms import SettlementForm, EntryPaymentForm
 from accounts.models import Customer
 from django.http import HttpResponse
+from django.utils import timezone
 from datetime import date, timedelta
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
@@ -72,9 +73,9 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         days = self.request.GET.get('days')
         if days and days.isdigit():
             start_date = date.today() - timedelta(days=int(days))
-            qs = qs.filter(created_at__date__gte=start_date)
+            qs = qs.filter(entry_date__date__gte=start_date)
             
-        return qs.order_by('-created_at')
+        return qs.order_by('-entry_date', '-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -124,10 +125,10 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
         time_label = "Tat ca"
         if days and days.isdigit():
             start_date = date.today() - timedelta(days=int(days))
-            qs = qs.filter(created_at__date__gte=start_date)
+            qs = qs.filter(entry_date__date__gte=start_date)
             time_label = f"Trong {days} ngay"
 
-        qs = qs.order_by('-created_at')
+        qs = qs.order_by('-entry_date', '-created_at')
 
         # Tạo workbook
         wb = openpyxl.Workbook()
@@ -168,7 +169,7 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
                     rem_pay = float(entry.remaining_amount)
 
             row = [
-                entry.created_at.strftime("%d/%m/%Y %H:%M"),
+                entry.entry_date.strftime("%d/%m/%Y %H:%M") if entry.entry_date else entry.created_at.strftime("%d/%m/%Y %H:%M"),
                 entry.note,
                 entry.sales_order.code if entry.sales_order else (entry.purchase_order.code if entry.purchase_order else ""),
                 po_val,
@@ -230,7 +231,8 @@ class EntryPaymentView(LoginRequiredMixin, View):
                 parent_entry=entry,
                 amount=amount,
                 is_settlement=True,
-                note=f"Thanh toán cho đơn: {entry.sales_order.code if entry.sales_order else entry.purchase_order.code}. Nội dung: {form.cleaned_data['note']}"
+                note=f"Thanh toán cho đơn: {entry.sales_order.code if entry.sales_order else entry.purchase_order.code}. Nội dung: {form.cleaned_data['note']}",
+                entry_date=form.cleaned_data['payment_date']
             )
             
             messages.success(request, f"Đã thanh toán {amount} cho đối tác {entry.customer.name}.")
@@ -252,6 +254,7 @@ class SettlementCreateView(LoginRequiredMixin, CreateView):
             account_type=self.object.account_type,
             amount=self.object.amount_paid,
             is_settlement=True,
-            note=f"Thanh toán/Thu nợ: {self.object.note}"
+            note=f"Thanh toán/Thu nợ: {self.object.note}",
+            entry_date=self.object.payment_date
         )
         return response

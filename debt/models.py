@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from accounts.models import Customer
 from orders.models import SalesOrder, PurchaseOrder
 
@@ -23,6 +24,7 @@ class DebtEntry(models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Số tiền")
     is_settlement = models.BooleanField(default=False, verbose_name="Là khoản thanh toán")
     note = models.TextField(blank=True, null=True, verbose_name="Ghi chú")
+    entry_date = models.DateTimeField(default=None, null=True, blank=True, verbose_name="Ngày ghi")
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property

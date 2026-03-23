@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from catalog.models import StockItem
 from debt.models import DebtEntry, AccountType
@@ -33,7 +34,8 @@ def confirm_sales_order(order):
             sales_order=order,
             amount=order.total_amount,
             is_settlement=False,
-            note=f"Ghi nợ từ đơn hàng bán {order.code}"
+            note=f"Ghi nợ từ đơn hàng bán {order.code}",
+            entry_date=order.order_date
         )
 
         # 4. Handle initial payment if any
@@ -45,7 +47,8 @@ def confirm_sales_order(order):
                 sales_order=order,
                 amount=order.paid_amount,
                 is_settlement=True,
-                note=f"Thanh toán lúc mua cho đơn {order.code}"
+                note=f"Thanh toán lúc mua cho đơn {order.code}",
+                entry_date=order.order_date
             )
 
 def cancel_sales_order(order):
@@ -73,5 +76,6 @@ def cancel_sales_order(order):
                 sales_order=order,
                 amount=debt_entry.remaining_amount,
                 is_settlement=True,
-                note=f"Đối trừ do hủy đơn hàng bán {order.code}"
+                note=f"Đối trừ do hủy đơn hàng bán {order.code}",
+                entry_date=timezone.now()
             )
