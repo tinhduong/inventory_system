@@ -173,9 +173,14 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
                     paid = float(entry.paid_amount)
                     rem_pay = float(entry.remaining_amount)
 
+            note_with_type = entry.note
+            if entry.is_settlement:
+                type_label = "[Thu]" if entry.account_type == AccountType.RECEIVABLE else "[Chi]"
+                note_with_type = f"{type_label} {entry.note}"
+
             row = [
                 entry.entry_date.strftime("%d/%m/%Y %H:%M") if entry.entry_date else entry.created_at.strftime("%d/%m/%Y %H:%M"),
-                entry.note,
+                note_with_type,
                 entry.sales_order.code if entry.sales_order else (entry.purchase_order.code if entry.purchase_order else ""),
                 po_val,
                 so_val,

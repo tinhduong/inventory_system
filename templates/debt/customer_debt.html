@@ -133,7 +133,7 @@
                     {# Phiếu thanh toán tự do #}
                     <tr class="table-info-subtle">
                         <td class="text-muted small">{% if entry.entry_date %}{{ entry.entry_date|date:"d/m/Y" }}{% else %}{{ entry.created_at|date:"d/m/Y H:i" }}{% endif %}</td>
-                        <td colspan="2">
+                        <td>
                             <i class="bi bi-wallet2 me-1"></i> {{ entry.note }}
                             <span class="badge bg-light text-dark border ms-1">{% if entry.account_type == 'RECEIVABLE' %}Thu{% else %}Chi{% endif %}</span>
                         </td>
