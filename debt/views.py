@@ -95,18 +95,16 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         t_rec = rec_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
         p_rec = rec_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         # Số tiền khách thực sự còn nợ (Nếu < 0 là khách trả dư)
-        context['receivable_balance'] = t_rec - p_rec
+        context['receivable_balance'] = round(t_rec - p_rec, 0)
         
         # 2. Tính Phải trả (Mình nợ họ)
         pay_entries = entries.filter(account_type=AccountType.PAYABLE)
         t_pay = pay_entries.filter(is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
         p_pay = pay_entries.filter(is_settlement=True).aggregate(Sum('amount'))['amount__sum'] or 0
         # Số tiền mình thực sự còn nợ (Nếu < 0 là mình trả dư)
-        context['payable_balance'] = t_pay - p_pay
+        context['payable_balance'] = round(t_pay - p_pay, 0)
         
         # 3. Số dư tổng cuối cùng
-        # Nếu > 0: Tổng cộng mình đang cần thu về từ người này
-        # Nếu < 0: Tổng cộng mình đang cần trả cho người này
         context['net_balance'] = context['receivable_balance'] - context['payable_balance']
         
         # Draft orders check
