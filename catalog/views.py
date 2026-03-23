@@ -72,9 +72,9 @@ class StockListView(LoginRequiredMixin, ListView):
         from django.db.models import Sum
         from django.db.models.functions import Coalesce
         
-        self.warehouse_id = self.request.GET.get('warehouse')
+        self.warehouse_id = self.request.GET.get('warehouse', 'all')
         
-        if self.warehouse_id:
+        if self.warehouse_id and self.warehouse_id != 'all':
             # Nếu có chọn kho cụ thể
             return StockItem.objects.filter(
                 warehouse_id=self.warehouse_id
@@ -89,7 +89,7 @@ class StockListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['warehouses'] = Warehouse.objects.all()
         # Đảm bảo current_warehouse là string để so sánh trong template
-        context['current_warehouse'] = self.warehouse_id if self.warehouse_id else ""
+        context['current_warehouse'] = self.warehouse_id if self.warehouse_id else "all"
         return context
 
 class ExportProductsView(LoginRequiredMixin, View):

@@ -13,7 +13,7 @@
             <div class="col-md-12">
                 <label class="form-label fw-bold text-muted small text-uppercase">Hãy chọn kho cần kiểm tra</label>
                 <select name="warehouse" class="form-select form-select-lg search-select" data-allow-clear="false" onchange="this.form.submit()">
-                    <option value="" {% if not current_warehouse %}selected{% endif %}>Tất cả kho hàng (Tổng hợp)</option>
+                    <option value="all" {% if current_warehouse == 'all' %}selected{% endif %}>Tất cả kho hàng (Tổng hợp)</option>
                     {% for w in warehouses %}
                     <option value="{{ w.id }}" {% if current_warehouse == w.id|stringformat:"s" %}selected{% endif %}>{{ w.name }}</option>
                     {% endfor %}
@@ -42,7 +42,7 @@
                 <tbody>
                     {% for stock in stocks %}
                     <tr>
-                        {% if current_warehouse %}
+                        {% if current_warehouse != 'all' %}
                             <td class="ps-3 fw-medium text-primary">{{ stock.product.name }}</td>
                             <td>{{ stock.warehouse.name }}</td>
                             <td class="text-end fw-bold">{{ stock.quantity|floatformat:0 }}</td>
