@@ -58,6 +58,9 @@ class SalesOrder(models.Model):
 
     @property
     def debt_entry(self):
+        # Optimization: Check if already prefetched to avoid N+1 queries
+        if hasattr(self, 'prefetched_debt_entries'):
+            return self.prefetched_debt_entries[0] if self.prefetched_debt_entries else None
         from debt.models import DebtEntry
         return DebtEntry.objects.filter(sales_order=self, is_settlement=False).first()
 
@@ -124,6 +127,9 @@ class PurchaseOrder(models.Model):
 
     @property
     def debt_entry(self):
+        # Optimization: Check if already prefetched to avoid N+1 queries
+        if hasattr(self, 'prefetched_debt_entries'):
+            return self.prefetched_debt_entries[0] if self.prefetched_debt_entries else None
         from debt.models import DebtEntry
         return DebtEntry.objects.filter(purchase_order=self, is_settlement=False).first()
 

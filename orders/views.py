@@ -35,9 +35,22 @@ class SalesListView(LoginRequiredMixin, ListView):
     template_name = 'orders/sales_list.html'
     context_object_name = 'orders'
     ordering = ['-created_at']
+    paginate_by = 25
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        from django.db.models import Prefetch
+        from debt.models import DebtEntry
+        
+        # Deep prefetch for debt entries and their payments to calculate balance in memory
+        debt_prefetch = Prefetch(
+            'debtentry_set',
+            queryset=DebtEntry.objects.filter(is_settlement=False).prefetch_related(
+                Prefetch('payments', to_attr='prefetched_payments')
+            ),
+            to_attr='prefetched_debt_entries'
+        )
+
+        queryset = super().get_queryset().select_related('warehouse', 'employee', 'customer').prefetch_related(debt_prefetch)
         
         # 1. Filter by Payment Status (Unpaid)
         payment_status = self.request.GET.get('payment_status')
@@ -126,9 +139,22 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     template_name = 'orders/purchase_list.html'
     context_object_name = 'orders'
     ordering = ['-created_at']
+    paginate_by = 25
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        from django.db.models import Prefetch
+        from debt.models import DebtEntry
+
+        # Deep prefetch for debt entries and their payments to calculate balance in memory
+        debt_prefetch = Prefetch(
+            'debtentry_set',
+            queryset=DebtEntry.objects.filter(is_settlement=False).prefetch_related(
+                Prefetch('payments', to_attr='prefetched_payments')
+            ),
+            to_attr='prefetched_debt_entries'
+        )
+
+        queryset = super().get_queryset().select_related('warehouse', 'employee', 'supplier').prefetch_related(debt_prefetch)
         
         # 1. Filter by Payment Status (Unpaid)
         payment_status = self.request.GET.get('payment_status')

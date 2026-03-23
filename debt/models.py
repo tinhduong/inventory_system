@@ -28,6 +28,9 @@ class DebtEntry(models.Model):
     @property
     def paid_amount(self):
         if self.is_settlement: return 0
+        # Optimization: Use prefetched payments to avoid N+1 query per row in list views
+        if hasattr(self, 'prefetched_payments'):
+            return sum(float(p.amount) for p in self.prefetched_payments)
         return self.payments.aggregate(models.Sum('amount'))['amount__sum'] or 0
 
     @property
