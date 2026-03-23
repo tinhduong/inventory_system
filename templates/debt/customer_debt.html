@@ -40,7 +40,7 @@
                 <h6 class="text-primary mb-1">Họ nợ mình <small>(Từ đơn bán)</small></h6>
                 <h4 class="fw-bold mb-0 text-primary">
                     {% if receivable_balance < 0 %}
-                        {{ receivable_balance|stringformat:"d"|slice:"1:"|floatformat:0|intcomma }} <small class="fw-normal text-muted">(Thu dư)</small>
+                        {{ receivable_balance|floatformat:0|cut:"-"|intcomma }} <small class="fw-normal text-muted">(Thu dư)</small>
                     {% else %}
                         {{ receivable_balance|floatformat:0|intcomma }}
                     {% endif %} đ
@@ -54,7 +54,7 @@
                 <h6 class="text-danger mb-1">Mình nợ họ <small>(Từ đơn nhập)</small></h6>
                 <h4 class="fw-bold mb-0 text-danger">
                     {% if payable_balance < 0 %}
-                        {{ payable_balance|stringformat:"d"|slice:"1:"|floatformat:0|intcomma }} <small class="fw-normal text-muted">(Trả dư)</small>
+                        {{ payable_balance|floatformat:0|cut:"-"|intcomma }} <small class="fw-normal text-muted">(Trả dư)</small>
                     {% else %}
                         {{ payable_balance|floatformat:0|intcomma }}
                     {% endif %} đ
@@ -66,14 +66,13 @@
         <div class="card shadow-sm {% if net_balance >= 0 %}bg-primary text-white{% else %}bg-danger text-white{% endif %}">
             <div class="card-body">
                 <h6 class="mb-1">
-                    {% if net_balance >= 0 %}TỔNG CẦN THU (Họ nợ mình){% else %}TỔNG PHẢI TRẢ (Mình nợ họ){% endif %}
+                    {% if net_balance > 0 %}TỔNG CẦN THU (Họ nợ mình)
+                    {% elif net_balance < 0 %}TỔNG PHẢI TRẢ (Mình nợ họ)
+                    {% else %}TẤT CẢ ĐÃ ĐỐI TRỪ (Bằng 0)
+                    {% endif %}
                 </h6>
                 <h4 class="fw-bold mb-0">
-                    {% if net_balance < 0 %}
-                        {{ net_balance|stringformat:"d"|slice:"1:"|floatformat:0|intcomma }}
-                    {% else %}
-                        {{ net_balance|floatformat:0|intcomma }}
-                    {% endif %} đ
+                    {{ net_balance|floatformat:0|cut:"-"|intcomma }} đ
                 </h4>
             </div>
         </div>
