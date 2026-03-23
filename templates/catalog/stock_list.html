@@ -10,19 +10,14 @@
 <div class="card shadow-sm mb-4">
     <div class="card-body p-4">
         <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <label class="form-label fw-bold text-muted small text-uppercase">Hãy chọn kho cần kiểm tra</label>
-                <select name="warehouse" class="form-select form-select-lg search-select" onchange="this.form.submit()">
+                <select name="warehouse" class="form-select form-select-lg search-select" data-allow-clear="false" onchange="this.form.submit()">
                     <option value="">Tất cả kho hàng (Tổng hợp)</option>
                     {% for w in warehouses %}
                     <option value="{{ w.id }}" {% if current_warehouse == w.id|stringformat:"s" %}selected{% endif %}>{{ w.name }}</option>
                     {% endfor %}
                 </select>
-            </div>
-            <div class="col-md-4">
-                <a href="?" class="btn btn-lg btn-outline-secondary w-100">
-                    <i class="bi bi-x-circle me-1"></i> Xóa bộ lọc
-                </a>
             </div>
         </form>
     </div>

@@ -235,12 +235,13 @@
         }
 
         function initSearchSelect(element) {
+            var allowClear = $(element).data('allow-clear');
             $(element).select2({
                 theme: 'bootstrap-5',
                 width: '100%',
                 dropdownAutoWidth: true,
                 placeholder: 'Chọn...',
-                allowClear: true,
+                allowClear: allowClear !== false,
                 language: {
                     noResults: function() {
                         return "Không tìm thấy";
