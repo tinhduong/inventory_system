@@ -62,9 +62,13 @@
                     <tr>
                         <th class="ps-3">Ngày đặt</th>
                         <th>Khách hàng</th>
+                        {% if user.role == 'ADMIN' %}
                         <th>Tổng tiền</th>
+                        {% endif %}
                         <th>Trạng thái</th>
+                        {% if user.role == 'ADMIN' %}
                         <th>Công nợ</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -72,12 +76,15 @@
                     <tr onclick="window.location='{% url 'orders:sales-detail' order.pk %}'" style="cursor: pointer;">
                         <td class="ps-3">{{ order.order_date|date:"d/m/Y" }}</td>
                         <td>{{ order.customer.name }}</td>
+                        {% if user.role == 'ADMIN' %}
                         <td class="fw-bold text-primary">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                        {% endif %}
                         <td>
                             <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                                 {{ order.get_status_display }}
                             </span>
                         </td>
+                        {% if user.role == 'ADMIN' %}
                         <td>
                             {% if order.status == 'CONFIRMED' %}
                             <span class="badge {% if order.remaining_amount <= 0 %}bg-success text-white{% elif order.remaining_amount < order.total_amount %}bg-warning text-dark{% else %}bg-danger text-white{% endif %}">
@@ -87,6 +94,7 @@
                             <span class="text-muted small italic">N/A</span>
                             {% endif %}
                         </td>
+                        {% endif %}
                     </tr>
                     {% empty %}
                     <tr>

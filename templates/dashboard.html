@@ -32,6 +32,7 @@
             </div>
         </a>
     </div>
+    {% if user.role == 'ADMIN' %}
     <div class="col-md-3 mb-4">
         <a href="{% url 'orders:sales-list' %}" class="text-decoration-none">
             <div class="card text-white bg-success h-100 shadow-sm border-0 hover-lift">
@@ -54,6 +55,7 @@
             </div>
         </a>
     </div>
+    {% endif %}
     <div class="col-md-2 mb-4">
         <a href="{% url 'accounts:customer-list' %}" class="text-decoration-none">
             <div class="card text-white bg-info h-100 shadow-sm border-0 hover-lift">
@@ -88,9 +90,11 @@
                         <tr>
                             <th>Mã đơn</th>
                             <th>Khách hàng</th>
+                            {% if user.role == 'ADMIN' %}
                             <th>Tổng (đ)</th>
                             <th>Đã trả (đ)</th>
-                            {% if user.role == 'ADMIN' %}<th>Còn thiếu (đ)</th>{% endif %}
+                            <th>Còn thiếu (đ)</th>
+                            {% endif %}
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
@@ -99,9 +103,9 @@
                         <tr>
                             <td><a href="{% url 'orders:sales-detail' order.pk %}" class="text-decoration-none">{{ order.code }}</a></td>
                             <td>{{ order.customer.name }}</td>
+                            {% if user.role == 'ADMIN' %}
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
-                            {% if user.role == 'ADMIN' %}
                             <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
                                 {{ order.remaining_amount|floatformat:0|intcomma }}
                             </td>
@@ -129,10 +133,12 @@
                         <tr>
                             <th>Mã đơn</th>
                             <th>Nhà cung cấp</th>
+                            {% if user.role == 'ADMIN' %}
                             <th>Tổng (đ)</th>
                             <th>Đã trả (đ)</th>
-                            {% if user.role == 'ADMIN' %}<th>Còn thiếu (đ)</th>{% endif %}
-                            <th>Trạng thái</th>
+                            <th>Còn thiếu (đ)</th>
+                            {% endif %}
+                            <th style="width: 120px;">Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -140,9 +146,9 @@
                         <tr>
                             <td><a href="{% url 'orders:purchase-detail' order.pk %}" class="text-decoration-none">{{ order.code }}</a></td>
                             <td>{{ order.supplier.name }}</td>
+                            {% if user.role == 'ADMIN' %}
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
-                            {% if user.role == 'ADMIN' %}
                             <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
                                 {{ order.remaining_amount|floatformat:0|intcomma }}
                             </td>
