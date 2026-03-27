@@ -7,9 +7,11 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import SalesOrder, PurchaseOrder, OrderStatus
 from .forms import SalesOrderForm, SalesOrderLineFormSet, PurchaseOrderForm, PurchaseOrderLineFormSet
-from .services.sales_service import confirm_sales_order
-from .services.purchase_service import confirm_purchase_order
+from .services.sales_service import confirm_sales_order, cancel_sales_order
+from .services.purchase_service import confirm_purchase_order, cancel_purchase_order
+from .services.inventory_service import update_stock_from_order
 from accounts.models import Customer
+from django.db.models import Prefetch
 
 def get_period_filter(period):
     today = timezone.now().date()
@@ -125,6 +127,8 @@ class SalesCreateView(LoginRequiredMixin, CreateView):
             # Calculate total amount
             self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
             self.object.save()
+            # Update Reservation Stock
+            update_stock_from_order(self.object)
             return redirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -158,6 +162,8 @@ class SalesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             # Recalculate total amount after updates
             self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
             self.object.save()
+            # Update Reservation Stock
+            update_stock_from_order(self.object)
             messages.success(self.request, f"Cập nhật đơn hàng {self.object.code} thành công.")
             return redirect(self.get_success_url())
         else:
@@ -276,6 +282,8 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
             lines.save()
             self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
             self.object.save()
+            # Update Reservation Stock
+            update_stock_from_order(self.object)
             return redirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -309,6 +317,8 @@ class PurchaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             # Recalculate total amount after updates
             self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
             self.object.save()
+            # Update Reservation Stock
+            update_stock_from_order(self.object)
             messages.success(self.request, f"Cập nhật đơn nhập {self.object.code} thành công.")
             return redirect(self.get_success_url())
         else:
@@ -344,7 +354,15 @@ def delete_sales_order(request, pk):
         return redirect('orders:sales-detail', pk=pk)
     
     code = order.code
+    warehouse = order.warehouse
+    products = [line.product for line in order.lines.all()]
     order.delete()
+    
+    # Refresh stock for affected products
+    from .services.inventory_service import refresh_stock_reservation
+    for product in products:
+        refresh_stock_reservation(product, warehouse)
+        
     messages.success(request, f"Đã xóa đơn hàng {code} thành công.")
     return redirect('orders:sales-list')
 
@@ -359,7 +377,15 @@ def delete_purchase_order(request, pk):
         return redirect('orders:purchase-detail', pk=pk)
     
     code = order.code
+    warehouse = order.warehouse
+    products = [line.product for line in order.lines.all()]
     order.delete()
+    
+    # Refresh stock for affected products
+    from .services.inventory_service import refresh_stock_reservation
+    for product in products:
+        refresh_stock_reservation(product, warehouse)
+        
     messages.success(request, f"Đã xóa đơn nhập {code} thành công.")
     return redirect('orders:purchase-list')
 

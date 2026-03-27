@@ -55,6 +55,10 @@ def confirm_sales_order(order):
                 note=f"Thanh toán lúc mua cho đơn {order.code}",
                 entry_date=order.order_date
             )
+        
+        # 5. Update Reservation Stock (Clear held stock as it's now deducted from physical)
+        from .inventory_service import update_stock_from_order
+        update_stock_from_order(order)
 
 def cancel_sales_order(order):
     if order.status != OrderStatus.CONFIRMED:
@@ -84,3 +88,7 @@ def cancel_sales_order(order):
                 note=f"Đối trừ do hủy đơn hàng bán {order.code}",
                 entry_date=timezone.now()
             )
+        
+        # 4. Update Reservation Stock (Release held stock if the order status changed)
+        from .inventory_service import update_stock_from_order
+        update_stock_from_order(order)

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Chi tiết giữ hàng - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'catalog:stock-list' %}">Tồn kho</a></li>
+            <li class="breadcrumb-item active">Chi tiết giữ hàng: {{ product.name }}</li>
+        </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="mb-1 text-primary">{{ product.name }}</h3>
+            <p class="text-muted">
+                {% if warehouse %}
+                    Tại kho: <strong>{{ warehouse.name }}</strong>
+                {% else %}
+                    Tổng hợp từ <strong>Tất cả kho</strong>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-list-ul me-2"></i>Danh sách đơn hàng nháp đang giữ hàng</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Mã đơn hàng</th>
+                        <th>Khách hàng</th>
+                        <th>Kho</th>
+                        <th class="text-end">Số lượng giữ</th>
+                        <th>Nhân viên</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in lines %}
+                    <tr>
+                        <td class="ps-3">
+                            <span class="fw-bold">{{ line.order.code }}</span>
+                            <span class="badge bg-warning text-dark ms-1">Nháp</span>
+                        </td>
+                        <td>{{ line.order.customer.name }}</td>
+                        <td>{{ line.order.warehouse.name }}</td>
+                        <td class="text-end fw-bold text-warning">{{ line.quantity|floatformat:0 }}</td>
+                        <td>{{ line.order.employee.username }}</td>
+                        <td>{{ line.order.created_at|date:"d/m/Y H:i" }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'orders:sales-detail' line.order.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> Xem đơn
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            Không có đơn hàng nháp nào đang giữ sản phẩm này.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

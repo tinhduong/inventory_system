@@ -81,9 +81,43 @@ class StockListView(LoginRequiredMixin, ListView):
             ).select_related('product', 'warehouse').order_by('product__name')
         else:
             # "Tất cả kho" hoặc chưa chọn (mặc định cho xem tất cả)
+            from django.db.models import Sum
+            from django.db.models.functions import Coalesce
             return Product.objects.annotate(
-                total_quantity=Coalesce(Sum('stocks__quantity'), 0)
+                total_quantity=Coalesce(Sum('stocks__quantity'), 0),
+                total_held=Coalesce(Sum('stocks__held_quantity'), 0),
+                total_incoming=Coalesce(Sum('stocks__incoming_quantity'), 0)
             ).filter(total_quantity__gt=0).order_by('name')
+
+class StockHeldDetailView(LoginRequiredMixin, ListView):
+    template_name = 'catalog/stock_held_detail.html'
+    context_object_name = 'lines'
+
+    def get_queryset(self):
+        from orders.models import SalesOrderLine, OrderStatus
+        product_id = self.request.GET.get('product')
+        warehouse_id = self.request.GET.get('warehouse')
+        
+        self.product = Product.objects.get(id=product_id)
+        
+        qs = SalesOrderLine.objects.filter(
+            order__status=OrderStatus.DRAFT,
+            product_id=product_id
+        ).select_related('order', 'order__customer', 'order__employee', 'order__warehouse')
+        
+        if warehouse_id and warehouse_id != 'all':
+            qs = qs.filter(order__warehouse_id=warehouse_id)
+            self.warehouse = Warehouse.objects.get(id=warehouse_id)
+        else:
+            self.warehouse = None
+            
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        context['warehouse'] = self.warehouse
+        return context
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

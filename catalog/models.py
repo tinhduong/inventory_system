@@ -22,14 +22,21 @@ class Product(models.Model):
         return f"{self.code} - {self.name}"
 
 class StockItem(models.Model):
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name='stocks')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='stocks')
-    quantity = models.IntegerField(default=0, verbose_name="Số lượng tồn")
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name='stocks')
+    quantity = models.IntegerField(default=0, verbose_name="Số lượng thực tế")
+    held_quantity = models.IntegerField(default=0, verbose_name="Số lượng đang giữ đơn")
+    incoming_quantity = models.IntegerField(default=0, verbose_name="Số lượng sắp nhập về")
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('warehouse', 'product')
         verbose_name = "Tồn kho"
         verbose_name_plural = "Tồn kho"
+
+    @property
+    def available_quantity(self):
+        return self.quantity - self.held_quantity
 
     def __str__(self):
         return f"{self.product.name} tại {self.warehouse.name}: {self.quantity}"

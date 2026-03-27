@@ -52,6 +52,10 @@ def confirm_purchase_order(order):
                 note=f"Thanh toán lúc nhập đơn {order.code}",
                 entry_date=order.order_date
             )
+        
+        # 5. Update Reservation Stock (Clear incoming as it's now in physical)
+        from .inventory_service import update_stock_from_order
+        update_stock_from_order(order)
 
 def cancel_purchase_order(order):
     if order.status != OrderStatus.CONFIRMED:
@@ -94,3 +98,7 @@ def cancel_purchase_order(order):
                 note=f"Đối trừ do hủy đơn hàng nhập {order.code}",
                 entry_date=timezone.now()
             )
+        
+        # 4. Update Reservation Stock
+        from .inventory_service import update_stock_from_order
+        update_stock_from_order(order)

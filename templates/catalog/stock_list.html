@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load inventory_tags %}
 
 {% block title %}Tồn kho{% endblock %}
 
@@ -34,7 +35,9 @@
                     <tr>
                         <th class="ps-3">Sản phẩm</th>
                         <th>Kho hàng</th>
-                        <th class="text-end">Số lượng</th>
+                        <th class="text-end">Tồn thực tế</th>
+                        <th class="text-end">Giữ đơn (Draft)</th>
+                        <th class="text-end">Khả dụng</th>
                         <th>Đơn vị</th>
                         <th class="text-center">Trạng thái</th>
                     </tr>
@@ -45,12 +48,22 @@
                         {% if current_warehouse != 'all' %}
                             <td class="ps-3 fw-medium text-primary">{{ stock.product.name }}</td>
                             <td>{{ stock.warehouse.name }}</td>
-                            <td class="text-end fw-bold {% if stock.quantity <= stock.product.min_stock %}text-danger{% endif %}">{{ stock.quantity|floatformat:0 }}</td>
+                            <td class="text-end fw-bold">{{ stock.quantity|floatformat:0 }}</td>
+                            <td class="text-end">
+                                {% if stock.held_quantity > 0 %}
+                                    <a href="{% url 'catalog:stock-held-detail' %}?product={{ stock.product.id }}&warehouse={{ stock.warehouse.id }}" class="text-warning fw-bold text-decoration-none">
+                                        {{ stock.held_quantity|floatformat:0 }} <i class="bi bi-info-circle ms-1"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-bold text-success">{{ stock.available_quantity|floatformat:0 }}</td>
                             <td>{{ stock.product.unit }}</td>
                             <td class="text-center">
-                                {% if stock.quantity <= stock.product.min_stock %}
+                                {% if stock.available_quantity <= stock.product.min_stock %}
                                     <span class="badge bg-danger">Sắp hết hàng</span>
-                                {% elif stock.quantity <= stock.product.min_stock|add:10 %}
+                                {% elif stock.available_quantity <= stock.product.min_stock|add:10 %}
                                     <span class="badge bg-warning text-dark">Sắp cần nhập</span>
                                 {% else %}
                                     <span class="badge bg-success opacity-75">Sẵn hàng</span>
@@ -59,16 +72,30 @@
                         {% else %}
                             <td class="ps-3 fw-medium text-primary">{{ stock.name }}</td>
                             <td><span class="badge bg-secondary">Tất cả kho</span></td>
-                            <td class="text-end fw-bold {% if stock.total_quantity <= stock.min_stock %}text-danger{% endif %}">{{ stock.total_quantity|floatformat:0 }}</td>
+                            <td class="text-end fw-bold">{{ stock.total_quantity|floatformat:0 }}</td>
+                            <td class="text-end">
+                                {% if stock.total_held > 0 %}
+                                    <a href="{% url 'catalog:stock-held-detail' %}?product={{ stock.id }}&warehouse=all" class="text-warning fw-bold text-decoration-none">
+                                        {{ stock.total_held|floatformat:0 }} <i class="bi bi-info-circle ms-1"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-bold text-success">
+                                {{ stock.total_quantity|subtract:stock.total_held|floatformat:0 }}
+                            </td>
                             <td>{{ stock.unit }}</td>
                             <td class="text-center">
-                                {% if stock.total_quantity <= stock.min_stock %}
+                                {% with available=stock.total_quantity|subtract:stock.total_held %}
+                                {% if available <= stock.min_stock %}
                                     <span class="badge bg-danger">Sắp hết hàng</span>
-                                {% elif stock.total_quantity <= stock.min_stock|add:10 %}
+                                {% elif available <= stock.min_stock|add:10 %}
                                     <span class="badge bg-warning text-dark">Sắp cần nhập</span>
                                 {% else %}
                                     <span class="badge bg-success opacity-75">Sẵn hàng</span>
                                 {% endif %}
+                                {% endwith %}
                             </td>
                         {% endif %}
                     </tr>
