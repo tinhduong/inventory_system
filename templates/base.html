@@ -40,6 +40,7 @@
             display: block; 
             transition: all 0.2s ease;
             border-left: 4px solid transparent;
+            font-size: 1.2rem;
         }
         
         .sidebar a:hover { 
@@ -55,15 +56,19 @@
             font-weight: 600;
         }
         
-        .sidebar i { margin-right: 12px; font-size: 1.1rem; }
+        .sidebar i { margin-right: 12px; font-size: 1.32rem; }
         
         .sidebar-heading {
             padding: 20px 20px 8px;
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.1rem;
             color: #7f8c8d;
             font-weight: 700;
+        }
+
+        .sidebar h5 {
+            font-size: 1.5rem;
         }
 
         .content { padding: 25px; transition: all 0.3s; }
@@ -139,7 +144,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <div class="px-2 small">
                                 <div class="text-info fw-bold">{{ user.username }}</div>
-                                <div class="text-white-50" style="font-size: 0.75rem;">{{ user.get_role_display }}</div>
+                                <div class="text-white-50" style="font-size: 0.9rem;">{{ user.get_role_display }}</div>
                             </div>
                             <form action="{% url 'accounts:logout' %}" method="post" class="m-0">
                                 {% csrf_token %}
