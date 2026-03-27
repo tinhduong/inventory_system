@@ -75,11 +75,11 @@ class SalesOrderLine(models.Model):
     order = models.ForeignKey(SalesOrder, on_delete=models.CASCADE, related_name='lines')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Sản phẩm")
     quantity = models.IntegerField(verbose_name="Số lượng")
-    unit_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Đơn giá")
+    unit_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Đơn giá", null=True, blank=True)
     line_total = models.DecimalField(max_digits=15, decimal_places=2, editable=False)
 
     def save(self, *args, **kwargs):
-        self.line_total = self.quantity * self.unit_price
+        self.line_total = self.quantity * (self.unit_price or 0)
         super().save(*args, **kwargs)
 
 class PurchaseOrder(models.Model):
@@ -144,9 +144,9 @@ class PurchaseOrderLine(models.Model):
     order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name='lines')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Sản phẩm")
     quantity = models.IntegerField(verbose_name="Số lượng")
-    unit_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Đơn giá")
+    unit_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Đơn giá", null=True, blank=True)
     line_total = models.DecimalField(max_digits=15, decimal_places=2, editable=False)
 
     def save(self, *args, **kwargs):
-        self.line_total = self.quantity * self.unit_price
+        self.line_total = self.quantity * (self.unit_price or 0)
         super().save(*args, **kwargs)

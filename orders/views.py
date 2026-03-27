@@ -164,6 +164,9 @@ class SalesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return redirect('orders:sales-detail', pk=self.get_object().pk)
 
 def confirm_sales_view(request, pk):
+    if request.user.role != 'ADMIN':
+        messages.error(request, "Chỉ Admin mới có quyền xác nhận đơn hàng.")
+        return redirect('orders:sales-detail', pk=pk)
     order = get_object_or_404(SalesOrder, pk=pk)
     try:
         confirm_sales_order(order)
@@ -305,6 +308,9 @@ class PurchaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return redirect('orders:purchase-detail', pk=self.get_object().pk)
 
 def confirm_purchase_view(request, pk):
+    if request.user.role != 'ADMIN':
+        messages.error(request, "Chỉ Admin mới có quyền xác nhận đơn nhập.")
+        return redirect('orders:purchase-detail', pk=pk)
     order = get_object_or_404(PurchaseOrder, pk=pk)
     try:
         confirm_purchase_order(order)

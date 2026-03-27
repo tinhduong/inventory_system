@@ -10,6 +10,11 @@ def confirm_sales_order(order):
         raise ValidationError("Chỉ có thể xác nhận đơn hàng ở trạng thái Nháp.")
 
     with transaction.atomic():
+        # 0. Check if all lines have unit price
+        for line in order.lines.all():
+            if line.unit_price is None or line.unit_price < 0:
+                raise ValidationError(f"Sản phẩm {line.product.name} chưa có đơn giá. Vui lòng cập nhật đơn giá trước khi xác nhận.")
+
         # 1. Update Inventory
         for line in order.lines.all():
             stock, created = StockItem.objects.get_or_create(

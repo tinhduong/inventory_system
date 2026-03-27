@@ -8,9 +8,11 @@
     <h4>Đơn bán hàng: {{ order.code }}</h4>
     <div>
         {% if order.status == 'DRAFT' %}
+        {% if user.role == 'ADMIN' %}
         <a href="{% url 'orders:sales-confirm' order.pk %}" class="btn btn-success">
             <i class="bi bi-check-circle"></i> Xác nhận đơn
         </a>
+        {% endif %}
         <a href="{% url 'orders:sales-edit' order.pk %}" class="btn btn-primary">
             <i class="bi bi-pencil"></i> Sửa đơn
         </a>
@@ -34,8 +36,10 @@
                         <tr>
                             <th>Sản phẩm</th>
                             <th>Số lượng</th>
+                            {% if user.role == 'ADMIN' %}
                             <th>Đơn giá</th>
                             <th>Thành tiền</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -43,17 +47,21 @@
                         <tr>
                             <td>{{ line.product.name }}</td>
                             <td>{{ line.quantity|floatformat:0 }}</td>
+                            {% if user.role == 'ADMIN' %}
                             <td>{{ line.unit_price|floatformat:0|intcomma }} đ</td>
                             <td class="fw-bold">{{ line.line_total|floatformat:0|intcomma }} đ</td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
+                    {% if user.role == 'ADMIN' %}
                     <tfoot class="table-light">
                         <tr>
                             <td colspan="3" class="text-end fw-bold">Tổng cộng:</td>
                             <td class="fw-bold text-danger">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
                         </tr>
                     </tfoot>
+                    {% endif %}
                 </table>
             </div>
         </div>
@@ -65,7 +73,9 @@
                 <p><strong>Khách hàng:</strong> {{ order.customer.name }}</p>
                 <p><strong>Ngày đặt:</strong> {{ order.order_date }}</p>
                 <p><strong>Ngày tạo:</strong> {{ order.created_at|date:"d/m/Y" }}</p>
+                {% if user.role == 'ADMIN' %}
                 <p><strong>Đã thanh toán (Trả trước):</strong> <span class="text-success fw-bold">{{ order.paid_amount|floatformat:0|intcomma }} đ</span></p>
+                {% endif %}
                 <p><strong>Trạng thái:</strong> 
                     <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                         {{ order.get_status_display }}
