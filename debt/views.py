@@ -154,11 +154,8 @@ class ExportDebtHistoryView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, customer_id):
         customer = get_object_or_404(Customer, pk=customer_id)
         
-        # Áp dụng logic filter tương tự get_queryset
-        qs = DebtEntry.objects.filter(
-            Q(customer=customer) & 
-            (Q(is_settlement=False) | Q(parent_entry__isnull=True))
-        )
+        # Lấy toàn bộ lịch sử giao dịch (Sổ cái) để đảm bảo SUM(Nợ) trong Excel = Số dư thực tế
+        qs = DebtEntry.objects.filter(customer=customer).select_related('sales_order', 'purchase_order')
         
         days = request.GET.get('days')
         time_label = "Tat ca"
@@ -185,7 +182,7 @@ class ExportDebtHistoryView(LoginRequiredMixin, UserPassesTestMixin, View):
             cell.fill = header_fill
             cell.alignment = Alignment(horizontal="center")
 
-        # Thêm dữ liệu
+        # Thêm dữ liệu (Logic Nhật ký giao dịch để SUM cột nợ chính xác trong Excel)
         for entry in qs:
             po_val = 0
             so_val = 0
@@ -194,23 +191,25 @@ class ExportDebtHistoryView(LoginRequiredMixin, UserPassesTestMixin, View):
             rem_pay = 0
 
             if entry.is_settlement:
-                # Phiếu thu/chi tự do
+                # Đây là khoản thanh toán / thu nợ (Làm giảm nợ -> Ghi âm số tiền vào cột nợ)
                 paid = float(entry.amount)
+                if entry.account_type == AccountType.RECEIVABLE:
+                    rem_rec = -paid
+                else:
+                    rem_pay = -paid
             else:
-                # Đơn hàng
+                # Đây là hóa đơn gốc (Làm tăng nợ -> Ghi dương toàn bộ giá trị đơn)
                 if entry.account_type == AccountType.RECEIVABLE: # Bán hàng
                     so_val = float(entry.amount)
-                    paid = float(entry.paid_amount)
-                    rem_rec = float(entry.remaining_amount)
+                    rem_rec = so_val
                 else: # Nhập hàng
                     po_val = float(entry.amount)
-                    paid = float(entry.paid_amount)
-                    rem_pay = float(entry.remaining_amount)
+                    rem_pay = po_val
 
-            note_with_type = entry.note
+            note_with_type = entry.note or ""
             if entry.is_settlement:
                 type_label = "[Thu]" if entry.account_type == AccountType.RECEIVABLE else "[Chi]"
-                note_with_type = f"{type_label} {entry.note}"
+                note_with_type = f"{type_label} {note_with_type}"
 
             row = [
                 entry.entry_date.strftime("%d/%m/%Y %H:%M") if entry.entry_date else entry.created_at.strftime("%d/%m/%Y %H:%M"),
