@@ -178,9 +178,11 @@
                         <a href="{% url 'orders:purchase-list' %}" class="{% if '/purchases/' in request.path %}active{% endif %}">
                             <i class="bi bi-truck"></i> Đơn nhập hàng
                         </a>
+                        {% if user.role == 'ADMIN' %}
                         <a href="{% url 'debt:overview' %}" class="{% if '/debt-overview/' in request.path %}active{% endif %}">
                             <i class="bi bi-wallet2"></i> Tổng quan công nợ
                         </a>
+                        {% endif %}
         
                         <div class="sidebar-heading">Hệ thống</div>
                         {% if user.role == 'ADMIN' %}

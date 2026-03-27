@@ -90,7 +90,7 @@
                             <th>Khách hàng</th>
                             <th>Tổng (đ)</th>
                             <th>Đã trả (đ)</th>
-                            <th>Còn thiếu (đ)</th>
+                            {% if user.role == 'ADMIN' %}<th>Còn thiếu (đ)</th>{% endif %}
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
@@ -101,9 +101,11 @@
                             <td>{{ order.customer.name }}</td>
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
+                            {% if user.role == 'ADMIN' %}
                             <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
                                 {{ order.remaining_amount|floatformat:0|intcomma }}
                             </td>
+                            {% endif %}
                             <td>
                                 <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                                     {{ order.get_status_display }}
@@ -129,7 +131,7 @@
                             <th>Nhà cung cấp</th>
                             <th>Tổng (đ)</th>
                             <th>Đã trả (đ)</th>
-                            <th>Còn thiếu (đ)</th>
+                            {% if user.role == 'ADMIN' %}<th>Còn thiếu (đ)</th>{% endif %}
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
@@ -140,9 +142,11 @@
                             <td>{{ order.supplier.name }}</td>
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
+                            {% if user.role == 'ADMIN' %}
                             <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
                                 {{ order.remaining_amount|floatformat:0|intcomma }}
                             </td>
+                            {% endif %}
                             <td>
                                 <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
                                     {{ order.get_status_display }}

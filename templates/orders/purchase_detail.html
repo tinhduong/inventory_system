@@ -11,6 +11,9 @@
         <a href="{% url 'orders:purchase-confirm' order.pk %}" class="btn btn-success">
             <i class="bi bi-check-circle"></i> Xác nhận nhập kho
         </a>
+        <a href="{% url 'orders:purchase-edit' order.pk %}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Sửa đơn
+        </a>
         {% if user.role == 'ADMIN' %}
         <a href="{% url 'orders:purchase-delete' order.pk %}" class="btn btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn nhập này?')">
             <i class="bi bi-trash"></i> Xóa đơn
@@ -68,7 +71,7 @@
                         {{ order.get_status_display }}
                     </span>
                 </p>
-                {% if order.status == 'CONFIRMED' %}
+                {% if order.status == 'CONFIRMED' and user.role == 'ADMIN' %}
                 <hr>
                 <h6 class="text-secondary text-uppercase mb-3">Tình hình thanh toán</h6>
                 <p><strong>Tình trạng nợ:</strong> 

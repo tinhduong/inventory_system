@@ -17,7 +17,13 @@
             <tbody>
                 {% for c in customers %}
                 <tr>
-                    <td><a href="{% url 'debt:customer-debt' c.pk %}">{{ c.name }}</a></td>
+                    <td>
+                        {% if user.role == 'ADMIN' %}
+                        <a href="{% url 'debt:customer-debt' c.pk %}">{{ c.name }}</a>
+                        {% else %}
+                        {{ c.name }}
+                        {% endif %}
+                    </td>
                     <td>{{ c.phone }}</td>
                     <td><a href="{% url 'accounts:customer-update' c.pk %}" class="btn btn-sm btn-link">Sửa</a></td>
                 </tr>

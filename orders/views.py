@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from datetime import timedelta
 from .models import SalesOrder, PurchaseOrder, OrderStatus
@@ -125,6 +125,44 @@ class SalesCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('orders:sales-detail', kwargs={'pk': self.object.pk})
 
+class SalesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = SalesOrder
+    form_class = SalesOrderForm
+    template_name = 'orders/sales_form.html'
+
+    def test_func(self):
+        order = self.get_object()
+        return order.status == OrderStatus.DRAFT
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['lines'] = SalesOrderLineFormSet(self.request.POST, instance=self.object)
+        else:
+            data['lines'] = SalesOrderLineFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        lines = context['lines']
+        if lines.is_valid():
+            self.object = form.save()
+            lines.save()
+            # Recalculate total amount after updates
+            self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
+            self.object.save()
+            messages.success(self.request, f"Cập nhật đơn hàng {self.object.code} thành công.")
+            return redirect(self.get_success_url())
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('orders:sales-detail', kwargs={'pk': self.object.pk})
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Chỉ có thể sửa đơn hàng ở trạng thái Nháp.")
+        return redirect('orders:sales-detail', pk=self.get_object().pk)
+
 def confirm_sales_view(request, pk):
     order = get_object_or_404(SalesOrder, pk=pk)
     try:
@@ -227,6 +265,44 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('orders:purchase-detail', kwargs={'pk': self.object.pk})
+
+class PurchaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = PurchaseOrder
+    form_class = PurchaseOrderForm
+    template_name = 'orders/purchase_form.html'
+
+    def test_func(self):
+        order = self.get_object()
+        return order.status == OrderStatus.DRAFT
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['lines'] = PurchaseOrderLineFormSet(self.request.POST, instance=self.object)
+        else:
+            data['lines'] = PurchaseOrderLineFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        lines = context['lines']
+        if lines.is_valid():
+            self.object = form.save()
+            lines.save()
+            # Recalculate total amount after updates
+            self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
+            self.object.save()
+            messages.success(self.request, f"Cập nhật đơn nhập {self.object.code} thành công.")
+            return redirect(self.get_success_url())
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse('orders:purchase-detail', kwargs={'pk': self.object.pk})
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Chỉ có thể sửa đơn nhập ở trạng thái Nháp.")
+        return redirect('orders:purchase-detail', pk=self.get_object().pk)
 
 def confirm_purchase_view(request, pk):
     order = get_object_or_404(PurchaseOrder, pk=pk)

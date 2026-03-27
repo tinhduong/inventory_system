@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, TemplateView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Sum, Q, DecimalField, F, ExpressionWrapper, Case, When
 from django.db.models.functions import Coalesce, Abs, Round
 from django.contrib import messages
@@ -15,10 +15,17 @@ from datetime import date, timedelta
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
 
-class DebtOverviewView(LoginRequiredMixin, ListView):
+class DebtOverviewView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'debt/overview.html'
     context_object_name = 'customer_list'
     paginate_by = 50
+
+    def test_func(self):
+        return self.request.user.role == 'ADMIN'
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Bạn không có quyền xem thông tin công nợ.")
+        return redirect('dashboard')
 
     def get_queryset(self):
         # 1. Annotate net balances per customer in the database
@@ -69,10 +76,17 @@ class DebtOverviewView(LoginRequiredMixin, ListView):
         context['search_query'] = self.request.GET.get('q', '')
         return context
 
-class CustomerDebtDetailView(LoginRequiredMixin, ListView):
+class CustomerDebtDetailView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = DebtEntry
     template_name = 'debt/customer_debt.html'
     context_object_name = 'entries'
+
+    def test_func(self):
+        return self.request.user.role == 'ADMIN'
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Bạn không có quyền xem thông tin công nợ.")
+        return redirect('dashboard')
 
     def get_queryset(self):
         # Lấy các khoản nợ gốc HOẶC các khoản thanh toán tự do (không có parent)
@@ -129,7 +143,14 @@ class CustomerDebtDetailView(LoginRequiredMixin, ListView):
         context['current_days'] = self.request.GET.get('days', '')
         return context
 
-class ExportDebtHistoryView(LoginRequiredMixin, View):
+class ExportDebtHistoryView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.role == 'ADMIN'
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Bạn không có quyền xuất dữ liệu công nợ.")
+        return redirect('dashboard')
+
     def get(self, request, customer_id):
         customer = get_object_or_404(Customer, pk=customer_id)
         
@@ -220,7 +241,14 @@ class ExportDebtHistoryView(LoginRequiredMixin, View):
         wb.save(response)
         return response
 
-class EntryPaymentView(LoginRequiredMixin, View):
+class EntryPaymentView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.role == 'ADMIN'
+    
+    def handle_no_permission(self):
+        messages.error(self.request, "Bạn không có quyền thực hiện thanh toán công nợ.")
+        return redirect('dashboard')
+
     def get(self, request, pk):
         entry = get_object_or_404(DebtEntry, pk=pk)
         form = EntryPaymentForm(initial={
@@ -263,11 +291,18 @@ class EntryPaymentView(LoginRequiredMixin, View):
         
         return render(request, 'debt/entry_payment_form.html', {'form': form, 'entry': entry})
 
-class SettlementCreateView(LoginRequiredMixin, CreateView):
+class SettlementCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Settlement
     form_class = SettlementForm
     template_name = 'debt/settlement_form.html'
     success_url = '/debt/overview/'
+
+    def test_func(self):
+        return self.request.user.role == 'ADMIN'
+    
+    def handle_no_permission(self):
+        messages.error(self.request, "Bạn không có quyền quyết toán công nợ.")
+        return redirect('dashboard')
 
     def get_initial(self):
         initial = super().get_initial()
