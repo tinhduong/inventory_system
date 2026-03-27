@@ -245,8 +245,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
         context['current_supplier'] = self.request.GET.get('supplier', '')
         context['current_status'] = self.request.GET.get('status', '')
         context['order_statuses'] = OrderStatus.choices
-        from accounts.models import Supplier
-        context['suppliers'] = Supplier.objects.all().order_by('name')
+        context['suppliers'] = Customer.objects.all().order_by('name')
         return context
 
 class PurchaseDetailView(LoginRequiredMixin, DetailView):
