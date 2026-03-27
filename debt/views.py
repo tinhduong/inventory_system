@@ -258,9 +258,18 @@ class EntryPaymentView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request, pk):
         entry = get_object_or_404(DebtEntry, pk=pk)
+        
+        if entry.remaining_amount <= 0:
+            messages.error(request, "Khoản nợ này đã được thanh toán hết.")
+            return redirect('debt:customer-debt', customer_id=entry.customer.pk)
+
         form = EntryPaymentForm(request.POST)
         if form.is_valid():
             amount = form.cleaned_data['amount']
+            if amount <= 0:
+                messages.error(request, "Số tiền thanh toán phải lớn hơn 0.")
+                return render(request, 'debt/entry_payment_form.html', {'form': form, 'entry': entry})
+
             if amount > entry.remaining_amount:
                 messages.error(request, "Số tiền thanh toán không được lớn hơn số nợ còn lại.")
                 return render(request, 'debt/entry_payment_form.html', {'form': form, 'entry': entry})

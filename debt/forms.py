@@ -29,13 +29,15 @@ class SettlementForm(forms.ModelForm):
         # In Django, disabled fields do NOT appear in cleaned_data if not submitted.
         # But we need the customer to validate. 
         # We can get it from initial or from the instance if it's already there.
-        customer = self.cleaned_data.get('customer') or self.initial.get('customer')
+        customer_id = self.cleaned_data.get('customer') or self.initial.get('customer')
         
-        if customer and amount:
+        if customer_id and amount is not None:
             # Handle case where customer might be an ID or an object
-            if not hasattr(customer, 'pk'):
-                from accounts.models import Customer
-                customer = Customer.objects.get(pk=customer)
+            from accounts.models import Customer
+            if isinstance(customer_id, Customer):
+                customer = customer_id
+            else:
+                customer = Customer.objects.get(pk=customer_id)
                 
             entries = DebtEntry.objects.filter(customer=customer)
             tr = entries.filter(account_type=AccountType.RECEIVABLE, is_settlement=False).aggregate(Sum('amount'))['amount__sum'] or 0
@@ -46,10 +48,15 @@ class SettlementForm(forms.ModelForm):
             net_balance = round((tr - pr) - (tp - pp), 0)
             abs_balance = abs(net_balance)
             
+            if abs_balance <= 0:
+                raise forms.ValidationError("Đối tác hiện không còn dư nợ. Không thể tạo phiếu quyết toán.")
+            
             if amount > abs_balance:
-                # Add human readable error
                 from django.contrib.humanize.templatetags.humanize import intcomma
                 raise forms.ValidationError(f"Số tiền quyết toán ({intcomma(int(amount))} đ) không được lớn hơn dư nợ hiện tại ({intcomma(int(abs_balance))} đ).")
+            
+            if amount <= 0:
+                raise forms.ValidationError("Số tiền quyết toán phải lớn hơn 0.")
         
         return amount
 

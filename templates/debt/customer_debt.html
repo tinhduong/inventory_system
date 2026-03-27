@@ -4,9 +4,11 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>Lịch sử công nợ: {{ customer.name }}</h3>
     <div>
+        {% if net_balance != 0 %}
         <a href="{% url 'debt:settlement-create' %}?customer={{ customer.pk }}&account_type={% if net_balance > 0 %}RECEIVABLE{% else %}PAYABLE{% endif %}" class="btn btn-warning me-2" target="_blank">
             <i class="bi bi-cash-stack"></i> Quyết toán công nợ
         </a>
+        {% endif %}
         <a href="{% url 'debt:overview' %}" class="btn btn-outline-secondary">Quay lại</a>
     </div>
 </div>
