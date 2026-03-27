@@ -79,6 +79,11 @@ class SalesListView(LoginRequiredMixin, ListView):
         if customer_id:
             queryset = queryset.filter(customer_id=customer_id)
 
+        # 4. Filter by Order Status
+        status = self.request.GET.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -86,6 +91,8 @@ class SalesListView(LoginRequiredMixin, ListView):
         context['payment_status'] = self.request.GET.get('payment_status', 'all')
         context['current_period'] = self.request.GET.get('period', 'all')
         context['current_customer'] = self.request.GET.get('customer', '')
+        context['current_status'] = self.request.GET.get('status', '')
+        context['order_statuses'] = OrderStatus.choices
         context['customers'] = Customer.objects.all().order_by('name')
         return context
 
@@ -224,6 +231,11 @@ class PurchaseListView(LoginRequiredMixin, ListView):
         if supplier_id:
             queryset = queryset.filter(supplier_id=supplier_id)
 
+        # 4. Filter by Order Status
+        status = self.request.GET.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -231,7 +243,10 @@ class PurchaseListView(LoginRequiredMixin, ListView):
         context['payment_status'] = self.request.GET.get('payment_status', 'all')
         context['current_period'] = self.request.GET.get('period', 'all')
         context['current_supplier'] = self.request.GET.get('supplier', '')
-        context['suppliers'] = Customer.objects.all().order_by('name')
+        context['current_status'] = self.request.GET.get('status', '')
+        context['order_statuses'] = OrderStatus.choices
+        from accounts.models import Supplier
+        context['suppliers'] = Supplier.objects.all().order_by('name')
         return context
 
 class PurchaseDetailView(LoginRequiredMixin, DetailView):
