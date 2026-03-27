@@ -81,13 +81,21 @@ class StockListView(LoginRequiredMixin, ListView):
             ).select_related('product', 'warehouse').order_by('product__name')
         else:
             # "Tất cả kho" hoặc chưa chọn (mặc định cho xem tất cả)
-            from django.db.models import Sum
-            from django.db.models.functions import Coalesce
+            from django.db.models import Q
             return Product.objects.annotate(
                 total_quantity=Coalesce(Sum('stocks__quantity'), 0),
                 total_held=Coalesce(Sum('stocks__held_quantity'), 0),
                 total_incoming=Coalesce(Sum('stocks__incoming_quantity'), 0)
-            ).filter(total_quantity__gt=0).order_by('name')
+            ).filter(
+                Q(total_quantity__gt=0) | Q(total_held__gt=0) | Q(total_incoming__gt=0)
+            ).order_by('name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['warehouses'] = Warehouse.objects.all()
+        # Ensure current_warehouse is in context
+        context['current_warehouse'] = getattr(self, 'warehouse_id', 'all')
+        return context
 
 class StockHeldDetailView(LoginRequiredMixin, ListView):
     template_name = 'catalog/stock_held_detail.html'
@@ -117,13 +125,6 @@ class StockHeldDetailView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['product'] = self.product
         context['warehouse'] = self.warehouse
-        return context
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['warehouses'] = Warehouse.objects.all()
-        # Đảm bảo current_warehouse là string để so sánh trong template
-        context['current_warehouse'] = self.warehouse_id if self.warehouse_id else "all"
         return context
 
 class ExportProductsView(LoginRequiredMixin, View):
