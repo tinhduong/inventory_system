@@ -31,6 +31,17 @@ class SalesOrderForm(forms.ModelForm):
             'paid_amount': forms.TextInput(attrs={'class': 'form-control money-input'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Nếu chỉ có 1 kho, mặc định chọn và disable
+        from catalog.models import Warehouse
+        wh = Warehouse.objects.first()
+        if wh:
+            self.fields['warehouse'].initial = wh
+            # Nếu chỉ có 1 kho duy nhất trong hệ thống thì disable chọn kho
+            if Warehouse.objects.count() <= 1:
+                self.fields['warehouse'].disabled = True
+
 class BaseSalesOrderLineFormSet(forms.BaseInlineFormSet):
     def clean(self):
         super().clean()
@@ -91,6 +102,16 @@ class PurchaseOrderForm(forms.ModelForm):
             'supplier': forms.Select(attrs={'class': 'form-control search-select'}),
             'paid_amount': forms.TextInput(attrs={'class': 'form-control money-input'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Tương tự cho đơn nhập
+        from catalog.models import Warehouse
+        wh = Warehouse.objects.first()
+        if wh:
+            self.fields['warehouse'].initial = wh
+            if Warehouse.objects.count() <= 1:
+                self.fields['warehouse'].disabled = True
 
 PurchaseOrderLineFormSet = inlineformset_factory(
     PurchaseOrder, PurchaseOrderLine,
