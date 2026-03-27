@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.views import View
 import openpyxl
@@ -215,3 +215,18 @@ class ImportProductsView(LoginRequiredMixin, View):
                 messages.error(request, f"Lỗi xử lý file Excel: {str(e)}")
         
         return render(request, 'catalog/product_import.html', {'form': form})
+
+class CheckStockView(LoginRequiredMixin, View):
+    def get(self, request):
+        product_id = request.GET.get('product_id')
+        warehouse_id = request.GET.get('warehouse_id')
+        if not product_id or not warehouse_id:
+            return JsonResponse({'available': 0})
+        
+        try:
+            stock = StockItem.objects.get(product_id=product_id, warehouse_id=warehouse_id)
+            available = stock.available_quantity
+        except StockItem.DoesNotExist:
+            available = 0
+            
+        return JsonResponse({'available': available})

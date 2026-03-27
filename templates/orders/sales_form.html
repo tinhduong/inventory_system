@@ -31,6 +31,7 @@
                                 <tr>
                                     <th>Sản phẩm</th>
                                     <th>Số lượng</th>
+                                    <th>Khả dụng</th>
                                     {% if user.role == 'ADMIN' %}
                                     <th>Đơn giá</th>
                                     <th>Thành tiền</th>
@@ -41,8 +42,11 @@
                             <tbody id="line-items-body">
                                 {% for line_form in lines %}
                                 <tr class="line-item-row">
-                                    <td style="width: 40%;">{{ line_form.product }}</td>
-                                    <td style="width: 15%;">{{ line_form.quantity }}</td>
+                                    <td style="width: 35%;">{{ line_form.product }}</td>
+                                    <td style="width: 12%;">{{ line_form.quantity }}</td>
+                                    <td style="width: 10%;" class="text-center">
+                                        <span class="available-qty-display fw-bold text-info">0</span>
+                                    </td>
                                     {% if user.role == 'ADMIN' %}
                                     <td style="width: 20%;">{{ line_form.unit_price }}</td>
                                     <td style="width: 20%;" class="text-end fw-bold">
@@ -142,15 +146,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function fetchAvailableQty(row) {
+        const productSelect = row.querySelector('select[name$="-product"]');
+        const warehouseSelect = document.querySelector('select[name="warehouse"]');
+        const display = row.querySelector('.available-qty-display');
+        
+        const productId = productSelect.value;
+        const warehouseId = warehouseSelect.value;
+        
+        if (!productId || !warehouseId) {
+            display.textContent = '0';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/catalog/stock/check/?product_id=${productId}&warehouse_id=${warehouseId}`);
+            const data = await response.json();
+            display.textContent = data.available;
+            
+            // Highlight if quantity exceeds available
+            const qtyInput = row.querySelector('.qty-input');
+            const qty = parseFloat(qtyInput.value) || 0;
+            if (qty > data.available) {
+                qtyInput.classList.add('is-invalid');
+                display.classList.remove('text-info');
+                display.classList.add('text-danger');
+            } else {
+                qtyInput.classList.remove('is-invalid');
+                display.classList.remove('text-danger');
+                display.classList.add('text-info');
+            }
+        } catch (error) {
+            console.error('Error fetching stock:', error);
+            display.textContent = 'err';
+        }
+    }
+
     function bindRowEvents(row) {
+        const productSelect = row.querySelector('select[name$="-product"]');
         const qtyInput = row.querySelector('.qty-input');
         const priceInput = row.querySelector('.price-input');
         
+        if (productSelect) {
+            $(productSelect).on('change', function() {
+                fetchAvailableQty(row);
+            });
+        }
+
         [qtyInput, priceInput].forEach(input => {
             if (input) {
                 input.addEventListener('input', () => {
                     calculateRowTotal(row);
                     calculateGrandTotal();
+                    if (input.classList.contains('qty-input')) {
+                        // Re-check against available when quantity changes
+                        const available = parseFloat(row.querySelector('.available-qty-display').textContent) || 0;
+                        const qty = parseFloat(input.value) || 0;
+                        if (qty > available) {
+                            input.classList.add('is-invalid');
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    }
                 });
             }
         });
@@ -171,8 +228,19 @@ document.addEventListener('DOMContentLoaded', function() {
     for (let row of initialRows) {
         bindRowEvents(row);
         calculateRowTotal(row);
+        fetchAvailableQty(row);
     }
     calculateGrandTotal();
+
+    const warehouseSelect = document.querySelector('select[name="warehouse"]');
+    if (warehouseSelect) {
+        $(warehouseSelect).on('change', function() {
+            const rows = tableBody.getElementsByClassName('line-item-row');
+            for (let row of rows) {
+                fetchAvailableQty(row);
+            }
+        });
+    }
 
     addButton.addEventListener('click', function() {
         const rows = tableBody.getElementsByClassName('line-item-row');

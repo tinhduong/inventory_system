@@ -111,18 +111,20 @@ class SalesCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         if self.request.POST:
-            data['lines'] = SalesOrderLineFormSet(self.request.POST)
+            # Ưu tiên lấy formset đã có errors nếu được truyền qua từ form_valid
+            data['lines'] = kwargs.get('lines') or SalesOrderLineFormSet(self.request.POST)
         else:
             data['lines'] = SalesOrderLineFormSet()
         return data
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        lines = context['lines']
+        self.object = form.save(commit=False)
+        self.object.employee = self.request.user
+        # Lấy formset và gắn instance (để có warehouse) trước khi validate
+        lines = SalesOrderLineFormSet(self.request.POST, instance=self.object)
+        
         if lines.is_valid():
-            form.instance.employee = self.request.user
-            self.object = form.save()
-            lines.instance = self.object
+            self.object.save()
             lines.save()
             # Calculate total amount
             self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
@@ -131,7 +133,7 @@ class SalesCreateView(LoginRequiredMixin, CreateView):
             update_stock_from_order(self.object)
             return redirect(self.get_success_url())
         else:
-            return self.render_to_response(self.get_context_data(form=form))
+            return self.render_to_response(self.get_context_data(form=form, lines=lines))
 
     def get_success_url(self):
         return reverse('orders:sales-detail', kwargs={'pk': self.object.pk})
@@ -154,6 +156,7 @@ class SalesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return data
 
     def form_valid(self, form):
+        # Đối với update, instance đã có warehouse
         context = self.get_context_data()
         lines = context['lines']
         if lines.is_valid():
@@ -167,7 +170,7 @@ class SalesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             messages.success(self.request, f"Cập nhật đơn hàng {self.object.code} thành công.")
             return redirect(self.get_success_url())
         else:
-            return self.render_to_response(self.get_context_data(form=form))
+            return self.render_to_response(self.get_context_data(form=form, lines=lines))
 
     def get_success_url(self):
         return reverse('orders:sales-detail', kwargs={'pk': self.object.pk})

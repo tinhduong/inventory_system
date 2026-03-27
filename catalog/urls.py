@@ -17,4 +17,5 @@ urlpatterns = [
     
     path('stock/', views.StockListView.as_view(), name='stock-list'),
     path('stock/held-detail/', views.StockHeldDetailView.as_view(), name='stock-held-detail'),
+    path('stock/check/', views.CheckStockView.as_view(), name='stock-check'),
 ]
