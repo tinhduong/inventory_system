@@ -100,7 +100,7 @@ class ExportProductsView(LoginRequiredMixin, View):
         ws = wb.active
         ws.title = "Danh muc san pham"
         
-        headers = ["Ma SKU", "Ten san pham", "Mo ta", "Don vi tinh"]
+        headers = ["Ma SKU", "Ten san pham", "Mo ta", "Don vi tinh", "Nguong canh bao"]
         ws.append(headers)
         
         header_fill = PatternFill(start_color="3498db", end_color="3498db", fill_type="solid")
@@ -115,7 +115,8 @@ class ExportProductsView(LoginRequiredMixin, View):
                 product.code,
                 product.name,
                 product.description or "",
-                product.unit
+                product.unit,
+                product.min_stock
             ])
             
         for col in ws.columns:
@@ -155,6 +156,7 @@ class ImportProductsView(LoginRequiredMixin, View):
                     name = str(row[1]).strip() if row[1] else ""
                     description = str(row[2]).strip() if row[2] else ""
                     unit = str(row[3]).strip() if row[3] else "Cái"
+                    min_stock = int(row[4]) if len(row) > 4 and row[4] is not None else 0
                     
                     if not code or not name:
                         error_count += 1
@@ -166,7 +168,8 @@ class ImportProductsView(LoginRequiredMixin, View):
                         defaults={
                             'name': name,
                             'description': description,
-                            'unit': unit
+                            'unit': unit,
+                            'min_stock': min_stock
                         }
                     )
                     success_count += 1

@@ -14,6 +14,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name="Tên sản phẩm")
     description = models.TextField(blank=True, null=True, verbose_name="Mô tả")
     unit = models.CharField(max_length=50, verbose_name="Đơn vị tính")
+    min_stock = models.IntegerField(default=0, verbose_name="Ngưỡng cảnh báo tồn kho")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -22,6 +22,7 @@
                     <th>Mã</th>
                     <th>Tên</th>
                     <th>ĐVT</th>
+                    <th>Ngưỡng</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -31,6 +32,7 @@
                     <td>{{ p.code }}</td>
                     <td>{{ p.name }}</td>
                     <td>{{ p.unit }}</td>
+                    <td><span class="badge bg-secondary opacity-75">{{ p.min_stock }}</span></td>
                     <td><a href="{% url 'catalog:product-update' p.pk %}" class="btn btn-sm btn-link">Sửa</a></td>
                 </tr>
                 {% endfor %}

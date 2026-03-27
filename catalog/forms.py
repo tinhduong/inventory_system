@@ -15,12 +15,13 @@ class WarehouseForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['code', 'name', 'description', 'unit']
+        fields = ['code', 'name', 'description', 'unit', 'min_stock']
         widgets = {
             'code': forms.TextInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'unit': forms.TextInput(attrs={'class': 'form-control'}),
+            'min_stock': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 class ExcelImportForm(forms.Form):
