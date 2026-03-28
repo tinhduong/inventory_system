@@ -150,3 +150,15 @@ class PurchaseOrderLine(models.Model):
     def save(self, *args, **kwargs):
         self.line_total = self.quantity * (self.unit_price or 0)
         super().save(*args, **kwargs)
+
+class OrderLog(models.Model):
+    sales_order = models.ForeignKey(SalesOrder, on_delete=models.CASCADE, related_name='logs', null=True, blank=True)
+    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name='logs', null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người thực hiện")
+    action = models.CharField(max_length=255, verbose_name="Hành động")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Thời gian")
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Lịch sử đơn hàng"
+        verbose_name_plural = "Lịch sử đơn hàng"

@@ -5,13 +5,19 @@ from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from datetime import timedelta
-from .models import SalesOrder, PurchaseOrder, OrderStatus
+from .models import SalesOrder, PurchaseOrder, OrderStatus, OrderLog
 from .forms import SalesOrderForm, SalesOrderLineFormSet, PurchaseOrderForm, PurchaseOrderLineFormSet
 from .services.sales_service import confirm_sales_order, cancel_sales_order
 from .services.purchase_service import confirm_purchase_order, cancel_purchase_order
 from .services.inventory_service import update_stock_from_order
 from accounts.models import Customer
 from django.db.models import Prefetch
+
+def log_order_action(order, user, action):
+    if isinstance(order, SalesOrder):
+        OrderLog.objects.create(sales_order=order, user=user, action=action)
+    elif isinstance(order, PurchaseOrder):
+        OrderLog.objects.create(purchase_order=order, user=user, action=action)
 
 def get_period_filter(period):
     today = timezone.now().date()
@@ -131,6 +137,8 @@ class SalesCreateView(LoginRequiredMixin, CreateView):
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
+            # Log action
+            log_order_action(self.object, self.request.user, "Tạo đơn hàng")
             return redirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form, lines=lines))
@@ -167,6 +175,8 @@ class SalesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
+            # Log action
+            log_order_action(self.object, self.request.user, "Sửa đơn hàng")
             messages.success(self.request, f"Cập nhật đơn hàng {self.object.code} thành công.")
             return redirect(self.get_success_url())
         else:
@@ -186,6 +196,8 @@ def confirm_sales_view(request, pk):
     order = get_object_or_404(SalesOrder, pk=pk)
     try:
         confirm_sales_order(order)
+        # Log action
+        log_order_action(order, request.user, "Xác nhận đơn hàng")
         messages.success(request, f"Đơn hàng {order.code} đã được xác nhận và trừ tồn kho.")
     except Exception as e:
         messages.error(request, f"Lỗi khi xác nhận: {str(e)}")
@@ -287,6 +299,8 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
+            # Log action
+            log_order_action(self.object, self.request.user, "Tạo đơn nhập hàng")
             return redirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -322,6 +336,8 @@ class PurchaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
+            # Log action
+            log_order_action(self.object, self.request.user, "Sửa đơn nhập hàng")
             messages.success(self.request, f"Cập nhật đơn nhập {self.object.code} thành công.")
             return redirect(self.get_success_url())
         else:
@@ -341,6 +357,8 @@ def confirm_purchase_view(request, pk):
     order = get_object_or_404(PurchaseOrder, pk=pk)
     try:
         confirm_purchase_order(order)
+        # Log action
+        log_order_action(order, request.user, "Xác nhận đơn nhập hàng")
         messages.success(request, f"Đơn nhập {order.code} đã được xác nhận và cộng tồn kho.")
     except Exception as e:
         messages.error(request, f"Lỗi khi xác nhận: {str(e)}")

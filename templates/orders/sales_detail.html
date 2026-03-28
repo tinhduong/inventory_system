@@ -103,6 +103,25 @@
                 </p>
             </div>
         </div>
+
+        {% if user.role == 'ADMIN' %}
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <h6 class="text-secondary text-uppercase mb-3 small">Lịch sử thao tác</h6>
+                <div class="timeline" style="font-size: 0.85rem;">
+                    {% for log in order.logs.all %}
+                    <div class="mb-2">
+                        <span class="text-muted">{{ log.created_at|date:"d/m/Y H:i" }}:</span>
+                        <span class="fw-bold">{{ log.action }}</span>
+                        <span class="text-muted small"> - bởi {{ log.user.username }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small mb-0">Chưa có lịch sử thao tác.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
