@@ -242,7 +242,46 @@
 
         // Hàm bỏ định dạng: 1,000,000 -> 1000000
         function unformatMoney(value) {
-            return value.replace(/,/g, "");
+            if (!value) return "";
+            return value.toString().replace(/,/g, "");
+        }
+
+        function initMoneyInput(input) {
+            // Tránh khởi tạo nhiều lần
+            if (input.dataset.moneyInit) return;
+            input.dataset.moneyInit = 'true';
+            
+            // Tự động thêm hậu tố ,000 bằng cách wrap vào input-group
+            if (!input.closest('.input-group')) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'input-group';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+                
+                const suffix = document.createElement('span');
+                suffix.className = 'input-group-text';
+                suffix.textContent = ',000';
+                wrapper.appendChild(suffix);
+            }
+
+            // Chia cho 1000 khi hiển thị giá trị ban đầu (nếu có)
+            if (input.value) {
+                let rawVal = unformatMoney(input.value);
+                if (rawVal) {
+                    let val = parseFloat(rawVal) / 1000;
+                    input.value = formatMoney(val);
+                }
+            }
+
+            // Lắng nghe sự kiện input để định dạng liên tục
+            input.addEventListener('input', function(e) {
+                let cursorPosition = this.selectionStart;
+                let oldLength = this.value.length;
+                this.value = formatMoney(this.value);
+                let newLength = this.value.length;
+                cursorPosition = cursorPosition + (newLength - oldLength);
+                this.setSelectionRange(cursorPosition, cursorPosition);
+            });
         }
 
         function initSearchSelect(element) {
@@ -267,31 +306,20 @@
                 initSearchSelect(this);
             });
 
-            // 1. Định dạng các ô nhập tiền khi tải trang
+            // 1. Khởi tạo các ô nhập tiền
             document.querySelectorAll('.money-input').forEach(function(input) {
-                if (input.value) {
-                    input.value = formatMoney(input.value);
-                }
-
-                // 2. Lắng nghe sự kiện gõ phím để định dạng trực tiếp
-                input.addEventListener('input', function(e) {
-                    let cursorPosition = this.selectionStart;
-                    let oldLength = this.value.length;
-                    
-                    this.value = formatMoney(this.value);
-                    
-                    // Giữ vị trí con trỏ chuột sau khi định dạng (tránh bị nhảy về cuối)
-                    let newLength = this.value.length;
-                    cursorPosition = cursorPosition + (newLength - oldLength);
-                    this.setSelectionRange(cursorPosition, cursorPosition);
-                });
+                initMoneyInput(input);
             });
 
-            // 3. Trước khi submit form, loại bỏ dấu phẩy để Django không bị lỗi validate Decimal
+            // 3. Trước khi submit form, nhân với 1000 để trả lại giá trị thực tế
             document.querySelectorAll('form').forEach(function(form) {
                 form.addEventListener('submit', function() {
                     form.querySelectorAll('.money-input').forEach(function(input) {
-                        input.value = unformatMoney(input.value);
+                        let rawVal = unformatMoney(input.value);
+                        if (rawVal !== "") {
+                            // Nhân với 1000 trước khi gửi lên server
+                            input.value = (parseFloat(rawVal) * 1000).toString();
+                        }
                     });
                 });
             });
@@ -301,11 +329,9 @@
                 mutations.forEach(function(mutation) {
                     mutation.addedNodes.forEach(function(node) {
                         if (node.nodeType === 1) { // ELEMENT_NODE
-                            // Khởi tạo tiền cho hàng mới
+                            // Khởi tạo cho hàng tiền mới
                             node.querySelectorAll('.money-input').forEach(function(input) {
-                                input.addEventListener('input', function(e) {
-                                    this.value = formatMoney(this.value);
-                                });
+                                initMoneyInput(input);
                             });
                             // Khởi tạo Select2 cho hàng mới
                             node.querySelectorAll('.search-select').forEach(function(select) {
