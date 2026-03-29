@@ -114,8 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
         const priceInput = row.querySelector('.price-input');
         if (!priceInput) return 0;
-        const price = parseVND(priceInput.value);
-        const total = qty * price;
+        const price = parseFloat(unformatMoney(priceInput.value)) || 0;
+        const total = qty * price * 1000;
         const display = row.querySelector('.line-total-display');
         if (display) display.textContent = formatVND(total);
         return total;

@@ -251,7 +251,18 @@
             if (input.dataset.moneyInit) return;
             input.dataset.moneyInit = 'true';
             
-            // Tự động thêm hậu tố ,000 bằng cách wrap vào input-group
+            // Tạo hidden field để giữ giá trị thực tế (đã nhân 1000)
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = input.name;
+            hiddenInput.value = input.value || "";
+            input.parentNode.insertBefore(hiddenInput, input);
+            
+            // Xóa name của ô nhập hiển thị để không bị gửi lên server
+            input.removeAttribute('name');
+            input.style.textAlign = 'right';
+
+            // Tự động thêm hậu tố 000 bằng cách wrap vào input-group
             if (!input.closest('.input-group')) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'input-group';
@@ -259,21 +270,20 @@
                 wrapper.appendChild(input);
                 
                 const suffix = document.createElement('span');
-                suffix.className = 'input-group-text';
-                suffix.textContent = ',000';
+                suffix.className = 'input-group-text text-muted';
+                suffix.textContent = '000';
                 wrapper.appendChild(suffix);
             }
 
             // Chia cho 1000 khi hiển thị giá trị ban đầu (nếu có)
-            if (input.value) {
-                let rawVal = unformatMoney(input.value);
-                if (rawVal) {
-                    let val = parseFloat(rawVal) / 1000;
-                    input.value = formatMoney(val);
+            if (hiddenInput.value) {
+                let rawVal = parseFloat(hiddenInput.value);
+                if (!isNaN(rawVal)) {
+                    input.value = formatMoney(rawVal / 1000);
                 }
             }
 
-            // Lắng nghe sự kiện input để định dạng liên tục
+            // Lắng nghe sự kiện input để cập nhật hidden field và định dạng hiển thị
             input.addEventListener('input', function(e) {
                 let cursorPosition = this.selectionStart;
                 let oldLength = this.value.length;
@@ -281,6 +291,17 @@
                 let newLength = this.value.length;
                 cursorPosition = cursorPosition + (newLength - oldLength);
                 this.setSelectionRange(cursorPosition, cursorPosition);
+
+                // Cập nhật giá trị thực tế vào hidden field
+                let rawVal = unformatMoney(this.value);
+                if (rawVal !== "") {
+                    hiddenInput.value = (parseFloat(rawVal) * 1000).toString();
+                } else {
+                    hiddenInput.value = "";
+                }
+                
+                // Kích hoạt sự kiện change để các script khác (như tính thành tiền) nhận biết
+                input.dispatchEvent(new Event('change', { bubbles: true }));
             });
         }
 
@@ -311,17 +332,9 @@
                 initMoneyInput(input);
             });
 
-            // 3. Trước khi submit form, nhân với 1000 để trả lại giá trị thực tế
+            // 3. Xử lý form submit (không cần nhân 1000 nữa vì đã có hidden field)
             document.querySelectorAll('form').forEach(function(form) {
-                form.addEventListener('submit', function() {
-                    form.querySelectorAll('.money-input').forEach(function(input) {
-                        let rawVal = unformatMoney(input.value);
-                        if (rawVal !== "") {
-                            // Nhân với 1000 trước khi gửi lên server
-                            input.value = (parseFloat(rawVal) * 1000).toString();
-                        }
-                    });
-                });
+                // Giữ nguyên logic khác nếu có, nhưng bỏ phần nhân 1000 trực tiếp
             });
 
             // Xử lý cả các hàng mới được thêm vào formset (nếu có)
