@@ -75,15 +75,15 @@
                         </button>
                     </div>
                     
-                    <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div class="mt-4">
                         {% if user.role == 'ADMIN' %}
-                        <div class="h4 mb-0 fw-bold">
+                        <div class="h4 mb-3 fw-bold text-end">
                             Tổng cộng: <span id="grand-total-display" class="text-primary">0</span> đ
                         </div>
                         {% endif %}
-                        <div>
-                            <button type="submit" class="btn btn-primary btn-lg px-5">Lưu đơn hàng</button>
-                            <a href="{% url 'orders:sales-list' %}" class="btn btn-outline-secondary btn-lg ms-2">Hủy bỏ</a>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-lg px-md-5 flex-grow-1 flex-md-grow-0 me-2">Lưu đơn hàng</button>
+                            <a href="{% url 'orders:sales-list' %}" class="btn btn-outline-secondary btn-lg flex-grow-1 flex-md-grow-0">Hủy bỏ</a>
                         </div>
                     </div>
                 </form>
