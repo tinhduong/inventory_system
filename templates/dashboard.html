@@ -77,7 +77,7 @@
                     </thead>
                     <tbody>
                         {% for order in recent_sales %}
-                        <tr>
+                        <tr onclick="window.location.href='{% url 'orders:sales-detail' order.pk %}'" style="cursor: pointer;">
                             <td>
                                 <div class="text-muted small">
                                     {% if order.status == 'CONFIRMED' %}
@@ -87,7 +87,7 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td><a href="{% url 'orders:sales-detail' order.pk %}" class="text-decoration-none fw-bold">{{ order.customer.name }}</a></td>
+                            <td class="fw-bold">{{ order.customer.name }}</td>
                             {% if user.role == 'ADMIN' %}
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
@@ -128,7 +128,7 @@
                     </thead>
                     <tbody>
                         {% for order in recent_purchases %}
-                        <tr>
+                        <tr onclick="window.location.href='{% url 'orders:purchase-detail' order.pk %}'" style="cursor: pointer;">
                             <td>
                                 <div class="text-muted small">
                                     {% if order.status == 'CONFIRMED' %}
@@ -138,7 +138,7 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td><a href="{% url 'orders:purchase-detail' order.pk %}" class="text-decoration-none fw-bold">{{ order.supplier.name }}</a></td>
+                            <td class="fw-bold">{{ order.supplier.name }}</td>
                             {% if user.role == 'ADMIN' %}
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
                             <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
