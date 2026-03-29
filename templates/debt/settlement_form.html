@@ -44,30 +44,29 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const amountInput = document.querySelector('input[name="amount_paid"]');
+    // Không dùng name="amount_paid" vì ở base.html name này đã bị remove khỏi visible_input
+    // Ta tìm theo class name 'money-input' cụ thể ở form này
+    const amountInput = document.querySelector('.money-input');
     const maxBalanceEl = document.getElementById('maxBalance');
     const maxAlert = document.getElementById('maxAlert');
     
     if (amountInput && maxBalanceEl) {
-        // Loại bỏ mọi ký tự không phải số trước khi parse để tránh lỗi do locale (dấu phẩy/chấm)
+        // Lấy số dư tối đa (giá trị thực tế trong DB)
         let maxBalanceStr = maxBalanceEl.getAttribute('data-value').replace(/[^0-9]/g, '');
         const maxBalance = parseInt(maxBalanceStr) || 0;
+        // Do ô nhập liệu đã loại bỏ 3 số 0, giới hạn lớn nhất cũng phải chia 1000
+        const maxAllowed = Math.floor(maxBalance / 1000);
         
         amountInput.addEventListener('input', function() {
             let rawValue = this.value.replace(/[^0-9]/g, '');
             let currentVal = parseInt(rawValue) || 0;
             
-            if (currentVal > maxBalance) {
-                this.value = maxBalance;
-                // Phát sự kiện để các plugin format tiền tệ (nếu có) cập nhật lại hiển thị
-                this.dispatchEvent(new Event('change', { bubbles: true }));
-                // Nếu trang web có sử dụng plugin định dạng tiền tệ như jQuery MaskMoney, 
-                // bạn có thể cần kích hoạt event 'change' hoặc 'blur' để nó tự format lại.
-                
+            if (currentVal > maxAllowed) {
+                // Giới hạn lại số tiền nhập trong ô
+                this.value = maxAllowed;
+                this.dispatchEvent(new Event('input', { bubbles: true }));
                 // Hiển thị thông báo
                 maxAlert.classList.remove('d-none');
-                
-                // Rung khung nhập liệu để báo lỗi
                 amountInput.classList.add('is-invalid');
             } else {
                 maxAlert.classList.add('d-none');
@@ -75,16 +74,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Xử lý khi người dùng dán hoặc hoàn tất nhập liệu
         amountInput.addEventListener('change', function() {
             let rawValue = this.value.replace(/[^0-9]/g, '');
             let currentVal = parseFloat(rawValue);
-            if (currentVal > maxBalance) {
-                this.value = maxBalance;
+            if (currentVal > maxAllowed) {
+                this.value = maxAllowed;
+                this.dispatchEvent(new Event('input', { bubbles: true }));
                 maxAlert.classList.remove('d-none');
             }
         });
     }
-});
-</script>
+});</script>
 {% endblock %}

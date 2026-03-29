@@ -38,4 +38,39 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.querySelector('.money-input');
+    // Số tiền còn lại thực tế từ DB
+    const maxBalance = parseInt("{{ entry.remaining_amount|floatformat:0 }}") || 0;
+    const maxAllowed = Math.floor(maxBalance / 1000);
+
+    if (amountInput) {
+        amountInput.addEventListener('input', function() {
+            let rawValue = this.value.replace(/[^0-9]/g, '');
+            let currentVal = parseInt(rawValue) || 0;
+            
+            if (currentVal > maxAllowed) {
+                // Giới hạn lại
+                this.value = maxAllowed;
+                this.dispatchEvent(new Event('input', { bubbles: true }));
+                
+                // Cảnh báo visually nếu cần
+                amountInput.classList.add('is-invalid');
+                setTimeout(() => amountInput.classList.remove('is-invalid'), 600);
+            }
+        });
+
+        amountInput.addEventListener('change', function() {
+            let rawValue = this.value.replace(/[^0-9]/g, '');
+            let currentVal = parseFloat(rawValue);
+            if (currentVal > maxAllowed) {
+                this.value = maxAllowed;
+                this.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
