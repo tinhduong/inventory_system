@@ -26,8 +26,8 @@ class SalesOrderForm(forms.ModelForm):
         fields = ['warehouse', 'customer', 'order_date', 'paid_amount']
         widgets = {
             'order_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'warehouse': forms.Select(attrs={'class': 'form-control search-select'}),
-            'customer': forms.Select(attrs={'class': 'form-control search-select'}),
+            'warehouse': forms.Select(attrs={'class': 'form-control search-select', 'data-allow-clear': 'false'}),
+            'customer': forms.Select(attrs={'class': 'form-control search-select', 'data-allow-clear': 'false'}),
             'paid_amount': forms.TextInput(attrs={'class': 'form-control money-input'}),
         }
 
@@ -86,7 +86,7 @@ SalesOrderLineFormSet = inlineformset_factory(
     formset=BaseSalesOrderLineFormSet,
     fields=['product', 'quantity', 'unit_price'],
     widgets={
-        'product': forms.Select(attrs={'class': 'form-control search-select'}),
+        'product': forms.Select(attrs={'class': 'form-control search-select', 'data-allow-clear': 'false'}),
         'quantity': forms.NumberInput(attrs={'class': 'form-control qty-input'}),
         'unit_price': forms.TextInput(attrs={'class': 'form-control money-input price-input'}),
     },
@@ -99,8 +99,8 @@ class PurchaseOrderForm(forms.ModelForm):
         fields = ['warehouse', 'supplier', 'order_date', 'paid_amount']
         widgets = {
             'order_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'warehouse': forms.Select(attrs={'class': 'form-control search-select'}),
-            'supplier': forms.Select(attrs={'class': 'form-control search-select'}),
+            'warehouse': forms.Select(attrs={'class': 'form-control search-select', 'data-allow-clear': 'false'}),
+            'supplier': forms.Select(attrs={'class': 'form-control search-select', 'data-allow-clear': 'false'}),
             'paid_amount': forms.TextInput(attrs={'class': 'form-control money-input'}),
         }
 
@@ -119,7 +119,7 @@ PurchaseOrderLineFormSet = inlineformset_factory(
     PurchaseOrder, PurchaseOrderLine,
     fields=['product', 'quantity', 'unit_price'],
     widgets={
-        'product': forms.Select(attrs={'class': 'form-control search-select'}),
+        'product': forms.Select(attrs={'class': 'form-control search-select', 'data-allow-clear': 'false'}),
         'quantity': forms.NumberInput(attrs={'class': 'form-control qty-input'}),
         'unit_price': forms.TextInput(attrs={'class': 'form-control money-input price-input'}),
     },
