@@ -33,6 +33,7 @@ class SalesOrderForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['paid_amount'].required = False
         # Nếu chỉ có 1 kho, mặc định chọn và disable
         from catalog.models import Warehouse
         wh = Warehouse.objects.first()
@@ -105,6 +106,7 @@ class PurchaseOrderForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['paid_amount'].required = False
         # Tương tự cho đơn nhập
         from catalog.models import Warehouse
         wh = Warehouse.objects.first()

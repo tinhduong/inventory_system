@@ -19,8 +19,8 @@ class SalesOrder(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     order_date = models.DateField(default=timezone.now, verbose_name="Ngày đặt hàng")
-    total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
-    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán (tại quầy)")
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Tổng tiền")
+    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
 
     @property
@@ -91,8 +91,8 @@ class PurchaseOrder(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     order_date = models.DateField(default=timezone.now, verbose_name="Ngày nhập hàng")
-    total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Tổng tiền")
-    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Đã thanh toán (tại quầy)")
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Tổng tiền")
+    paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
 
     @property
