@@ -22,12 +22,11 @@
 
 <div class="row">
     <div class="col-md-4 mb-4">
-        <a href="{% url 'catalog:product-list' %}" class="text-decoration-none">
+        <a href="{% url 'catalog:stock-list' %}" class="text-decoration-none">
             <div class="card text-white bg-primary h-100 shadow-sm border-0 hover-lift">
-                <div class="card-body text-center">
-                    <h6 class="card-title mb-2 opacity-75">Sản phẩm</h6>
-                    <h3 class="fw-bold mb-0">{{ product_count }}</h3>
-                    <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
+                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
+                    <h5 class="card-title mb-1 fw-bold">Báo cáo tồn kho</h5>
+                    <div class="mt-2 small opacity-75">Truy cập báo cáo <i class="bi bi-arrow-right"></i></div>
                 </div>
             </div>
         </a>
