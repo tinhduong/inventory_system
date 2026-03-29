@@ -66,6 +66,7 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th>Thời gian</th>
                             <th>Khách hàng</th>
                             {% if user.role == 'ADMIN' %}
                             <th>Tổng (đ)</th>
@@ -78,6 +79,15 @@
                     <tbody>
                         {% for order in recent_sales %}
                         <tr>
+                            <td>
+                                <div class="text-muted small">
+                                    {% if order.status == 'CONFIRMED' %}
+                                        {{ order.updated_at|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        {{ order.created_at|date:"d/m/Y H:i" }}
+                                    {% endif %}
+                                </div>
+                            </td>
                             <td><a href="{% url 'orders:sales-detail' order.pk %}" class="text-decoration-none fw-bold">{{ order.customer.name }}</a></td>
                             {% if user.role == 'ADMIN' %}
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
@@ -107,6 +117,7 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th>Thời gian</th>
                             <th>Nhà cung cấp</th>
                             {% if user.role == 'ADMIN' %}
                             <th>Tổng (đ)</th>
@@ -119,6 +130,15 @@
                     <tbody>
                         {% for order in recent_purchases %}
                         <tr>
+                            <td>
+                                <div class="text-muted small">
+                                    {% if order.status == 'CONFIRMED' %}
+                                        {{ order.updated_at|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        {{ order.created_at|date:"d/m/Y H:i" }}
+                                    {% endif %}
+                                </div>
+                            </td>
                             <td><a href="{% url 'orders:purchase-detail' order.pk %}" class="text-decoration-none fw-bold">{{ order.supplier.name }}</a></td>
                             {% if user.role == 'ADMIN' %}
                             <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
