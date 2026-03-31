@@ -74,6 +74,11 @@ def allocate_settlement_fifo(settlement, amount_to_allocate):
     for entry in unpaid_entries:
         if remaining <= 0:
             break
+        
+        # Determine order code for the note
+        order = entry.sales_order if entry.sales_order else entry.purchase_order
+        order_code = order.code if order else "Không xác định"
+
         allocation = min(entry.rem, remaining)
         DebtEntry.objects.create(
             customer=settlement.customer, 
@@ -82,7 +87,7 @@ def allocate_settlement_fifo(settlement, amount_to_allocate):
             settlement=settlement, 
             amount=allocation,
             is_settlement=True, 
-            note=f"Khấu trừ nợ FIFO. Settlement #{settlement.id}",
+            note=f"Khấu trừ nợ cho đơn hàng {order_code} bởi phiếu quyết toán số {settlement.id}",
             entry_date=settlement.payment_date
         )
         remaining -= allocation
