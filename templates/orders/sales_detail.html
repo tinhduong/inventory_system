@@ -48,8 +48,8 @@
                             <td>{{ line.product.name }}</td>
                             <td>{{ line.quantity|floatformat:0 }}</td>
                             {% if user.role == 'ADMIN' %}
-                            <td>{{ line.unit_price|floatformat:0|intcomma }} đ</td>
-                            <td class="fw-bold">{{ line.line_total|floatformat:0|intcomma }} đ</td>
+                             <td>{{ line.unit_price|floatformat:0 }} đ</td>
+                             <td class="fw-bold">{{ line.line_total|floatformat:0 }} đ</td>
                             {% endif %}
                         </tr>
                         {% endfor %}
@@ -58,7 +58,7 @@
                     <tfoot class="table-light">
                         <tr>
                             <td colspan="3" class="text-end fw-bold">Tổng cộng:</td>
-                            <td class="fw-bold text-danger">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                             <td class="fw-bold text-danger">{{ order.total_amount|floatformat:0 }} đ</td>
                         </tr>
                     </tfoot>
                     {% endif %}
@@ -74,7 +74,7 @@
                 <p><strong>Ngày đặt:</strong> {{ order.order_date }}</p>
                 <p><strong>Ngày tạo:</strong> {{ order.created_at|date:"d/m/Y" }}</p>
                 {% if user.role == 'ADMIN' %}
-                <p><strong>Đã thanh toán (Trả trước):</strong> <span class="text-success fw-bold">{{ order.paid_amount|floatformat:0|intcomma }} đ</span></p>
+                 <p><strong>Đã thanh toán (Trả trước):</strong> <span class="text-success fw-bold">{{ order.paid_amount|floatformat:0 }} đ</span></p>
                 {% endif %}
                 <p><strong>Trạng thái:</strong> 
                     <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
@@ -89,8 +89,8 @@
                         {{ order.debt_status_display }}
                     </span>
                 </p>
-                <p><strong>Tổng đã thanh toán:</strong> <span class="text-success fw-bold">{{ order.current_paid_amount|floatformat:0|intcomma }} đ</span></p>
-                <p><strong>Số tiền còn nợ:</strong> <span class="text-danger fw-bold">{{ order.remaining_amount|floatformat:0|intcomma }} đ</span></p>
+                 <p><strong>Tổng đã thanh toán:</strong> <span class="text-success fw-bold">{{ order.current_paid_amount|floatformat:0 }} đ</span></p>
+                 <p><strong>Số tiền còn nợ:</strong> <span class="text-danger fw-bold">{{ order.remaining_amount|floatformat:0 }} đ</span></p>
                 <a href="{% url 'debt:customer-debt' order.customer.pk %}" class="btn btn-sm btn-outline-primary w-100 mb-2">
                     <i class="bi bi-wallet2"></i> Chi tiết công nợ đối tác
                 </a>

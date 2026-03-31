@@ -6,7 +6,7 @@
         <div class="card border-primary">
             <div class="card-body">
                 <h5 class="text-primary">Tổng phải thu (Khách nợ)</h5>
-                <h2 class="fw-bold">{{ total_receivable|floatformat:0|intcomma }} đ</h2>
+                <h2 class="fw-bold">{{ total_receivable|floatformat:0 }} đ</h2>
             </div>
         </div>
     </div>
@@ -14,7 +14,7 @@
         <div class="card border-danger">
             <div class="card-body">
                 <h5 class="text-danger">Tổng phải trả (Nợ NCC)</h5>
-                <h2 class="fw-bold">{{ total_payable|floatformat:0|intcomma }} đ</h2>
+                <h2 class="fw-bold">{{ total_payable|floatformat:0 }} đ</h2>
             </div>
         </div>
     </div>
@@ -60,10 +60,10 @@
                         </td>
                         <td class="text-end">
                             {% if item.balance > 0 %}
-                                <span class="text-primary fw-bold">{{ item.balance|floatformat:0|intcomma }} đ</span>
+                                <span class="text-primary fw-bold">{{ item.balance|floatformat:0 }} đ</span>
                                 <div class="small text-muted">Họ nợ mình</div>
                             {% elif item.balance < 0 %}
-                                <span class="text-danger fw-bold">{{ item.abs_balance|floatformat:0|intcomma }} đ</span>
+                                <span class="text-danger fw-bold">{{ item.abs_balance|floatformat:0 }} đ</span>
                                 <div class="small text-muted">Mình nợ họ</div>
                             {% else %}
                                 <span class="text-muted">0 đ</span>

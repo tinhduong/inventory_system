@@ -37,7 +37,7 @@
             <div class="card text-white bg-success h-100 shadow-sm border-0 hover-lift">
                 <div class="card-body text-center">
                     <h6 class="card-title mb-2 opacity-75">Doanh thu bán</h6>
-                    <h3 class="fw-bold mb-0">{{ total_sales|floatformat:0|intcomma }} đ</h3>
+                    <h3 class="fw-bold mb-0">{{ total_sales|floatformat:0 }} đ</h3>
                     <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
             <div class="card text-white bg-danger h-100 shadow-sm border-0 hover-lift">
                 <div class="card-body text-center">
                     <h6 class="card-title mb-2 opacity-75">Chi phí nhập</h6>
-                    <h3 class="fw-bold mb-0">{{ total_purchases|floatformat:0|intcomma }} đ</h3>
+                    <h3 class="fw-bold mb-0">{{ total_purchases|floatformat:0 }} đ</h3>
                     <div class="mt-2 small opacity-50">Xem chi tiết <i class="bi bi-arrow-right"></i></div>
                 </div>
             </div>
@@ -89,10 +89,10 @@
                             </td>
                             <td class="fw-bold">{{ order.customer.name }}</td>
                             {% if user.role == 'ADMIN' %}
-                            <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
-                            <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
+                            <td>{{ order.total_amount|floatformat:0 }}</td>
+                            <td class="text-success">{{ order.current_paid_amount|floatformat:0 }}</td>
                             <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
-                                {{ order.remaining_amount|floatformat:0|intcomma }}
+                                {{ order.remaining_amount|floatformat:0 }}
                             </td>
                             {% endif %}
                             <td>
@@ -140,10 +140,10 @@
                             </td>
                             <td class="fw-bold">{{ order.supplier.name }}</td>
                             {% if user.role == 'ADMIN' %}
-                            <td>{{ order.total_amount|floatformat:0|intcomma }}</td>
-                            <td class="text-success">{{ order.current_paid_amount|floatformat:0|intcomma }}</td>
+                            <td>{{ order.total_amount|floatformat:0 }}</td>
+                            <td class="text-success">{{ order.current_paid_amount|floatformat:0 }}</td>
                             <td class="{% if order.remaining_amount > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
-                                {{ order.remaining_amount|floatformat:0|intcomma }}
+                                {{ order.remaining_amount|floatformat:0 }}
                             </td>
                             {% endif %}
                             <td>

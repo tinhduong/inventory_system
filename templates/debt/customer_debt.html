@@ -46,7 +46,7 @@
             <div class="card-body">
                 <h6 class="text-primary mb-1">Họ nợ mình <small>(Từ đơn bán)</small></h6>
                 <h4 class="fw-bold mb-0 text-primary">
-                    {{ receivable_balance|floatformat:0|intcomma }} đ
+                    {{ receivable_balance|floatformat:0 }} đ
                 </h4>
             </div>
         </div>
@@ -56,7 +56,7 @@
             <div class="card-body">
                 <h6 class="text-danger mb-1">Mình nợ họ <small>(Từ đơn nhập)</small></h6>
                 <h4 class="fw-bold mb-0 text-danger">
-                    {{ payable_balance|floatformat:0|intcomma }} đ
+                    {{ payable_balance|floatformat:0 }} đ
                 </h4>
             </div>
         </div>
@@ -71,7 +71,7 @@
                     {% endif %}
                 </h6>
                 <h4 class="fw-bold mb-0">
-                    {{ net_balance|floatformat:0|cut:"-"|intcomma }} đ
+                    {{ net_balance|floatformat:0|cut:"-" }} đ
                 </h4>
             </div>
         </div>
@@ -114,19 +114,19 @@
                             </div>
                         </td>
                         <td class="text-end text-danger">
-                            {% if entry.account_type == 'PAYABLE' %}{{ entry.amount|floatformat:0|intcomma }}{% else %}0{% endif %}
+                            {% if entry.account_type == 'PAYABLE' %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
                         </td>
                         <td class="text-end text-primary">
-                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.amount|floatformat:0|intcomma }}{% else %}0{% endif %}
+                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
                         </td>
                         <td class="text-end text-success">
-                            {{ entry.paid_amount|floatformat:0|intcomma }}
+                            {{ entry.paid_amount|floatformat:0 }}
                         </td>
                         <td class="text-end fw-bold text-primary">
-                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.remaining_amount|floatformat:0|intcomma }}{% else %}0{% endif %}
+                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
                         </td>
                         <td class="text-end fw-bold text-danger">
-                            {% if entry.account_type == 'PAYABLE' %}{{ entry.remaining_amount|floatformat:0|intcomma }}{% else %}0{% endif %}
+                            {% if entry.account_type == 'PAYABLE' %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
                         </td>
                         <td class="text-center">
                             {% if entry.remaining_amount > 0 %}
@@ -146,7 +146,7 @@
                         </td>
                         <td class="text-end">0</td>
                         <td class="text-end">0</td>
-                        <td class="text-end text-success fw-bold">{{ entry.amount|floatformat:0|intcomma }}</td>
+                        <td class="text-end text-success fw-bold">{{ entry.amount|floatformat:0 }}</td>
                         <td class="text-end">0</td>
                         <td class="text-end">0</td>
                         <td class="text-center"><i class="bi bi-clock-history text-muted"></i></td>

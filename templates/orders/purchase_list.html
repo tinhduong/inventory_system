@@ -77,7 +77,7 @@
                         <td class="ps-3">{{ order.order_date|date:"d/m/Y" }}</td>
                         <td>{{ order.supplier.name }}</td>
                         {% if user.role == 'ADMIN' %}
-                        <td class="fw-bold text-success">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                        <td class="fw-bold text-success">{{ order.total_amount|floatformat:0 }} đ</td>
                         {% endif %}
                         <td>
                             <span class="badge {% if order.status == 'CONFIRMED' %}bg-success{% elif order.status == 'DRAFT' %}bg-secondary{% else %}bg-danger{% endif %}">
