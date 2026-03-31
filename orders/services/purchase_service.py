@@ -65,8 +65,9 @@ def cancel_purchase_order(order):
         # 1. Revert Inventory
         for line in order.lines.all():
             stock = StockItem.objects.get(warehouse=order.warehouse, product=line.product)
-            if stock.quantity < line.quantity:
-                raise ValidationError(f"Không thể hủy đơn nhập: Tồn kho hiện tại của {line.product.name} ({stock.quantity}) ít hơn số lượng cần trừ ({line.quantity}).")
+            # Comment out check for canceling purchase order to allow negative stock
+            # if stock.quantity < line.quantity:
+            #     raise ValidationError(f"Không thể hủy đơn nhập: Tồn kho hiện tại của {line.product.name} ({stock.quantity}) ít hơn số lượng cần trừ ({line.quantity}).")
             stock.quantity -= line.quantity
             stock.save()
 

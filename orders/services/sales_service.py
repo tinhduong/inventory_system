@@ -22,8 +22,9 @@ def confirm_sales_order(order):
                 product=line.product,
                 defaults={'quantity': 0}
             )
-            if stock.quantity < line.quantity:
-                raise ValidationError(f"Không đủ hàng trong kho cho sản phẩm {line.product.name}. Yêu cầu {line.quantity}, hiện có {stock.quantity}.")
+            # Comment out strict physical stock check to allow negative physical stock
+            # if stock.quantity < line.quantity:
+            #     raise ValidationError(f"Không đủ hàng trong kho cho sản phẩm {line.product.name}. Yêu cầu {line.quantity}, hiện có {stock.quantity}.")
             
             stock.quantity -= line.quantity
             stock.save()

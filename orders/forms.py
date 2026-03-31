@@ -78,8 +78,10 @@ class BaseSalesOrderLineFormSet(forms.BaseInlineFormSet):
                     except SalesOrderLine.DoesNotExist:
                         pass
                 
-                if quantity > (available + current_line_qty):
-                    form.add_error('quantity', f"Số lượng ({quantity}) vượt quá tồn kho khả dụng ({available + current_line_qty}).")
+                # Comment out stock validation for allowing negative available stock
+                # if quantity > (available + current_line_qty):
+                #     form.add_error('quantity', f"Số lượng ({quantity}) vượt quá tồn kho khả dụng ({available + current_line_qty}).")
+                pass
 
 SalesOrderLineFormSet = inlineformset_factory(
     SalesOrder, SalesOrderLine,

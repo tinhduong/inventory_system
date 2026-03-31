@@ -48,7 +48,7 @@
                         {% if current_warehouse != 'all' %}
                             <td class="ps-3 fw-medium text-primary">{{ stock.product.name }}</td>
                             <td>{{ stock.warehouse.name }}</td>
-                            <td class="text-end fw-bold">{{ stock.quantity|floatformat:0 }}</td>
+                            <td class="text-end fw-bold {% if stock.quantity < 0 %}text-danger{% endif %}">{{ stock.quantity|floatformat:0 }}</td>
                             <td class="text-end">
                                 {% if stock.held_quantity > 0 %}
                                     <a href="{% url 'catalog:stock-held-detail' %}?product={{ stock.product.id }}&warehouse={{ stock.warehouse.id }}" class="text-warning fw-bold text-decoration-none">
@@ -58,7 +58,7 @@
                                     <span class="text-muted">0</span>
                                 {% endif %}
                             </td>
-                            <td class="text-end fw-bold text-success">{{ stock.available_quantity|floatformat:0 }}</td>
+                            <td class="text-end fw-bold {% if stock.available_quantity < 0 %}text-danger{% else %}text-success{% endif %}">{{ stock.available_quantity|floatformat:0 }}</td>
                             <td>{{ stock.product.unit }}</td>
                             <td class="text-center">
                                 {% if stock.available_quantity <= stock.product.min_stock %}
@@ -72,7 +72,7 @@
                         {% else %}
                             <td class="ps-3 fw-medium text-primary">{{ stock.name }}</td>
                             <td><span class="badge bg-secondary">Tất cả kho</span></td>
-                            <td class="text-end fw-bold">{{ stock.total_quantity|floatformat:0 }}</td>
+                            <td class="text-end fw-bold {% if stock.total_quantity < 0 %}text-danger{% endif %}">{{ stock.total_quantity|floatformat:0 }}</td>
                             <td class="text-end">
                                 {% if stock.total_held > 0 %}
                                     <a href="{% url 'catalog:stock-held-detail' %}?product={{ stock.id }}&warehouse=all" class="text-warning fw-bold text-decoration-none">
@@ -82,7 +82,7 @@
                                     <span class="text-muted">0</span>
                                 {% endif %}
                             </td>
-                            <td class="text-end fw-bold text-success">
+                            <td class="text-end fw-bold {% if stock.total_quantity|subtract:stock.total_held < 0 %}text-danger{% else %}text-success{% endif %}">
                                 {{ stock.total_quantity|subtract:stock.total_held|floatformat:0 }}
                             </td>
                             <td>{{ stock.unit }}</td>
