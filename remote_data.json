@@ -1,0 +1,1245 @@
+[
+{
+  "model": "sessions.session",
+  "pk": "5g6lb2x0h9mbavu64z7m37pig54hnnme",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w6N1b:a-cjqIjVJ9zpUFKk55y0u34NylE01F2Pg7YOoEaNZNA",
+    "expire_date": "2026-04-11T06:19:59.714Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "9r4sylu9jrjmnxl2zwq1rhsupiqzjvd6",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w1cXQ:IyMnoGHazMpIVNlgNK1bhKDLHEVk-JM_ZTueucR5Xrc",
+    "expire_date": "2026-03-29T03:53:12.676Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "baz5g5grtfmwmmsnb4mzbjecz0c520vj",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w7UOB:_BssOLUnn6t1l0Ww-Y41YxDbpqF6TLRyqURckS4rZTA",
+    "expire_date": "2026-04-14T08:23:55.354Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "c2u7s7xbikcjck3t6wbh4qhfq4xfe8nq",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w5MKR:YYMuo8RX6Vk__it1WoQH7UW5CLAqIgVN7NQNapvV7jc",
+    "expire_date": "2026-04-08T11:23:15.772Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "dh7e0kp1voiry0mbjwu7c1sk3e466yre",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w69wU:8L76rHKOcu3Q1sKTdPpkzkJUVoMS-AWS9knqGNYrSHw",
+    "expire_date": "2026-04-10T16:21:50.271Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ffexc0bixfex50hzf51gd75zqn1j9mfi",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w1bbG:b4eTefBhtzhZwy4kt1EXIZx96ZvW_fG12xvqyhCH12Q",
+    "expire_date": "2026-03-29T02:53:06.285Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "itbuir9ivfomzsis8h3kcynv1wetsgos",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w2Km9:vfBJfRw2AIyvsFA9zfs2I4Ze-1mH_c8iGH3UJ-OOSsw",
+    "expire_date": "2026-03-31T03:07:21.625Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "kazpb1ae611dtl3bj6rbrdu34fne1svv",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w1eAX:GnS9Q9nfQ0TPj7GqzZKjxCTao6cLF3DhL0--oSRXkis",
+    "expire_date": "2026-03-29T05:37:41.739Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "p9clz6pddlye1uvkqjr90z65rh1luyqm",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w23YP:gFp085UJQcCm9IXkj_yodRhzUNa9zMz8t2D55A9umlM",
+    "expire_date": "2026-03-30T08:44:01.303Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "qc2dl3m6uckbni9ks8y1f9bmpwdfvc6j",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w5MbA:4t3S5QJmdgzrohj9xr6IXTTdz7-a5dS55I1jTA13XHk",
+    "expire_date": "2026-04-08T11:40:32.028Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "rwovwq6xxl7zb7wjimtp0kwwxsr8rprx",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w2O3m:NdSc857F-HOgVRlVFU5j2ReEogL4xd4K117jpWC4ymU",
+    "expire_date": "2026-03-31T06:37:46.329Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "tb5ngtwhhtte1eswtzaw6rnxhj613k0l",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w1cWQ:NYfvheSlXjQVRVaMYZFt1Ob3Sx_V2r8JYZXvJkC_igM",
+    "expire_date": "2026-03-29T03:52:10.267Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "vxygnsycigy2v7cuet61ea06sx97og8t",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w6QFD:W0iyS53emiqzZ3Gk7G-QhAFBvAkTM1aPp2FKPOpfE44",
+    "expire_date": "2026-04-11T09:46:15.065Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "wjr1n5otrk795gtzwle8hb354une0hq1",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w1cXc:savnPg-ve-_f1pYqFNd2wCadZhgoolOeQGOA6LT3DCU",
+    "expire_date": "2026-03-29T03:53:24.227Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "zyervcvttt4da1fs3unmes6z7gnaquh0",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-EH8o6XMGa-PdxQFkS3FSIe4OkVJA-2bmvUSCbS1p67SkGcVFaHH63SbID6o7wDvUW5O51XWZJ7kr8qBdjg3peT3cv4MCvXzrASAqYPA2euU1D9FNaK0OaByRZfZklAtIYCmyIW0zIWet1dnHoFi8P-0ZODw:1w69cx:iLY0X9z9qVWjbxib2xSmjja0LTmokAi4WuzE6VmeHsI",
+    "expire_date": "2026-04-10T16:01:39.208Z"
+  }
+},
+{
+  "model": "accounts.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$Y9j8LHIktRg4Bmzv80Tfro$fCgaZjwp78RgT0Y3aMNUXFqxv7xIC6YQox0T0oQirU0=",
+    "last_login": "2026-03-31T08:23:55.348Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "Tuyet",
+    "last_name": "Nguyen",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-14T13:00:01.242Z",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$HKpwV96EdHDgJvbJHs4Rq1$QOOV/qWK2N63j/lK9GiNmWTmo9vkJ38V6jX0t0r/D+I=",
+    "last_login": "2026-03-27T15:34:22.550Z",
+    "is_superuser": false,
+    "username": "nv01",
+    "first_name": "",
+    "last_name": "",
+    "email": "nv01@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-14T13:00:01.694Z",
+    "role": "EMPLOYEE",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$PumxA9MXpJNdWAFASHUlmj$xjtZOiBfc8spSS8b5b92YtHhH5cUoaFVdztb4Zka7eg=",
+    "last_login": "2026-03-15T14:51:11.227Z",
+    "is_superuser": false,
+    "username": "tinh",
+    "first_name": "Tình",
+    "last_name": "Dương Mạnh",
+    "email": "tinhduong.fpt@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-15T14:50:56.806Z",
+    "role": "EMPLOYEE",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customer",
+  "pk": 16,
+  "fields": {
+    "name": "Tâm Chũ",
+    "phone": null,
+    "email": null,
+    "address": "",
+    "note": "",
+    "created_at": "2026-03-28T06:21:11.003Z"
+  }
+},
+{
+  "model": "accounts.customer",
+  "pk": 17,
+  "fields": {
+    "name": "Hồi Chũ",
+    "phone": null,
+    "email": null,
+    "address": "",
+    "note": "",
+    "created_at": "2026-03-28T10:27:02.874Z"
+  }
+},
+{
+  "model": "accounts.customer",
+  "pk": 18,
+  "fields": {
+    "name": "Hằng Đồng tiền",
+    "phone": null,
+    "email": null,
+    "address": "",
+    "note": "",
+    "created_at": "2026-03-28T10:27:23.121Z"
+  }
+},
+{
+  "model": "accounts.customer",
+  "pk": 19,
+  "fields": {
+    "name": "Bắc Tiếp",
+    "phone": null,
+    "email": null,
+    "address": "",
+    "note": "",
+    "created_at": "2026-03-28T10:27:39.369Z"
+  }
+},
+{
+  "model": "catalog.warehouse",
+  "pk": 4,
+  "fields": {
+    "name": "Kho hàng chính",
+    "location": "",
+    "description": "Kho mặc định",
+    "is_active": true
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 4,
+  "fields": {
+    "code": "LY01",
+    "name": "Ly vàng nhọn 3 tai",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:45:29.757Z",
+    "updated_at": "2026-03-16T08:46:47.625Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 5,
+  "fields": {
+    "code": "LY02",
+    "name": "Ly vàng nhọn 5 tai",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:45:47.376Z",
+    "updated_at": "2026-03-16T08:46:41.709Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 6,
+  "fields": {
+    "code": "LY03",
+    "name": "LY VÀNG Ù 3 TAI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 50,
+    "created_at": "2026-03-16T08:46:07.968Z",
+    "updated_at": "2026-03-27T15:51:44.952Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 7,
+  "fields": {
+    "code": "LY04",
+    "name": "LY VÀNG Ù 5 TAI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 50,
+    "created_at": "2026-03-16T08:46:30.364Z",
+    "updated_at": "2026-03-27T15:51:32.307Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 8,
+  "fields": {
+    "code": "LY05",
+    "name": "LY VÀNG Ù 2 TAI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:47:20.861Z",
+    "updated_at": "2026-03-16T08:47:20.861Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 9,
+  "fields": {
+    "code": "LY06",
+    "name": "LY ĐỎ Ù 3 TAI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:49:11.714Z",
+    "updated_at": "2026-03-16T08:49:11.714Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 10,
+  "fields": {
+    "code": "ĐT01",
+    "name": "ĐỒNG TIỀN ĐƠN HÀ NỘI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:49:33.382Z",
+    "updated_at": "2026-03-16T08:49:33.382Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 11,
+  "fields": {
+    "code": "ĐT02",
+    "name": "ĐỒNG TIỀN KÉP ĐÀ LẠT",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:49:57.289Z",
+    "updated_at": "2026-03-16T08:49:57.289Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 12,
+  "fields": {
+    "code": "ML01",
+    "name": "MAO LƯƠNG",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:50:33.777Z",
+    "updated_at": "2026-03-16T08:50:33.777Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 13,
+  "fields": {
+    "code": "CTC01",
+    "name": "CẨM TÚ CẦU BÓ 5 CÀNH",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:50:57.684Z",
+    "updated_at": "2026-03-16T08:50:57.684Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 14,
+  "fields": {
+    "code": "CTC02",
+    "name": "CẨM TÚ CẦU ĐƠN 1 CÀNH",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:51:15.435Z",
+    "updated_at": "2026-03-17T06:33:18.618Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 15,
+  "fields": {
+    "code": "CAU01",
+    "name": "CAU XANH",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 160,
+    "created_at": "2026-03-16T08:51:33.279Z",
+    "updated_at": "2026-03-27T15:52:31.694Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 16,
+  "fields": {
+    "code": "CAU02",
+    "name": "CAU DÀI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:51:50.234Z",
+    "updated_at": "2026-03-16T08:51:50.234Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 17,
+  "fields": {
+    "code": "NGAU01",
+    "name": "LÁ NGÂU",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:52:17.060Z",
+    "updated_at": "2026-03-16T08:52:17.060Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 18,
+  "fields": {
+    "code": "LA01",
+    "name": "LÁ THIẾT MỘC LAN",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:52:35.221Z",
+    "updated_at": "2026-03-16T08:52:35.221Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 19,
+  "fields": {
+    "code": "LA02",
+    "name": "LÁ TÙNG NHO",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:52:54.428Z",
+    "updated_at": "2026-03-16T08:52:54.428Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 20,
+  "fields": {
+    "code": "LA03",
+    "name": "LÁ TÁO",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:54:08.985Z",
+    "updated_at": "2026-03-16T08:54:08.985Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 21,
+  "fields": {
+    "code": "LA04",
+    "name": "LÁ BẠC",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:54:52.165Z",
+    "updated_at": "2026-03-16T08:54:52.165Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 22,
+  "fields": {
+    "code": "LA05",
+    "name": "LÁ CỌ",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:55:20.741Z",
+    "updated_at": "2026-03-16T08:55:20.741Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 23,
+  "fields": {
+    "code": "LA06",
+    "name": "LÁ TRÚC BÁCH DIỆP",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:55:41.338Z",
+    "updated_at": "2026-03-16T08:55:41.338Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 24,
+  "fields": {
+    "code": "LA07",
+    "name": "LÁ SI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:56:05.691Z",
+    "updated_at": "2026-03-16T08:56:16.130Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 25,
+  "fields": {
+    "code": "LVN01",
+    "name": "LAN VŨ NỮ HOA MẶT TRỜI",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:56:39.754Z",
+    "updated_at": "2026-03-16T08:56:39.754Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 26,
+  "fields": {
+    "code": "XOP01",
+    "name": "MIẾNG XỐP",
+    "description": "",
+    "unit": "MIẾNG",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:57:08.488Z",
+    "updated_at": "2026-03-16T08:57:08.488Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 27,
+  "fields": {
+    "code": "XOP02",
+    "name": "THÙNG XỐP LOẠI 1",
+    "description": "",
+    "unit": "THÙNG",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:57:25.056Z",
+    "updated_at": "2026-03-16T08:57:25.056Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 28,
+  "fields": {
+    "code": "DON01",
+    "name": "HOA DƠN PHÁP 100",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:58:00.388Z",
+    "updated_at": "2026-03-16T08:58:08.321Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 29,
+  "fields": {
+    "code": "DON02",
+    "name": "HOA DƠN Ý",
+    "description": "",
+    "unit": "BÓ",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:58:23.501Z",
+    "updated_at": "2026-03-16T08:58:23.501Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 30,
+  "fields": {
+    "code": "BD01",
+    "name": "BĂNG DÍNH",
+    "description": "",
+    "unit": "CUỘN",
+    "min_stock": 0,
+    "created_at": "2026-03-16T08:58:42.472Z",
+    "updated_at": "2026-03-16T08:58:42.472Z"
+  }
+},
+{
+  "model": "catalog.stockitem",
+  "pk": 98,
+  "fields": {
+    "product": 8,
+    "warehouse": 4,
+    "quantity": -917,
+    "held_quantity": 0,
+    "incoming_quantity": 0,
+    "updated_at": "2026-03-31T12:56:32.624Z"
+  }
+},
+{
+  "model": "catalog.stockitem",
+  "pk": 99,
+  "fields": {
+    "product": 10,
+    "warehouse": 4,
+    "quantity": 124,
+    "held_quantity": 0,
+    "incoming_quantity": 0,
+    "updated_at": "2026-03-29T02:55:07.973Z"
+  }
+},
+{
+  "model": "catalog.stockitem",
+  "pk": 100,
+  "fields": {
+    "product": 4,
+    "warehouse": 4,
+    "quantity": 20,
+    "held_quantity": 0,
+    "incoming_quantity": 0,
+    "updated_at": "2026-03-29T03:15:55.347Z"
+  }
+},
+{
+  "model": "orders.salesorder",
+  "pk": 219,
+  "fields": {
+    "code": "SO260328-001",
+    "warehouse": 4,
+    "employee": 1,
+    "customer": 16,
+    "status": "CONFIRMED",
+    "created_at": "2026-03-28T06:26:01.442Z",
+    "updated_at": "2026-03-28T06:26:26.761Z",
+    "order_date": "2026-03-28",
+    "total_amount": "5000000.00",
+    "paid_amount": "0.00",
+    "public_token": "71555dd0-bd3f-4a1e-8b76-c97f8685b656"
+  }
+},
+{
+  "model": "orders.salesorder",
+  "pk": 222,
+  "fields": {
+    "code": "SO260328-003",
+    "warehouse": 4,
+    "employee": 1,
+    "customer": 16,
+    "status": "CONFIRMED",
+    "created_at": "2026-03-28T09:55:41.395Z",
+    "updated_at": "2026-03-28T09:56:29.137Z",
+    "order_date": "2026-03-28",
+    "total_amount": "1040000.00",
+    "paid_amount": "0.00",
+    "public_token": "69d1003f-2091-4035-83fd-f95bd1f7c7ea"
+  }
+},
+{
+  "model": "orders.salesorder",
+  "pk": 225,
+  "fields": {
+    "code": "SO260329-001",
+    "warehouse": 4,
+    "employee": 1,
+    "customer": 16,
+    "status": "CONFIRMED",
+    "created_at": "2026-03-29T02:50:41.025Z",
+    "updated_at": "2026-03-29T02:50:42.986Z",
+    "order_date": "2026-03-29",
+    "total_amount": "1320000.00",
+    "paid_amount": "0.00",
+    "public_token": "e42b7647-4515-48a7-8503-9ea9a0446bb4"
+  }
+},
+{
+  "model": "orders.salesorder",
+  "pk": 226,
+  "fields": {
+    "code": "SO260329-002",
+    "warehouse": 4,
+    "employee": 1,
+    "customer": 16,
+    "status": "CONFIRMED",
+    "created_at": "2026-03-29T02:55:04.415Z",
+    "updated_at": "2026-03-29T02:55:07.945Z",
+    "order_date": "2026-03-29",
+    "total_amount": "2220000.00",
+    "paid_amount": "0.00",
+    "public_token": "cc293f9f-90e5-4d70-9c5d-00c70caa6256"
+  }
+},
+{
+  "model": "orders.salesorder",
+  "pk": 227,
+  "fields": {
+    "code": "SO260331-001",
+    "warehouse": 4,
+    "employee": 1,
+    "customer": 16,
+    "status": "CONFIRMED",
+    "created_at": "2026-03-31T12:53:57.147Z",
+    "updated_at": "2026-03-31T12:56:32.595Z",
+    "order_date": "2026-03-31",
+    "total_amount": "10000000.00",
+    "paid_amount": "0.00",
+    "public_token": "b2a2f738-2c79-48d6-ba9a-96ca20575f6d"
+  }
+},
+{
+  "model": "orders.salesorderline",
+  "pk": 423,
+  "fields": {
+    "order": 219,
+    "product": 8,
+    "quantity": 10,
+    "unit_price": "200000.00",
+    "line_total": "2000000.00"
+  }
+},
+{
+  "model": "orders.salesorderline",
+  "pk": 424,
+  "fields": {
+    "order": 219,
+    "product": 10,
+    "quantity": 50,
+    "unit_price": "60000.00",
+    "line_total": "3000000.00"
+  }
+},
+{
+  "model": "orders.salesorderline",
+  "pk": 429,
+  "fields": {
+    "order": 222,
+    "product": 8,
+    "quantity": 7,
+    "unit_price": "120000.00",
+    "line_total": "840000.00"
+  }
+},
+{
+  "model": "orders.salesorderline",
+  "pk": 430,
+  "fields": {
+    "order": 222,
+    "product": 10,
+    "quantity": 4,
+    "unit_price": "50000.00",
+    "line_total": "200000.00"
+  }
+},
+{
+  "model": "orders.salesorderline",
+  "pk": 433,
+  "fields": {
+    "order": 225,
+    "product": 10,
+    "quantity": 12,
+    "unit_price": "110000.00",
+    "line_total": "1320000.00"
+  }
+},
+{
+  "model": "orders.salesorderline",
+  "pk": 434,
+  "fields": {
+    "order": 226,
+    "product": 10,
+    "quantity": 10,
+    "unit_price": "222000.00",
+    "line_total": "2220000.00"
+  }
+},
+{
+  "model": "orders.salesorderline",
+  "pk": 435,
+  "fields": {
+    "order": 227,
+    "product": 8,
+    "quantity": 1000,
+    "unit_price": "10000.00",
+    "line_total": "10000000.00"
+  }
+},
+{
+  "model": "orders.purchaseorder",
+  "pk": 215,
+  "fields": {
+    "code": "PO260329-001",
+    "warehouse": 4,
+    "employee": 1,
+    "supplier": 16,
+    "status": "CONFIRMED",
+    "created_at": "2026-03-29T03:15:53.666Z",
+    "updated_at": "2026-03-29T03:15:55.309Z",
+    "order_date": "2026-03-29",
+    "total_amount": "400000.00",
+    "paid_amount": "0.00",
+    "public_token": "0049428e-c73a-45c8-9ed2-11ef98f9918e"
+  }
+},
+{
+  "model": "orders.purchaseorderline",
+  "pk": 531,
+  "fields": {
+    "order": 215,
+    "product": 4,
+    "quantity": 20,
+    "unit_price": "20000.00",
+    "line_total": "400000.00"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 17,
+  "fields": {
+    "sales_order": 225,
+    "purchase_order": null,
+    "user": 1,
+    "action": "Tạo đơn hàng",
+    "created_at": "2026-03-29T02:50:41.077Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 18,
+  "fields": {
+    "sales_order": 225,
+    "purchase_order": null,
+    "user": 1,
+    "action": "Xác nhận đơn hàng",
+    "created_at": "2026-03-29T02:50:43.027Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 19,
+  "fields": {
+    "sales_order": 226,
+    "purchase_order": null,
+    "user": 1,
+    "action": "Tạo đơn hàng",
+    "created_at": "2026-03-29T02:55:04.461Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 20,
+  "fields": {
+    "sales_order": 226,
+    "purchase_order": null,
+    "user": 1,
+    "action": "Xác nhận đơn hàng",
+    "created_at": "2026-03-29T02:55:07.981Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 21,
+  "fields": {
+    "sales_order": null,
+    "purchase_order": 215,
+    "user": 1,
+    "action": "Tạo đơn nhập hàng",
+    "created_at": "2026-03-29T03:15:53.740Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 22,
+  "fields": {
+    "sales_order": null,
+    "purchase_order": 215,
+    "user": 1,
+    "action": "Xác nhận đơn nhập hàng",
+    "created_at": "2026-03-29T03:15:55.357Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 23,
+  "fields": {
+    "sales_order": 227,
+    "purchase_order": null,
+    "user": 1,
+    "action": "Tạo đơn hàng",
+    "created_at": "2026-03-31T12:53:57.201Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 24,
+  "fields": {
+    "sales_order": 227,
+    "purchase_order": null,
+    "user": 1,
+    "action": "Sửa đơn hàng",
+    "created_at": "2026-03-31T12:54:09.395Z"
+  }
+},
+{
+  "model": "orders.orderlog",
+  "pk": 25,
+  "fields": {
+    "sales_order": 227,
+    "purchase_order": null,
+    "user": 1,
+    "action": "Xác nhận đơn hàng",
+    "created_at": "2026-03-31T12:56:32.637Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 550,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": 219,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "5000000.00",
+    "is_settlement": false,
+    "note": "Ghi nợ từ đơn hàng bán SO260328-001",
+    "entry_date": "2026-03-27T17:00:00Z",
+    "created_at": "2026-03-28T06:26:26.769Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 551,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": 222,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "1040000.00",
+    "is_settlement": false,
+    "note": "Ghi nợ từ đơn hàng bán SO260328-003",
+    "entry_date": "2026-03-27T17:00:00Z",
+    "created_at": "2026-03-28T09:56:29.145Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 555,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "5000000.00",
+    "is_settlement": true,
+    "note": "Thanh toán/Thu nợ: ",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T01:38:51.134Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 556,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "1040000.00",
+    "is_settlement": true,
+    "note": "Thanh toán/Thu nợ: ",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T02:40:59.975Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 557,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": 225,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "1320000.00",
+    "is_settlement": false,
+    "note": "Ghi nợ từ đơn hàng bán SO260329-001",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T02:50:42.995Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 558,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": 226,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "2220000.00",
+    "is_settlement": false,
+    "note": "Ghi nợ từ đơn hàng bán SO260329-002",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T02:55:07.952Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 561,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": 550,
+    "amount": "3480000.00",
+    "is_settlement": true,
+    "note": "Thanh toán cho đơn: SO260328-001. Nội dung: ",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T03:05:52.865Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 562,
+  "fields": {
+    "customer": 16,
+    "account_type": "PAYABLE",
+    "sales_order": null,
+    "purchase_order": 215,
+    "parent_entry": null,
+    "amount": "400000.00",
+    "is_settlement": false,
+    "note": "Ghi nợ từ đơn hàng nhập PO260329-001",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T03:15:55.319Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 563,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": 550,
+    "amount": "1520000.00",
+    "is_settlement": true,
+    "note": "Thanh toán cho đơn: SO260328-001. Nội dung: ",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T03:18:44.897Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 564,
+  "fields": {
+    "customer": 16,
+    "account_type": "PAYABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": 562,
+    "amount": "400000.00",
+    "is_settlement": true,
+    "note": "Thanh toán cho đơn: PO260329-001. Nội dung: ",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T03:23:09.049Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 565,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": 558,
+    "amount": "1000000.00",
+    "is_settlement": true,
+    "note": "Thanh toán cho đơn: SO260329-002. Nội dung: ",
+    "entry_date": "2026-03-28T17:00:00Z",
+    "created_at": "2026-03-29T03:28:35.403Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 566,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": 227,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "10000000.00",
+    "is_settlement": false,
+    "note": "Ghi nợ từ đơn hàng bán SO260331-001",
+    "entry_date": "2026-03-30T17:00:00Z",
+    "created_at": "2026-03-31T12:56:32.602Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 568,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": 566,
+    "amount": "1000000.00",
+    "is_settlement": true,
+    "note": "Thanh toán cho đơn: SO260331-001. Nội dung: ",
+    "entry_date": "2026-03-30T17:00:00Z",
+    "created_at": "2026-03-31T13:09:34.108Z"
+  }
+},
+{
+  "model": "debt.debtentry",
+  "pk": 569,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "sales_order": null,
+    "purchase_order": null,
+    "parent_entry": null,
+    "amount": "1000000.00",
+    "is_settlement": true,
+    "note": "Thanh toán/Thu nợ: ",
+    "entry_date": "2026-03-30T17:00:00Z",
+    "created_at": "2026-03-31T13:11:22.146Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 35,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "5000000.00",
+    "payment_date": "2026-03-29",
+    "note": "",
+    "created_at": "2026-03-29T01:38:51.124Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 36,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "1040000.00",
+    "payment_date": "2026-03-29",
+    "note": "",
+    "created_at": "2026-03-29T02:40:59.968Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 39,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "3480000.00",
+    "payment_date": "2026-03-29",
+    "note": "",
+    "created_at": "2026-03-29T03:05:52.847Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 40,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "1520000.00",
+    "payment_date": "2026-03-29",
+    "note": "",
+    "created_at": "2026-03-29T03:18:44.886Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 41,
+  "fields": {
+    "customer": 16,
+    "account_type": "PAYABLE",
+    "amount_paid": "400000.00",
+    "payment_date": "2026-03-29",
+    "note": "",
+    "created_at": "2026-03-29T03:23:09.038Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 42,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "1000000.00",
+    "payment_date": "2026-03-29",
+    "note": "",
+    "created_at": "2026-03-29T03:28:35.389Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 43,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "7500000.00",
+    "payment_date": "2026-03-31",
+    "note": "",
+    "created_at": "2026-03-31T12:58:25.858Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 44,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "1000000.00",
+    "payment_date": "2026-03-31",
+    "note": "",
+    "created_at": "2026-03-31T13:09:34.095Z"
+  }
+},
+{
+  "model": "debt.settlement",
+  "pk": 45,
+  "fields": {
+    "customer": 16,
+    "account_type": "RECEIVABLE",
+    "amount_paid": "1000000.00",
+    "payment_date": "2026-03-31",
+    "note": "",
+    "created_at": "2026-03-31T13:11:22.141Z"
+  }
+}
+]

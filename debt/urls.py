@@ -9,5 +9,6 @@ urlpatterns = [
     path('customer/<int:customer_id>/export/', views.ExportDebtHistoryView.as_view(), name='export-debt-history'),
     path('settlement/create/', views.SettlementCreateView.as_view(), name='settlement-create'),
     path('settlement/success/', views.SettlementSuccessView.as_view(), name='settlement-success'),
+    path('settlement/<int:pk>/delete/', views.SettlementDeleteView.as_view(), name='settlement-delete'),
     path('entry/<int:pk>/pay/', views.EntryPaymentView.as_view(), name='entry-payment'),
 ]

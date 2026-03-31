@@ -98,63 +98,106 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for entry in entries %}
-                    {% if not entry.is_settlement %}
-                    <tr class="{% if entry.status == 'PAID' %}table-light opacity-75{% endif %}">
-                        <td class="text-muted small">{% if entry.entry_date %}{{ entry.entry_date|date:"d/m/Y" }}{% else %}{{ entry.created_at|date:"d/m/Y H:i" }}{% endif %}</td>
-                        <td>
-                            <div class="fw-medium">{{ entry.note }}</div>
-                            <div class="d-flex gap-2 align-items-center mt-1">
-                                {% if entry.sales_order %}
-                                    <a href="{% url 'orders:sales-detail' entry.sales_order.pk %}" class="badge bg-primary-subtle text-primary text-decoration-none">SO: {{ entry.sales_order.code }}</a>
-                                {% elif entry.purchase_order %}
-                                    <a href="{% url 'orders:purchase-detail' entry.purchase_order.pk %}" class="badge bg-danger-subtle text-danger text-decoration-none">PO: {{ entry.purchase_order.code }}</a>
-                                {% endif %}
-                                {% if entry.status == 'PAID' %}<span class="badge bg-success-subtle text-success small">Xong</span>{% endif %}
-                            </div>
-                        </td>
-                        <td class="text-end text-danger">
-                            {% if entry.account_type == 'PAYABLE' %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
-                        </td>
-                        <td class="text-end text-primary">
-                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
-                        </td>
-                        <td class="text-end text-success">
-                            {{ entry.paid_amount|floatformat:0 }}
-                        </td>
-                        <td class="text-end fw-bold text-primary">
-                            {% if entry.account_type == 'RECEIVABLE' %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
-                        </td>
-                        <td class="text-end fw-bold text-danger">
-                            {% if entry.account_type == 'PAYABLE' %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
-                        </td>
-                        <td class="text-center">
-                            {% if entry.remaining_amount > 0 %}
-                                <a href="{% url 'debt:entry-payment' entry.pk %}" title="Thanh toán"><i class="bi bi-cash-stack fs-5"></i></a>
-                            {% else %}
-                                <i class="bi bi-check-lg text-success"></i>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% else %}
-                    {# Phiếu thanh toán tự do #}
-                    <tr class="table-info-subtle">
-                        <td class="text-muted small">{% if entry.entry_date %}{{ entry.entry_date|date:"d/m/Y" }}{% else %}{{ entry.created_at|date:"d/m/Y H:i" }}{% endif %}</td>
-                        <td>
-                            <i class="bi bi-wallet2 me-1"></i> {{ entry.note }}
-                            <span class="badge bg-light text-dark border ms-1">{% if entry.account_type == 'RECEIVABLE' %}Thu{% else %}Chi{% endif %}</span>
-                        </td>
-                        <td class="text-end">0</td>
-                        <td class="text-end">0</td>
-                        <td class="text-end text-success fw-bold">{{ entry.amount|floatformat:0 }}</td>
-                        <td class="text-end">0</td>
-                        <td class="text-end">0</td>
-                        <td class="text-center"><i class="bi bi-clock-history text-muted"></i></td>
-                    </tr>
-                    {% endif %}
+                    {% for item in grouped_entries %}
+                        {% if item.type == 'solo' %}
+                            {% with entry=item.entry %}
+                            <tr id="entry-{{ entry.id }}" class="{% if entry.status == 'PAID' %}table-light opacity-75{% endif %}">
+                                <td class="text-muted small">{% if entry.entry_date %}{{ entry.entry_date|date:"d/m/Y" }}{% else %}{{ entry.created_at|date:"d/m/Y H:i" }}{% endif %}</td>
+                                <td>
+                                    <div class="fw-medium">{{ entry.note }}</div>
+                                    <div class="d-flex gap-2 align-items-center mt-1">
+                                        {% if entry.sales_order %}
+                                            <a href="{% url 'orders:sales-detail' entry.sales_order.pk %}" class="badge bg-primary-subtle text-primary text-decoration-none">SO: {{ entry.sales_order.code }}</a>
+                                        {% elif entry.purchase_order %}
+                                            <a href="{% url 'orders:purchase-detail' entry.purchase_order.pk %}" class="badge bg-danger-subtle text-danger text-decoration-none">PO: {{ entry.purchase_order.code }}</a>
+                                        {% endif %}
+                                        {% if entry.status == 'PAID' %}<span class="badge bg-success-subtle text-success small">Xong</span>{% endif %}
+                                    </div>
+                                </td>
+                                <td class="text-end text-danger">
+                                    {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
+                                </td>
+                                <td class="text-end text-primary">
+                                    {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
+                                </td>
+                                <td class="text-end text-success">
+                                    {% if entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}{{ entry.paid_amount|floatformat:0 }}{% endif %}
+                                </td>
+                                <td class="text-end fw-bold text-primary">
+                                    {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
+                                </td>
+                                <td class="text-end fw-bold text-danger">
+                                    {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if entry.remaining_amount > 0 and not entry.is_settlement %}
+                                        <a href="{% url 'debt:entry-payment' entry.pk %}" title="Thanh toán"><i class="bi bi-cash-stack fs-5"></i></a>
+                                    {% elif not entry.is_settlement %}
+                                        <i class="bi bi-check-lg text-success"></i>
+                                    {% else %}
+                                        <i class="bi bi-clock-history text-muted"></i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endwith %}
+                        {% else %}
+                            {# Nhóm phiếu Quyết toán (Settlement) #}
+                            <tr class="table-info-subtle border-primary-subtle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#settlement-{{ item.settlement.id }}">
+                                <td class="text-muted small">{{ item.entry_date|date:"d/m/Y" }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-layers-fill text-primary me-2"></i>
+                                        <div>
+                                            <span class="fw-bold text-primary">Phiếu quyết toán #{{ item.settlement.id }}</span>
+                                            <div class="text-muted small">{{ item.settlement.note|default:"Gom nợ FIFO" }}</div>
+                                        </div>
+                                        <i class="bi bi-chevron-down ms-auto text-muted small"></i>
+                                    </div>
+                                </td>
+                                <td class="text-end">0</td>
+                                <td class="text-end">0</td>
+                                <td class="text-end text-success fw-bold">{{ item.settlement.amount_paid|floatformat:0 }}</td>
+                                <td class="text-end">0</td>
+                                <td class="text-end">0</td>
+                                <td class="text-center">
+                                    <i class="bi bi-link-45deg text-primary fs-5"></i>
+                                </td>
+                            </tr>
+                            {# Chi tiết phân bổ cho Quyết toán này #}
+                            <tr class="collapse" id="settlement-{{ item.settlement.id }}">
+                                <td colspan="8" class="p-0 border-0">
+                                    <div class="bg-light p-2 border-start border-primary border-4 ms-3 my-1 rounded-end shadow-sm">
+                                        <div class="small fw-bold text-muted mb-1 px-2"><i class="bi bi-info-circle me-1"></i> Chi tiết khấu trừ nợ:</div>
+                                        <table class="table table-sm table-borderless mb-0 small">
+                                            {% for sub in item.sub_entries %}
+                                            <tr>
+                                                <td style="width: 40%">
+                                                    <i class="bi bi-arrow-return-right text-muted me-1"></i>
+                                                    Trả cho: 
+                                                    {% if sub.parent_entry %}
+                                                        {% if sub.parent_entry.sales_order %}
+                                                            <a href="#entry-{{ sub.parent_entry.id }}" class="badge bg-primary-subtle text-primary text-decoration-none">{{ sub.parent_entry.sales_order.code }}</a>
+                                                        {% elif sub.parent_entry.purchase_order %}
+                                                            <a href="#entry-{{ sub.parent_entry.id }}" class="badge bg-danger-subtle text-danger text-decoration-none">{{ sub.parent_entry.purchase_order.code }}</a>
+                                                        {% else %}
+                                                            <span class="text-secondary">{{ sub.parent_entry.note }}</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="text-muted italic">Tiền dư / Hạch toán tự do</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-end fw-bold text-success">{{ sub.amount|floatformat:0 }} đ</td>
+                                                <td class="text-muted ps-3 italic">{{ sub.note }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">Chưa có lịch sử giao dịch nào.</td>
+                        <td colspan="8" class="text-center py-4 text-muted">Chưa có lịch sử giao dịch nào.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
