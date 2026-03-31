@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import dashboard
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,7 +10,7 @@ urlpatterns = [
     path('catalog/', include('catalog.urls')),
     path('orders/', include('orders.urls')),
     path('debt/', include('debt.urls')),
-    path('', dashboard, name='dashboard'),
+    path('', views.dashboard, name='dashboard'),
 ]
 
 if settings.DEBUG:
