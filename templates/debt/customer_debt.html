@@ -91,11 +91,11 @@
                         <th>Nội dung / Chứng từ</th>
                         <th class="text-end d-none d-md-table-cell" style="width: 12%">Đơn mua</th>
                         <th class="text-end d-none d-md-table-cell" style="width: 12%">Đơn bán</th>
-                        <th class="text-end d-md-none" style="width: 15%">Giao dịch</th>
-                        <th class="text-end" style="width: 12%">Đã trả/thu</th>
+                        <th class="text-start d-md-none" style="width: 15%">Giao dịch</th>
+                        <th class="text-start text-md-end" style="width: 12%">Đã trả/thu</th>
                         <th class="text-end d-none d-md-table-cell" style="width: 12%">Phải thu</th>
                         <th class="text-end d-none d-md-table-cell" style="width: 12%">Phải chi</th>
-                        <th class="text-end d-md-none" style="width: 15%">Dư nợ</th>
+                        <th class="text-start d-md-none" style="width: 15%">Dư nợ</th>
                         <th class="text-center" style="width: 8%">T.tác</th>
                     </tr>
                 </thead>
@@ -123,11 +123,11 @@
                                 <td class="text-end text-primary d-none d-md-table-cell">
                                     {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
                                 </td>
-                                <td class="text-end d-md-none">
+                                <td class="text-start d-md-none">
                                     <div class="small text-danger">Mua: {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}</div>
                                     <div class="small text-primary">Bán: {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}</div>
                                 </td>
-                                <td class="text-end text-success">
+                                <td class="text-start text-md-end text-success">
                                     {% if entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}{{ entry.paid_amount|floatformat:0 }}{% endif %}
                                 </td>
                                 <td class="text-end fw-bold text-primary d-none d-md-table-cell">
@@ -136,7 +136,7 @@
                                 <td class="text-end fw-bold text-danger d-none d-md-table-cell">
                                     {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
                                 </td>
-                                <td class="text-end d-md-none">
+                                <td class="text-start d-md-none">
                                     <div class="small text-primary fw-bold">Thu: {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}</div>
                                     <div class="small text-danger fw-bold">Chi: {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}</div>
                                 </td>
@@ -168,14 +168,14 @@
                                 </td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
-                                <td class="text-end d-md-none text-muted">
+                                <td class="text-start d-md-none text-muted">
                                     <div class="small">Mua: 0</div>
                                     <div class="small">Bán: 0</div>
                                 </td>
-                                <td class="text-end text-success fw-bold">{{ item.settlement.amount_paid|floatformat:0 }}</td>
+                                <td class="text-start text-md-end text-success fw-bold">{{ item.settlement.amount_paid|floatformat:0 }}</td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
-                                <td class="text-end d-md-none text-muted">
+                                <td class="text-start d-md-none text-muted">
                                     <div class="small">Thu: 0</div>
                                     <div class="small">Chi: 0</div>
                                 </td>
