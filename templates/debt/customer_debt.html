@@ -124,13 +124,8 @@
                                     {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
                                 </td>
                                 <td class="text-end d-md-none">
-                                    {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}
-                                        <div class="text-danger">{{ entry.amount|floatformat:0 }}<br><small class="text-muted">mua</small></div>
-                                    {% elif entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}
-                                        <div class="text-primary">{{ entry.amount|floatformat:0 }}<br><small class="text-muted">bán</small></div>
-                                    {% else %}
-                                        <span class="text-muted">0</span>
-                                    {% endif %}
+                                    <div class="small text-danger">Mua: {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}</div>
+                                    <div class="small text-primary">Bán: {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}</div>
                                 </td>
                                 <td class="text-end text-success">
                                     {% if entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}{{ entry.paid_amount|floatformat:0 }}{% endif %}
@@ -141,14 +136,9 @@
                                 <td class="text-end fw-bold text-danger d-none d-md-table-cell">
                                     {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
                                 </td>
-                                <td class="text-end d-md-none fw-bold">
-                                    {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}
-                                        <div class="text-primary">{{ entry.remaining_amount|floatformat:0 }}<br><small class="text-muted fw-normal">thu</small></div>
-                                    {% elif entry.account_type == 'PAYABLE' and not entry.is_settlement %}
-                                        <div class="text-danger">{{ entry.remaining_amount|floatformat:0 }}<br><small class="text-muted fw-normal">chi</small></div>
-                                    {% else %}
-                                        <span class="text-muted fw-normal">0</span>
-                                    {% endif %}
+                                <td class="text-end d-md-none">
+                                    <div class="small text-primary fw-bold">Thu: {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}</div>
+                                    <div class="small text-danger fw-bold">Chi: {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}</div>
                                 </td>
                                 <td class="text-center">
                                     {% if entry.remaining_amount > 0 and not entry.is_settlement %}
@@ -178,11 +168,17 @@
                                 </td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
-                                <td class="text-end d-md-none text-muted">0</td>
+                                <td class="text-end d-md-none text-muted">
+                                    <div class="small">Mua: 0</div>
+                                    <div class="small">Bán: 0</div>
+                                </td>
                                 <td class="text-end text-success fw-bold">{{ item.settlement.amount_paid|floatformat:0 }}</td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
-                                <td class="text-end d-md-none text-muted">0</td>
+                                <td class="text-end d-md-none text-muted">
+                                    <div class="small">Thu: 0</div>
+                                    <div class="small">Chi: 0</div>
+                                </td>
                                 <td class="text-center">
                                     <i class="bi bi-link-45deg text-primary fs-5"></i>
                                 </td>
