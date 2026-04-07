@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.db.models import Q, Sum
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
@@ -34,8 +35,12 @@ class WarehouseDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Lấy tồn kho tại kho này
-        context['stocks'] = StockItem.objects.filter(warehouse=self.object, quantity__gt=0).select_related('product')
+        # Lấy tồn kho tại kho này (bao gồm cả hàng âm nếu có)
+        context['stocks'] = StockItem.objects.filter(
+            warehouse=self.object
+        ).filter(
+            Q(quantity__ne=0) | Q(held_quantity__gt=0) | Q(incoming_quantity__gt=0)
+        ).select_related('product')
         
         # Lấy lịch sử nhập hàng gần đây liên quan đến kho này (đã xác nhận)
         from orders.models import PurchaseOrder
@@ -69,7 +74,6 @@ class StockListView(LoginRequiredMixin, ListView):
     context_object_name = 'stocks'
     
     def get_queryset(self):
-        from django.db.models import Sum
         from django.db.models.functions import Coalesce
         
         self.warehouse_id = self.request.GET.get('warehouse', 'all')
@@ -81,13 +85,12 @@ class StockListView(LoginRequiredMixin, ListView):
             ).select_related('product', 'warehouse').order_by('product__name')
         else:
             # "Tất cả kho" hoặc chưa chọn (mặc định cho xem tất cả)
-            from django.db.models import Q
             return Product.objects.annotate(
                 total_quantity=Coalesce(Sum('stocks__quantity'), 0),
                 total_held=Coalesce(Sum('stocks__held_quantity'), 0),
                 total_incoming=Coalesce(Sum('stocks__incoming_quantity'), 0)
             ).filter(
-                Q(total_quantity__gt=0) | Q(total_held__gt=0) | Q(total_incoming__gt=0)
+                Q(total_quantity__gt=0) | Q(total_quantity__lt=0) | Q(total_held__gt=0) | Q(total_incoming__gt=0)
             ).order_by('name')
 
     def get_context_data(self, **kwargs):
