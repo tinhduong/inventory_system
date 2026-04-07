@@ -42,11 +42,13 @@
                                 {% for line_form in lines %}
                                 <tr class="line-item-row">
                                     <td class="cell-product" data-label="Sản phẩm" style="width: 40%;">{{ line_form.product }}</td>
-                                    <td class="cell-qty" data-label="Số lượng" style="width: 15%;">{{ line_form.quantity }}</td>
+                                    <td class="cell-qty align-middle" data-label="Số lượng" style="width: 15%;">{{ line_form.quantity }}</td>
                                     {% if user.role == 'ADMIN' %}
-                                    <td class="cell-price" data-label="Đơn giá nhập" style="width: 20%;">{{ line_form.unit_price }}</td>
-                                    <td class="cell-total" data-label="Thành tiền" style="width: 20%;" class="text-end fw-bold">
-                                        <span class="line-total-display">0</span> đ
+                                    <td class="cell-price align-middle" data-label="Đơn giá nhập" style="width: 20%;">{{ line_form.unit_price }}</td>
+                                    <td class="cell-total text-end fw-bold align-middle py-2" data-label="Thành tiền" style="width: 20%;">
+                                        <div class="py-1">
+                                            <span class="line-total-display">0</span> đ
+                                        </div>
                                     </td>
                                     {% else %}
                                     <td style="display: none;">{{ line_form.unit_price }}</td>
