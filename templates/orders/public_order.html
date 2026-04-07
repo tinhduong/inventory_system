@@ -33,7 +33,11 @@
                     <div class="col-6">
                         <h6 class="text-secondary text-uppercase">Khách hàng</h6>
                         <h5 class="fw-bold">{{ order.customer.name }}</h5>
-                        <p>{{ order.customer.phone }}<br>{{ order.customer.address }}</p>
+                        <p class="mb-0 text-muted">
+                            {% if order.customer.phone %}{{ order.customer.phone }}{% endif %}
+                            {% if order.customer.phone and order.customer.address %}<br>{% endif %}
+                            {% if order.customer.address %}{{ order.customer.address }}{% endif %}
+                        </p>
                     </div>
                     <div class="col-6 text-end">
                         <h6 class="text-secondary text-uppercase">Ngày lập</h6>
