@@ -166,7 +166,7 @@ class ExportProductsView(LoginRequiredMixin, View):
             ws.column_dimensions[column].width = max_length + 2
             
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="DanhSachSanPham.xlsx"'
+        response['Content-Disposition'] = 'attachment; filename="danh_sach_san_pham.xlsx"'
         wb.save(response)
         return response
 

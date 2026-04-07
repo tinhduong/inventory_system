@@ -16,6 +16,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, TemplateView
 
 from accounts.models import Customer
+from django.utils.text import slugify
 from .forms import EntryPaymentForm, SettlementForm
 from .models import AccountType, DebtEntry, Settlement
 
@@ -298,7 +299,8 @@ class ExportDebtHistoryView(LoginRequiredMixin, UserPassesTestMixin, View):
             ws.column_dimensions[column].width = max(len(str(cell.value) or "") for cell in col) + 4
 
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = f'attachment; filename="CongNo_{customer.name}_{date.today()}.xlsx"'
+        filename = f"congno_{slugify(customer.name)}_{date.today()}.xlsx"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
         wb.save(response)
         return response
 
