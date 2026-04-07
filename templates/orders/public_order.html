@@ -21,7 +21,7 @@
             @page { margin: 0.5cm 1cm; size: A4; }
         }
         .page-content { min-height: 28.5cm; display: flex; flex-direction: column; }
-        .stamp-space { margin-top: auto; height: 10cm; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2cm; }
+        .stamp-space { margin-top: auto; height: 8cm; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 1cm; }
     </style>
 </head>
 <body class="bg-light">
@@ -88,7 +88,8 @@
                             {% endfor %}
                             
                             <!-- Dòng trống bổ sung để làm đầy bảng -->
-                            {% with "123456789012345" as filler %}
+                             <!-- Dòng trống bổ sung để làm đầy bảng -->
+                            {% with "1234567890" as filler %}
                                 {% for _ in filler %}
                                     <tr style="height: 1.5rem">
                                         <td>&nbsp;</td>
