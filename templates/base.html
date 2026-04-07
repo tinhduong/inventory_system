@@ -132,6 +132,95 @@
             50% { background-color: rgba(52, 152, 219, 0.2) !important; }
             100% { background-color: rgba(52, 152, 219, 0) !important; }
         }
+        /* Responsive Product Table */
+        @media (max-width: 768px) {
+            .product-input-table thead {
+                display: none;
+            }
+            .product-input-table, 
+            .product-input-table tbody, 
+            .product-input-table tr, 
+            .product-input-table td {
+                display: block;
+                width: 100% !important;
+            }
+            .product-input-table tr {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                grid-template-areas: 
+                    "product product"
+                    "qty avail"
+                    "price total"
+                    "delete delete";
+                gap: 12px;
+                margin-bottom: 24px;
+                padding: 16px;
+                border: 1px solid #dee2e6;
+                border-radius: 12px;
+                background: #fff;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+            
+            /* Admin view area adjustment */
+            .product-input-table.no-admin tr {
+                grid-template-areas: 
+                    "product product"
+                    "qty avail"
+                    "delete delete";
+            }
+
+            /* Purchase form area adjustment (no avail) */
+            .product-input-table.purchase-table tr {
+                grid-template-areas: 
+                    "product product"
+                    "qty qty"
+                    "price total"
+                    "delete delete";
+            }
+
+            .product-input-table td {
+                display: block;
+                padding: 0 !important;
+                width: 100% !important;
+                border: none !important;
+            }
+            
+            .product-input-table td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #6c757d;
+                margin-bottom: 4px;
+                text-transform: uppercase;
+            }
+
+            .product-input-table td.cell-product { grid-area: product; border-bottom: 1px solid #f0f0f0 !important; padding-bottom: 12px !important; }
+            .product-input-table td.cell-qty { grid-area: qty; }
+            .product-input-table td.cell-avail { grid-area: avail; }
+            .product-input-table td.cell-price { grid-area: price; }
+            .product-input-table td.cell-total { grid-area: total; }
+            .product-input-table td.cell-delete { 
+                grid-area: delete; 
+                border-top: 1px solid #f0f0f0 !important; 
+                padding-top: 12px !important;
+                margin-top: 4px;
+            }
+            
+            .product-input-table .remove-line-btn {
+                width: 100%;
+                padding: 8px;
+                border-style: dashed;
+            }
+            
+            .product-input-table .available-qty-display {
+                display: block;
+                padding: 8px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
