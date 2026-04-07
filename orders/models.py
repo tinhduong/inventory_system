@@ -64,6 +64,28 @@ class SalesOrder(models.Model):
         from debt.models import DebtEntry
         return DebtEntry.objects.filter(sales_order=self, is_settlement=False).first()
 
+    def get_payment_history(self):
+        history = []
+        if self.paid_amount > 0:
+            history.append({
+                'date': self.created_at,
+                'amount': self.paid_amount,
+                'type': 'Thanh toán ban đầu',
+                'note': 'Đã trả khi tạo đơn'
+            })
+        
+        entry = self.debt_entry
+        if entry:
+            for p in entry.payments.all().select_related('settlement'):
+                history.append({
+                    'date': p.entry_date or p.created_at,
+                    'amount': p.amount,
+                    'type': 'Trả nợ / Quyết toán',
+                    'note': p.note or (p.settlement.note if p.settlement else "")
+                })
+        history.sort(key=lambda x: x['date'], reverse=True)
+        return history
+
     def __str__(self):
         return self.code
 
@@ -132,6 +154,28 @@ class PurchaseOrder(models.Model):
             return self.prefetched_debt_entries[0] if self.prefetched_debt_entries else None
         from debt.models import DebtEntry
         return DebtEntry.objects.filter(purchase_order=self, is_settlement=False).first()
+
+    def get_payment_history(self):
+        history = []
+        if self.paid_amount > 0:
+            history.append({
+                'date': self.created_at,
+                'amount': self.paid_amount,
+                'type': 'Thanh toán ban đầu',
+                'note': 'Đã trả khi tạo đơn'
+            })
+        
+        entry = self.debt_entry
+        if entry:
+            for p in entry.payments.all().select_related('settlement'):
+                history.append({
+                    'date': p.entry_date or p.created_at,
+                    'amount': p.amount,
+                    'type': 'Trả nợ / Quyết toán',
+                    'note': p.note or (p.settlement.note if p.settlement else "")
+                })
+        history.sort(key=lambda x: x['date'], reverse=True)
+        return history
 
     def __str__(self):
         return self.code
