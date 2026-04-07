@@ -19,9 +19,16 @@
         }
 
         html {
-            font-size: 125%;
+            font-size: 110%;
             scroll-behavior: smooth;
             scroll-padding-top: 70px;
+        }
+
+        @media (max-width: 768px) {
+            html { font-size: 100%; }
+            .table-responsive { border: 0; }
+            .qty-input { min-width: 80px !important; }
+            .money-input { min-width: 100px !important; }
         }
 
         body { 

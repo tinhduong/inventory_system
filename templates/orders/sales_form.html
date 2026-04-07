@@ -164,18 +164,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             display.textContent = data.available;
             
-            // Highlight if quantity exceeds available
+            // Highlight display only, no invalid state on input to allow negative stock
             const qtyInput = row.querySelector('.qty-input');
             const qty = parseFloat(qtyInput.value) || 0;
             if (qty > data.available) {
-                qtyInput.classList.add('is-invalid');
                 display.classList.remove('text-info');
                 display.classList.add('text-danger');
             } else {
-                qtyInput.classList.remove('is-invalid');
                 display.classList.remove('text-danger');
                 display.classList.add('text-info');
             }
+            qtyInput.classList.remove('is-invalid');
         } catch (error) {
             console.error('Error fetching stock:', error);
             display.textContent = 'err';
@@ -198,16 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.addEventListener('input', () => {
                     calculateRowTotal(row);
                     calculateGrandTotal();
-                    if (input.classList.contains('qty-input')) {
-                        // Re-check against available when quantity changes
-                        const available = parseFloat(row.querySelector('.available-qty-display').textContent) || 0;
-                        const qty = parseFloat(input.value) || 0;
-                        if (qty > available) {
-                            input.classList.add('is-invalid');
-                        } else {
-                            input.classList.remove('is-invalid');
-                        }
-                    }
+                    // Quantity validation removed to allow negative stock
+                    // Just reset invalid state if any
+                    input.classList.remove('is-invalid');
                 });
             }
         });
@@ -244,10 +236,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     addButton.addEventListener('click', function() {
         const rows = tableBody.getElementsByClassName('line-item-row');
-        const rowCount = rows.length;
+        const rowCount = parseInt(totalForms.value);
         const newRow = rows[0].cloneNode(true);
         
-        // Clean up Select2 artifacts in the cloned row
+        // 1. Clean up Select2 artifacts in the cloned row
         const select2Containers = newRow.querySelectorAll('.select2-container');
         select2Containers.forEach(container => container.remove());
         
@@ -256,21 +248,59 @@ document.addEventListener('DOMContentLoaded', function() {
             $(select).removeClass('select2-hidden-accessible');
             $(select).removeAttr('data-select2-id');
             $(select).find('option').removeAttr('data-select2-id');
+            $(select).val('');
         });
 
-        // Reset inputs in the new row
+        // 2. Clean up MoneyInput artifacts (from base.html initialization)
+        const moneyInputs = newRow.querySelectorAll('.money-input');
+        moneyInputs.forEach(input => {
+            const group = input.closest('.input-group');
+            if (group) {
+                const parent = group.parentElement;
+                // Find hidden input created by initMoneyInput (usually sibling before the group)
+                const hidden = parent.querySelector('input[type="hidden"]');
+                if (hidden && !hidden.name.includes('DELETE') && !hidden.name.includes('id')) {
+                    input.name = hidden.name;
+                    hidden.remove();
+                }
+                parent.insertBefore(input, group);
+                group.remove();
+            }
+            delete input.dataset.moneyInit;
+            input.style.textAlign = '';
+        });
+
+        // 3. Reset and Update names/IDs for all inputs
         const inputs = newRow.querySelectorAll('input, select');
         inputs.forEach(input => {
-            input.value = (input.tagName === 'SELECT') ? '' : (input.classList.contains('qty-input') ? '0' : '');
+            const oldName = input.getAttribute('name');
+            if (oldName) {
+                const newName = oldName.replace(/-\d+-/, `-${rowCount}-`);
+                input.setAttribute('name', newName);
+            }
+            const oldId = input.getAttribute('id');
+            if (oldId) {
+                const newId = oldId.replace(/-\d+-/, `-${rowCount}-`);
+                input.setAttribute('id', newId);
+            }
             
-            const name = input.getAttribute('name').replace(/-\d+-/, `-${rowCount}-`);
-            const id = input.getAttribute('id').replace(/-\d+-/, `-${rowCount}-`);
-            input.setAttribute('name', name);
-            input.setAttribute('id', id);
+            // Reset value (except for select which is handled above)
+            if (input.tagName !== 'SELECT' && input.type !== 'hidden') {
+                input.value = input.classList.contains('qty-input') ? '1' : '';
+            }
+            input.classList.remove('is-invalid');
         });
 
-        // Reset display
-        newRow.querySelector('.line-total-display').textContent = '0';
+        // 4. Reset display elements
+        const totalDisplay = newRow.querySelector('.line-total-display');
+        if (totalDisplay) totalDisplay.textContent = '0';
+        
+        const availDisplay = newRow.querySelector('.available-qty-display');
+        if (availDisplay) {
+            availDisplay.textContent = '0';
+            availDisplay.classList.remove('text-danger');
+            availDisplay.classList.add('text-info');
+        }
 
         tableBody.appendChild(newRow);
         totalForms.value = rowCount + 1;

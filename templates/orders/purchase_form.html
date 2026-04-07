@@ -175,10 +175,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     addButton.addEventListener('click', function() {
         const rows = tableBody.getElementsByClassName('line-item-row');
-        const rowCount = rows.length;
+        const rowCount = parseInt(totalForms.value);
         const newRow = rows[0].cloneNode(true);
         
-        // Clean up Select2 artifacts in the cloned row
+        // 1. Clean up Select2 artifacts in the cloned row
         const select2Containers = newRow.querySelectorAll('.select2-container');
         select2Containers.forEach(container => container.remove());
         
@@ -187,21 +187,50 @@ document.addEventListener('DOMContentLoaded', function() {
             $(select).removeClass('select2-hidden-accessible');
             $(select).removeAttr('data-select2-id');
             $(select).find('option').removeAttr('data-select2-id');
+            $(select).val('');
         });
 
-        // Reset inputs in the new row
+        // 2. Clean up MoneyInput artifacts
+        const moneyInputs = newRow.querySelectorAll('.money-input');
+        moneyInputs.forEach(input => {
+            const group = input.closest('.input-group');
+            if (group) {
+                const parent = group.parentElement;
+                const hidden = parent.querySelector('input[type="hidden"]');
+                if (hidden && !hidden.name.includes('DELETE') && !hidden.name.includes('id')) {
+                    input.name = hidden.name;
+                    hidden.remove();
+                }
+                parent.insertBefore(input, group);
+                group.remove();
+            }
+            delete input.dataset.moneyInit;
+            input.style.textAlign = '';
+        });
+
+        // 3. Reset and Update names/IDs
         const inputs = newRow.querySelectorAll('input, select');
         inputs.forEach(input => {
-            input.value = (input.tagName === 'SELECT') ? '' : (input.classList.contains('qty-input') ? '0' : '');
+            const oldName = input.getAttribute('name');
+            if (oldName) {
+                const newName = oldName.replace(/-\d+-/, `-${rowCount}-`);
+                input.setAttribute('name', newName);
+            }
+            const oldId = input.getAttribute('id');
+            if (oldId) {
+                const newId = oldId.replace(/-\d+-/, `-${rowCount}-`);
+                input.setAttribute('id', newId);
+            }
             
-            const name = input.getAttribute('name').replace(/-\d+-/, `-${rowCount}-`);
-            const id = input.getAttribute('id').replace(/-\d+-/, `-${rowCount}-`);
-            input.setAttribute('name', name);
-            input.setAttribute('id', id);
+            if (input.tagName !== 'SELECT' && input.type !== 'hidden') {
+                input.value = input.classList.contains('qty-input') ? '1' : '';
+            }
+            input.classList.remove('is-invalid');
         });
 
-        // Reset display
-        newRow.querySelector('.line-total-display').textContent = '0';
+        // 4. Reset display
+        const totalDisplay = newRow.querySelector('.line-total-display');
+        if (totalDisplay) totalDisplay.textContent = '0';
 
         tableBody.appendChild(newRow);
         totalForms.value = rowCount + 1;
