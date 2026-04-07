@@ -20,8 +20,8 @@
             }
             @page { margin: 0.5cm 1cm; size: A4; }
         }
-        .page-content { min-height: 28.2cm; display: flex; flex-direction: column; }
-        .stamp-space { margin-top: auto; height: 6.5cm; display: flex; flex-direction: column; justify-content: flex-start; }
+        .page-content { min-height: 28.5cm; display: flex; flex-direction: column; }
+        .stamp-space { margin-top: auto; height: 7.5cm; display: flex; flex-direction: column; justify-content: flex-start; }
     </style>
 </head>
 <body class="bg-light">
@@ -86,6 +86,18 @@
                                 <td class="text-end fw-bold">{{ line.line_total|floatformat:0|intcomma }} đ</td>
                             </tr>
                             {% endfor %}
+                            
+                            <!-- Dòng trống bổ sung để làm đầy bảng -->
+                            {% with "123456" as filler %}
+                                {% for _ in filler %}
+                                    <tr style="height: 1.5rem">
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endwith %}
                         </tbody>
                         <tfoot>
                             <tr class="fs-5 bg-light">
