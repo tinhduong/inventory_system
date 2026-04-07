@@ -6,13 +6,35 @@
     <title>Thông tin đơn hàng {{ order.code }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        @media print {
+            body { background-color: white !important; }
+            .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .card { border: none !important; box-shadow: none !important; }
+            .no-print { display: none !important; }
+            .card-header { background-color: white !important; color: black !important; border-bottom: 2px solid #000 !important; }
+            .bg-light { 
+                background-color: #f8f9fa !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+            }
+            @page { margin: 1cm; size: A4; }
+        }
+        .page-content { min-height: 27cm; display: flex; flex-direction: column; }
+        .stamp-space { margin-top: auto; padding-bottom: 2rem; }
+    </style>
 </head>
 <body class="bg-light">
-    <div class="container py-5">
-        <div class="card shadow-lg mx-auto" style="max-width: 800px;">
+    <div class="container py-2 py-md-5">
+        <div class="no-print text-center mb-3">
+            <button onclick="window.print()" class="btn btn-primary px-4">
+                <i class="bi bi-printer"></i> In Hóa Đơn
+            </button>
+        </div>
+        <div class="card shadow-lg mx-auto page-content" style="max-width: 800px;">
             <div class="card-header bg-white border-bottom p-4">
                 <div class="row align-items-center">
-                    <div class="col-md-7 text-start">
+                    <div class="col-7 text-start">
                         <h4 class="fw-bold text-primary mb-1">Cửa hàng hoa tươi Giới Vân</h4>
                         <p class="text-muted small mb-0">
                             <i class="bi bi-geo-alt"></i> Địa chỉ: số 441, đường Lê Lợi, phường Bắc Giang, tỉnh Bắc Ninh. 
@@ -21,63 +43,78 @@
                             <i class="bi bi-telephone"></i> SĐT: 0913561411 hoặc 0833858887
                         </p>
                     </div>
-                    <div class="col-md-5 text-end mt-3 mt-md-0">
+                    <div class="col-5 text-end">
                         <h2 class="mb-0 fw-bold text-uppercase">Hóa Đơn</h2>
                         <div class="h5 mb-0 text-secondary">{{ order.code }}</div>
                         <p class="mb-0 small text-muted">Trạng thái: {{ order.get_status_display }}</p>
                     </div>
                 </div>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 flex-grow-1">
                 <div class="row mb-4">
                     <div class="col-6">
-                        <h6 class="text-secondary text-uppercase">Khách hàng</h6>
-                        <h5 class="fw-bold">{{ order.customer.name }}</h5>
-                        <p class="mb-0 text-muted">
+                        <h6 class="text-secondary text-uppercase small">Khách hàng</h6>
+                        <h5 class="fw-bold text-dark">{{ order.customer.name }}</h5>
+                        <p class="mb-0 text-muted small">
                             {% if order.customer.phone %}{{ order.customer.phone }}{% endif %}
                             {% if order.customer.phone and order.customer.address %}<br>{% endif %}
                             {% if order.customer.address %}{{ order.customer.address }}{% endif %}
                         </p>
                     </div>
                     <div class="col-6 text-end">
-                        <h6 class="text-secondary text-uppercase">Ngày lập</h6>
-                        <h5>{{ order.order_date }}</h5>
+                        <h6 class="text-secondary text-uppercase small">Ngày lập</h6>
+                        <h5 class="text-dark">{{ order.order_date }}</h5>
                     </div>
                 </div>
 
-                <table class="table table-bordered">
-                    <thead class="bg-light">
-                        <tr>
-                            <th>Sản phẩm</th>
-                            <th class="text-center">Số lượng</th>
-                            <th class="text-end">Đơn giá</th>
-                            <th class="text-end">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for line in order.lines.all %}
-                        <tr>
-                            <td>{{ line.product.name }}</td>
-                            <td class="text-center">{{ line.quantity|floatformat:0 }}</td>
-                            <td class="text-end">{{ line.unit_price|floatformat:0|intcomma }} đ</td>
-                            <td class="text-end fw-bold">{{ line.line_total|floatformat:0|intcomma }} đ</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr class="fs-5">
-                            <td colspan="3" class="text-end fw-bold">TỔNG CỘNG:</td>
-                            <td class="text-end fw-bold text-danger">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered border-dark border-opacity-25 mt-3">
+                        <thead class="bg-light">
+                            <tr class="align-middle">
+                                <th style="width: 50%">Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in order.lines.all %}
+                            <tr>
+                                <td>{{ line.product.name }}</td>
+                                <td class="text-center">{{ line.quantity|floatformat:0 }}</td>
+                                <td class="text-end">{{ line.unit_price|floatformat:0|intcomma }} đ</td>
+                                <td class="text-end fw-bold">{{ line.line_total|floatformat:0|intcomma }} đ</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="fs-5 bg-light">
+                                <td colspan="3" class="text-end fw-bold">TỔNG CỘNG:</td>
+                                <td class="text-end fw-bold text-danger">{{ order.total_amount|floatformat:0|intcomma }} đ</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
-                <div class="alert alert-info mt-4">
+                <div class="alert alert-info mt-4 no-print">
                     Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi!
                 </div>
+
+                <div class="stamp-space">
+                    <div class="row text-center mt-5">
+                        <div class="col-6">
+                            <p class="fw-bold mb-5">Người nhận hàng</p>
+                            <span class="text-muted small mt-5">(Ký, ghi rõ họ tên)</span>
+                        </div>
+                        <div class="col-6">
+                            <p class="fw-bold mb-5">Đơn vị bán hàng</p>
+                            <span class="text-muted small mt-5">(Ký tên và đóng dấu)</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-footer text-muted text-center py-3">
-                Generated by Inventory System
+            <div class="card-footer bg-white text-muted text-center py-3 border-top-0 no-print">
+                 Generated by Inventory System
             </div>
         </div>
     </div>
