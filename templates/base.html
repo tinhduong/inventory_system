@@ -24,11 +24,15 @@
             scroll-padding-top: 70px;
         }
 
+        /* Mobile/Tablet adjustments */
+        @media (max-width: 1024px) {
+            .qty-input { min-width: 100px !important; }
+            .money-input { min-width: 160px !important; }
+        }
+
         @media (max-width: 768px) {
             html { font-size: 100%; }
             .table-responsive { border: 0; }
-            .qty-input { min-width: 80px !important; }
-            .money-input { min-width: 100px !important; }
         }
 
         body { 
@@ -423,6 +427,7 @@
                 theme: 'bootstrap-5',
                 width: '100%',
                 dropdownAutoWidth: true,
+                dropdownParent: $(element).parent(),
                 placeholder: 'Chọn...',
                 allowClear: allowClear !== false && allowClear !== 'false',
                 language: {
