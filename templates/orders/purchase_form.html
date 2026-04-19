@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const lunarInfo = document.getElementById('lunar_info_display');
     const lunarError = document.getElementById('lunar_error');
 
-    let isSyncing = false;
+    let _isSyncing = false;
 
     // Initialize Flatpickr for Solar Date (Force Day/Month/Year)
     const fp = flatpickr(solarInput, {
@@ -274,19 +274,15 @@ document.addEventListener('DOMContentLoaded', function() {
         altFormat: "d/m/Y",
         locale: "vn",
         onChange: function(selectedDates, dateStr, instance) {
-            if (isSyncing) return;
+            if (_isSyncing) return;
             const ymd = instance.formatDate(selectedDates[0], "Y-m-d");
             updateLunarFromSolar(ymd);
         }
     });
 
     function updateLunarFromSolar(ymd) {
-        if (!ymd && fp.selectedDates[0]) {
-            ymd = fp.formatDate(fp.selectedDates[0], "Y-m-d");
-        }
         if (!ymd) return;
-        
-        isSyncing = true;
+        _isSyncing = true;
         fetch(`/orders/convert-date/?direction=s2l&date=${ymd}`)
             .then(res => res.json())
             .then(data => {
@@ -296,17 +292,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     lunarError.style.display = 'none';
                 }
             })
-            .finally(() => {
-                isSyncing = false;
-            });
+            .finally(() => { _isSyncing = false; });
     }
 
     function updateSolarFromLunar() {
-        if (isSyncing) return;
+        if (_isSyncing) return;
         const lunarVal = lunarInput.value; 
-        if (!lunarVal.includes('/') || lunarVal.length < 8) return;
+        const regex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+        if (!regex.test(lunarVal)) return;
         
-        isSyncing = true;
+        _isSyncing = true;
         fetch(`/orders/convert-date/?direction=l2s&date=${encodeURIComponent(lunarVal)}`)
             .then(res => res.json())
             .then(data => {
@@ -317,23 +312,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     lunarError.style.display = 'block';
                 }
             })
-            .catch(() => {
-                lunarError.style.display = 'block';
-            })
-            .finally(() => {
-                isSyncing = false;
-            });
+            .catch(() => { lunarError.style.display = 'block'; })
+            .finally(() => { _isSyncing = false; });
     }
 
     if (solarInput && lunarInput) {
-        const initialYmd = fp.selectedDates[0] ? fp.formatDate(fp.selectedDates[0], "Y-m-d") : "";
-        if (initialYmd) updateLunarFromSolar(initialYmd);
-
+        if (fp.selectedDates[0]) {
+            updateLunarFromSolar(fp.formatDate(fp.selectedDates[0], "Y-m-d"));
+        }
+        lunarInput.addEventListener('input', function() {
+            if (this.value.length >= 8) updateSolarFromLunar();
+        });
         lunarInput.addEventListener('change', updateSolarFromLunar); 
         lunarInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 updateSolarFromLunar();
+                this.blur();
             }
         });
     }

@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const lunarInfo = document.getElementById('lunar_info_display');
     const lunarError = document.getElementById('lunar_error');
 
-    let isSyncing = false;
+    let _isSyncing = false;
 
     // Initialize Flatpickr for Solar Date (Force Day/Month/Year)
     const fp = flatpickr(solarInput, {
@@ -345,75 +345,67 @@ document.addEventListener('DOMContentLoaded', function() {
         altFormat: "d/m/Y",
         locale: "vn",
         onChange: function(selectedDates, dateStr, instance) {
-            if (isSyncing) return;
+            if (_isSyncing) return;
             const ymd = instance.formatDate(selectedDates[0], "Y-m-d");
-            console.log("Solar changed -> Syncing Lunar:", ymd);
             updateLunarFromSolar(ymd);
         }
     });
 
     function updateLunarFromSolar(ymd) {
-        if (!ymd && fp.selectedDates[0]) {
-            ymd = fp.formatDate(fp.selectedDates[0], "Y-m-d");
-        }
         if (!ymd) return;
-        
-        isSyncing = true;
+        _isSyncing = true;
         fetch(`/orders/convert-date/?direction=s2l&date=${ymd}`)
             .then(res => res.json())
             .then(data => {
-                console.log("S2L Result:", data);
                 if (data.day) {
                     lunarInput.value = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
                     lunarInfo.textContent = data.leap ? '(Nhuận)' : '';
                     lunarError.style.display = 'none';
                 }
             })
-            .finally(() => {
-                isSyncing = false;
-            });
+            .finally(() => { _isSyncing = false; });
     }
 
     function updateSolarFromLunar() {
-        if (isSyncing) return;
+        if (_isSyncing) return;
         const lunarVal = lunarInput.value; 
-        if (!lunarVal.includes('/') || lunarVal.length < 8) return;
+        // Only trigger if format is dd/mm/yyyy
+        const regex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+        if (!regex.test(lunarVal)) return;
         
-        console.log("Lunar changed -> Syncing Solar:", lunarVal);
-        isSyncing = true;
+        _isSyncing = true;
         fetch(`/orders/convert-date/?direction=l2s&date=${encodeURIComponent(lunarVal)}`)
             .then(res => res.json())
             .then(data => {
-                console.log("L2S Result:", data);
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    // Disable onChange trigger while setting date programmatically
-                    fp.setDate(data.solar_date, false); 
-                    // Update leap info manually since we skipped onChange
-                    // (Actually we can call converted data directly if we had it, but s2l is safer)
+                    // setDate without triggering onChange
+                    fp.setDate(data.solar_date, false);
                 } else {
                     lunarError.style.display = 'block';
                 }
             })
-            .catch(err => {
-                console.error("L2S Error:", err);
-                lunarError.style.display = 'block';
-            })
-            .finally(() => {
-                isSyncing = false;
-            });
+            .catch(() => { lunarError.style.display = 'block'; })
+            .finally(() => { _isSyncing = false; });
     }
 
     if (solarInput && lunarInput) {
         // Initial sync
-        const initialYmd = fp.selectedDates[0] ? fp.formatDate(fp.selectedDates[0], "Y-m-d") : "";
-        if (initialYmd) updateLunarFromSolar(initialYmd);
+        if (fp.selectedDates[0]) {
+            updateLunarFromSolar(fp.formatDate(fp.selectedDates[0], "Y-m-d"));
+        }
 
-        lunarInput.addEventListener('change', updateSolarFromLunar); 
+        // Add both change and input (for responsiveness)
+        lunarInput.addEventListener('input', function() {
+            if (this.value.length >= 8) updateSolarFromLunar();
+        });
+        lunarInput.addEventListener('change', updateSolarFromLunar);
+
         lunarInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 updateSolarFromLunar();
+                this.blur();
             }
         });
     }
