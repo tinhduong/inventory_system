@@ -300,8 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    const formattedSolar = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
-                    fp.setDate(formattedSolar, true); 
+                    fp.setDate(data.solar_date, true); 
                 } else {
                     lunarError.style.display = 'block';
                 }
@@ -316,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const fp = flatpickr(solarInput, {
-        dateFormat: "d/m/Y",
+        dateFormat: "Y-m-d",
         altInput: true,
         altFormat: "d/m/Y",
         locale: "vn",

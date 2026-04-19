@@ -379,9 +379,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log("[Sync] L2S Success:", data);
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    // Use the parts to create a correctly formatted string for Flatpickr
-                    const formattedSolar = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
-                    fp.setDate(formattedSolar, true); 
+                    // Internal format is now Y-m-d, so we use solar_date directly
+                    fp.setDate(data.solar_date, true); 
                 } else {
                     lunarError.style.display = 'block';
                 }
@@ -399,9 +398,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const fp = flatpickr(solarInput, {
-        dateFormat: "d/m/Y",
+        dateFormat: "Y-m-d", // Matches Django default format
         altInput: true,
-        altFormat: "d/m/Y",
+        altFormat: "d/m/Y",   // Displays as Day/Month/Year to the user
         locale: "vn",
         onClose: function() { syncSolarToLunar(); },
         onChange: function() { syncSolarToLunar(); }
