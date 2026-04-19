@@ -130,7 +130,7 @@
                                     <div class="small text-primary">Bán: {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}</div>
                                 </td>
                                 <td class="text-start text-md-end text-success">
-                                    {% if entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}{{ entry.paid_amount|floatformat:0 }}{% endif %}
+                                    {% if entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
                                 </td>
                                 <td class="text-end fw-bold text-primary d-none d-md-table-cell">
                                     {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
