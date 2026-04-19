@@ -5,6 +5,14 @@ from django.conf import settings
 from django.utils import timezone
 from accounts.models import Customer
 from catalog.models import Warehouse, Product
+import vnlunar
+
+def solar_to_lunar_string(solar_date):
+    if not solar_date:
+        return ""
+    lunar = vnlunar.get_lunar_date(solar_date.day, solar_date.month, solar_date.year)
+    leap = " (Nhuận)" if lunar['leap'] else ""
+    return f"{lunar['day']:02d}/{lunar['month']:02d}/{lunar['year']}{leap}"
 
 class OrderStatus(models.TextChoices):
     DRAFT = 'DRAFT', 'Nháp'
@@ -23,6 +31,10 @@ class SalesOrder(models.Model):
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Tổng tiền")
     paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
+    
+    @property
+    def lunar_date_display(self):
+        return solar_to_lunar_string(self.order_date)
 
     @property
     def remaining_amount(self):
@@ -117,6 +129,10 @@ class PurchaseOrder(models.Model):
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Tổng tiền")
     paid_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0, blank=True, verbose_name="Đã thanh toán (tại quầy)")
     public_token = models.UUIDField(default=uuid.uuid4, unique=True)
+
+    @property
+    def lunar_date_display(self):
+        return solar_to_lunar_string(self.order_date)
 
     @property
     def remaining_amount(self):

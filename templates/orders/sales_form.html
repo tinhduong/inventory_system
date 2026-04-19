@@ -13,6 +13,19 @@
                         {% for field in form %}
                             {% if field.name == 'paid_amount' and user.role != 'ADMIN' %}
                                 <div style="display:none;">{{ field }}</div>
+                            {% elif field.name == 'order_date' %}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">{{ field.label }} (Dương lịch)</label>
+                                    {{ field }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Ngày đặt hàng (Âm lịch)</label>
+                                    <div class="input-group">
+                                        <input type="text" id="lunar_date_input" class="form-control" placeholder="dd/mm/yyyy" title="Nhập ngày âm lịch">
+                                        <span class="input-group-text bg-light text-muted small" id="lunar_info_display"></span>
+                                    </div>
+                                    <div id="lunar_error" class="text-danger small mt-1" style="display:none;">Định dạng ngày không hợp lệ (dd/mm/yyyy)</div>
+                                </div>
                             {% else %}
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">{{ field.label }}</label>
@@ -100,6 +113,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{% static 'js/lunar_calendar.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const addButton = document.getElementById('add-line-btn');
@@ -314,6 +328,55 @@ document.addEventListener('DOMContentLoaded', function() {
         bindRowEvents(newRow);
         updateRemoveButtons();
     });
+
+    // --- Lunar Calendar Integration ---
+    const solarInput = document.querySelector('input[name="order_date"]');
+    const lunarInput = document.getElementById('lunar_date_input');
+    const lunarInfo = document.getElementById('lunar_info_display');
+    const lunarError = document.getElementById('lunar_error');
+
+    function updateLunarFromSolar() {
+        const solarVal = solarInput.value; // yyyy-mm-dd
+        if (!solarVal) return;
+        const [y, m, d] = solarVal.split('-').map(Number);
+        const lunar = LunarUtils.solarToLunar(d, m, y);
+        lunarInput.value = `${String(lunar.day).padStart(2, '0')}/${String(lunar.month).padStart(2, '0')}/${lunar.year}`;
+        lunarInfo.textContent = lunar.leap ? '(Nhuận)' : '';
+    }
+
+    function updateSolarFromLunar() {
+        const lunarVal = lunarInput.value; // dd/mm/yyyy
+        const parts = lunarVal.split('/');
+        if (parts.length !== 3) {
+            lunarError.style.display = 'block';
+            return;
+        }
+        lunarError.style.display = 'none';
+        const d = parseInt(parts[0]);
+        const m = parseInt(parts[1]);
+        const y = parseInt(parts[2]);
+        if (isNaN(d) || isNaN(m) || isNaN(y)) {
+            lunarError.style.display = 'block';
+            return;
+        }
+
+        const solar = LunarUtils.lunarToSolar(d, m, y, false); // Default no leap for now
+        solarInput.value = `${solar.year}-${String(solar.month).padStart(2, '0')}-${String(solar.day).padStart(2, '0')}`;
+    }
+
+    if (solarInput && lunarInput) {
+        // Initial sync
+        updateLunarFromSolar();
+
+        solarInput.addEventListener('change', updateLunarFromSolar);
+        lunarInput.addEventListener('blur', updateSolarFromLunar);
+        lunarInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                updateSolarFromLunar();
+            }
+        });
+    }
 
     updateRemoveButtons();
 });

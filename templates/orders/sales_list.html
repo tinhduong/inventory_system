@@ -74,7 +74,10 @@
                 <tbody>
                     {% for order in orders %}
                     <tr onclick="window.location='{% url 'orders:sales-detail' order.pk %}'" style="cursor: pointer;">
-                        <td class="ps-3">{{ order.order_date|date:"d/m/Y" }}</td>
+                        <td class="ps-3">
+                            <div class="fw-bold">{{ order.order_date|date:"d/m/Y" }} <small class="text-muted fw-normal" style="font-size: 0.7rem;">(Dương)</small></div>
+                            <div class="small text-info">{{ order.lunar_date_display }} <small class="text-muted" style="font-size: 0.7rem;">(Âm)</small></div>
+                        </td>
                         <td>{{ order.customer.name }}</td>
                         {% if user.role == 'ADMIN' %}
                         <td class="fw-bold text-primary">{{ order.total_amount|floatformat:0 }} đ</td>
