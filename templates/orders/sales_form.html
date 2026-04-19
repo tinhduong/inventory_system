@@ -402,6 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
         altInput: true,
         altFormat: "d/m/Y",   // Displays as Day/Month/Year to the user
         locale: "vn",
+        disableMobile: "true", // Force Flatpickr UI on mobile to keep d/m/Y consistency
         onClose: function() { syncSolarToLunar(); },
         onChange: function() { syncSolarToLunar(); }
     });
