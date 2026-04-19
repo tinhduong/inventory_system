@@ -1,6 +1,6 @@
 /**
  * Vietnamese Lunar Calendar Conversion (Hồ Ngọc Đức algorithm)
- * Corrected year boundary logic for lunarToSolar.
+ * FIXED getLunarMonth11 logic where k was not updated correctly.
  */
 
 var LunarUtils = (function() {
@@ -112,9 +112,7 @@ var LunarUtils = (function() {
         lunarToSolar: function(ld, lm, ly, lleap, timezone) {
             timezone = timezone || 7;
             var off = timezone / 24.0;
-            // The key is which "month 11" to start from.
-            // Month 11 of Lunar Year ly is Solar Year ly's Winter Solstice.
-            var a11 = (lm >= 11) ? getLunarMonth11(ly, timezone) : getLunarMonth11(ly - 1, timezone);
+            var a11 = (lm >= 11) ? getLunarMonth11(ly, timezone) : getLunarMonth11(ly-1, timezone);
             
             var k = INT((a11 - 2451550.0) / 29.530588853 + 0.5);
             var leapOff = getLeapMonthOffset(a11, timezone);

@@ -40,8 +40,8 @@ def get_lunar_month_11(y, timezone=7):
     nm = get_new_moon(k)
     off = timezone / 24.0
     sun_long = get_sun_longitude(nm - 0.5 + off)
-    if sun_long >= 285: nm = get_new_moon(k - 1)
-    elif sun_long < 255: nm = get_new_moon(k + 1)
+    if sun_long >= 285: k -= 1
+    elif sun_long < 255: k += 1
     return INT(get_new_moon(k) + 0.5 + off)
 
 def get_leap_month_offset(a11, timezone=7):
