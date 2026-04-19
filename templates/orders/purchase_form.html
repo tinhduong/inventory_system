@@ -312,7 +312,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    fp.setDate(data.solar_date, false);
+                    const picker = solarInput._flatpickr || fp;
+                    if (picker) {
+                        picker.setDate(data.solar_date, true);
+                    } else {
+                        solarInput.value = data.solar_date;
+                    }
                 } else {
                     lunarError.style.display = 'block';
                 }
