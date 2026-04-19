@@ -379,8 +379,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log("[Sync] L2S Success:", data);
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    // Force set date and trigger conversion feedback
-                    fp.setDate(data.solar_date, true);
+                    // Use the parts to create a correctly formatted string for Flatpickr
+                    const formattedSolar = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
+                    fp.setDate(formattedSolar, true); 
                 } else {
                     lunarError.style.display = 'block';
                 }

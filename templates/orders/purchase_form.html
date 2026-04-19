@@ -300,7 +300,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    fp.setDate(data.solar_date, true); 
+                    const formattedSolar = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
+                    fp.setDate(formattedSolar, true); 
                 } else {
                     lunarError.style.display = 'block';
                 }
