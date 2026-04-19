@@ -19,4 +19,5 @@ urlpatterns = [
     path('purchases/<int:pk>/delete/', views.delete_purchase_order, name='purchase-delete'),
 
     path('public/<uuid:token>/', views.customer_public_order_view, name='public-order'),
+    path('convert-date/', views.lunar_convert_api, name='convert-date'),
 ]

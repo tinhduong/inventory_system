@@ -1,4 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+import vnlunar
+import datetime
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
@@ -420,3 +423,39 @@ def customer_public_order_view(request, token):
     if order:
         return render(request, 'orders/public_order.html', {'order': order, 'type': 'purchase'})
     return render(request, '404.html', status=404)
+
+def lunar_convert_api(request):
+    date_str = request.GET.get('date')
+    direction = request.GET.get('direction', 's2l')
+    
+    if not date_str:
+        return JsonResponse({'error': 'No date provided'}, status=400)
+        
+    try:
+        if direction == 's2l':
+            dt = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+            lunar = vnlunar.get_lunar_date(dt.day, dt.month, dt.year)
+            return JsonResponse({
+                'day': lunar['day'],
+                'month': lunar['month'],
+                'year': lunar['year'],
+                'leap': bool(lunar['leap'])
+            })
+        else:
+            parts = date_str.split('/')
+            day, month, year = map(int, parts)
+            # Search for the solar date within a +/- 60 day window of the target year/month
+            start_dt = datetime.datetime(year, month, 1) if month <= 12 else datetime.datetime(year, 12, 1)
+            for offset in range(-60, 90):
+                check_dt = start_dt + datetime.timedelta(days=offset)
+                res = vnlunar.get_lunar_date(check_dt.day, check_dt.month, check_dt.year)
+                if res['day'] == day and res['month'] == month and res['year'] == year:
+                    return JsonResponse({
+                        'solar_date': check_dt.strftime('%Y-%m-%d'),
+                        'day': check_dt.day,
+                        'month': check_dt.month,
+                        'year': check_dt.year
+                    })
+            return JsonResponse({'error': 'Could not find solar date for this lunar date'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)

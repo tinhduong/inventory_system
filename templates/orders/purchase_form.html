@@ -280,25 +280,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateLunarFromSolar() {
         const solarVal = solarInput.value;
-        const date = parseSolarDate(solarVal);
-        if (!date) return;
-        const lunar = LunarUtils.solarToLunar(date.d, date.m, date.y);
-        lunarInput.value = `${String(lunar.day).padStart(2, '0')}/${String(lunar.month).padStart(2, '0')}/${lunar.year}`;
-        lunarInfo.textContent = lunar.leap ? '(Nhuận)' : '';
+        if (!solarVal) return;
+        
+        fetch(`/orders/convert-date/?direction=s2l&date=${solarVal}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.day) {
+                    lunarInput.value = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
+                    lunarInfo.textContent = data.leap ? '(Nhuận)' : '';
+                }
+            });
     }
 
     function updateSolarFromLunar() {
         const lunarVal = lunarInput.value; 
-        const parts = lunarVal.split('/').map(Number);
-        if (parts.length !== 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
-            lunarError.style.display = 'block';
-            return;
-        }
-        lunarError.style.display = 'none';
+        if (!lunarVal.includes('/')) return;
         
-        const solar = LunarUtils.lunarToSolar(parts[0], parts[1], parts[2], false);
-        solarInput.value = `${solar.year}-${String(solar.month).padStart(2, '0')}-${String(solar.day).padStart(2, '0')}`;
-        updateLunarFromSolar();
+        fetch(`/orders/convert-date/?direction=l2s&date=${encodeURIComponent(lunarVal)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.solar_date) {
+                    lunarError.style.display = 'none';
+                    solarInput.value = data.solar_date;
+                    updateLunarFromSolar();
+                } else {
+                    lunarError.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                lunarError.style.display = 'block';
+            });
     }
 
     if (solarInput && lunarInput) {
