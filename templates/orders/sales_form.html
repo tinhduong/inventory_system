@@ -336,33 +336,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const lunarInfo = document.getElementById('lunar_info_display');
     const lunarError = document.getElementById('lunar_error');
 
+    function parseSolarDate(val) {
+        if (!val) return null;
+        // Check for yyyy-mm-dd (default) or dd/mm/yyyy or mm/dd/yyyy
+        if (val.includes('-')) {
+            const [y, m, d] = val.split('-').map(Number);
+            return { d, m, y };
+        } else if (val.includes('/')) {
+            const parts = val.split('/').map(Number);
+            if (parts[2] > 1000) return { d: parts[0], m: parts[1], y: parts[2] }; // Assume d/m/y
+        }
+        return null;
+    }
+
     function updateLunarFromSolar() {
-        const solarVal = solarInput.value; // yyyy-mm-dd
-        if (!solarVal) return;
-        const [y, m, d] = solarVal.split('-').map(Number);
-        const lunar = LunarUtils.solarToLunar(d, m, y);
+        const solarVal = solarInput.value;
+        const date = parseSolarDate(solarVal);
+        if (!date) return;
+        const lunar = LunarUtils.solarToLunar(date.d, date.m, date.y);
         lunarInput.value = `${String(lunar.day).padStart(2, '0')}/${String(lunar.month).padStart(2, '0')}/${lunar.year}`;
         lunarInfo.textContent = lunar.leap ? '(Nhuận)' : '';
     }
 
     function updateSolarFromLunar() {
         const lunarVal = lunarInput.value; // dd/mm/yyyy
-        const parts = lunarVal.split('/');
-        if (parts.length !== 3) {
+        const parts = lunarVal.split('/').map(Number);
+        if (parts.length !== 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
             lunarError.style.display = 'block';
             return;
         }
         lunarError.style.display = 'none';
-        const d = parseInt(parts[0]);
-        const m = parseInt(parts[1]);
-        const y = parseInt(parts[2]);
-        if (isNaN(d) || isNaN(m) || isNaN(y)) {
-            lunarError.style.display = 'block';
-            return;
-        }
-
-        const solar = LunarUtils.lunarToSolar(d, m, y, false); // Default no leap for now
+        
+        // Note: Default to non-leap for manual input unless we add a checkbox
+        const solar = LunarUtils.lunarToSolar(parts[0], parts[1], parts[2], false);
         solarInput.value = `${solar.year}-${String(solar.month).padStart(2, '0')}-${String(solar.day).padStart(2, '0')}`;
+        updateLunarFromSolar(); // Refresh lunar info (like leap suffix)
     }
 
     if (solarInput && lunarInput) {
@@ -370,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLunarFromSolar();
 
         solarInput.addEventListener('change', updateLunarFromSolar);
-        lunarInput.addEventListener('blur', updateSolarFromLunar);
+        lunarInput.addEventListener('change', updateSolarFromLunar); 
         lunarInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
