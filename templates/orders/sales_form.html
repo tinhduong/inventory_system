@@ -330,30 +330,30 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveButtons();
     });
 
-    // --- Lunar Calendar Integration ---
+    // --- Date Pickers Integration ---
     const solarInput = document.querySelector('input[name="order_date"]');
     const lunarInput = document.getElementById('lunar_date_input');
     const lunarInfo = document.getElementById('lunar_info_display');
     const lunarError = document.getElementById('lunar_error');
 
-    function parseSolarDate(val) {
-        if (!val) return null;
-        // Check for yyyy-mm-dd (default) or dd/mm/yyyy or mm/dd/yyyy
-        if (val.includes('-')) {
-            const [y, m, d] = val.split('-').map(Number);
-            return { d, m, y };
-        } else if (val.includes('/')) {
-            const parts = val.split('/').map(Number);
-            if (parts[2] > 1000) return { d: parts[0], m: parts[1], y: parts[2] }; // Assume d/m/y
+    // Initialize Flatpickr for Solar Date (Force Day/Month/Year)
+    const fp = flatpickr(solarInput, {
+        dateFormat: "d/m/Y",
+        altInput: true,
+        altFormat: "d/m/Y",
+        locale: "vn",
+        onChange: function(selectedDates, dateStr, instance) {
+            // For Flatpickr, we need the internal yyyy-mm-dd for the API
+            const ymd = instance.formatDate(selectedDates[0], "Y-m-d");
+            updateLunarFromSolar(ymd);
         }
-        return null;
-    }
+    });
 
-    function updateLunarFromSolar() {
-        const solarVal = solarInput.value;
-        if (!solarVal) return;
+    function updateLunarFromSolar(ymd) {
+        let dateVal = ymd || (fp.selectedDates[0] ? fp.formatDate(fp.selectedDates[0], "Y-m-d") : "");
+        if (!dateVal) return;
         
-        fetch(`/orders/convert-date/?direction=s2l&date=${solarVal}`)
+        fetch(`/orders/convert-date/?direction=s2l&date=${dateVal}`)
             .then(res => res.json())
             .then(data => {
                 if (data.day) {
@@ -372,9 +372,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    solarInput.value = data.solar_date;
-                    // Trigger a re-sync to get the leap month info if needed
-                    updateLunarFromSolar();
+                    // Parse the solar_date (yyyy-mm-dd) and set it in Flatpickr
+                    fp.setDate(data.solar_date, true);
                 } else {
                     lunarError.style.display = 'block';
                 }

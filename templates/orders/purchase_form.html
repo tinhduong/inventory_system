@@ -260,29 +260,29 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveButtons();
     });
 
-    // --- Lunar Calendar Integration ---
+    // --- Date Pickers Integration ---
     const solarInput = document.querySelector('input[name="order_date"]');
     const lunarInput = document.getElementById('lunar_date_input');
     const lunarInfo = document.getElementById('lunar_info_display');
     const lunarError = document.getElementById('lunar_error');
 
-    function parseSolarDate(val) {
-        if (!val) return null;
-        if (val.includes('-')) {
-            const [y, m, d] = val.split('-').map(Number);
-            return { d, m, y };
-        } else if (val.includes('/')) {
-            const parts = val.split('/').map(Number);
-            if (parts[2] > 1000) return { d: parts[0], m: parts[1], y: parts[2] };
+    // Initialize Flatpickr for Solar Date (Force Day/Month/Year)
+    const fp = flatpickr(solarInput, {
+        dateFormat: "d/m/Y",
+        altInput: true,
+        altFormat: "d/m/Y",
+        locale: "vn",
+        onChange: function(selectedDates, dateStr, instance) {
+            const ymd = instance.formatDate(selectedDates[0], "Y-m-d");
+            updateLunarFromSolar(ymd);
         }
-        return null;
-    }
+    });
 
-    function updateLunarFromSolar() {
-        const solarVal = solarInput.value;
-        if (!solarVal) return;
+    function updateLunarFromSolar(ymd) {
+        let dateVal = ymd || (fp.selectedDates[0] ? fp.formatDate(fp.selectedDates[0], "Y-m-d") : "");
+        if (!dateVal) return;
         
-        fetch(`/orders/convert-date/?direction=s2l&date=${solarVal}`)
+        fetch(`/orders/convert-date/?direction=s2l&date=${dateVal}`)
             .then(res => res.json())
             .then(data => {
                 if (data.day) {
@@ -301,8 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    solarInput.value = data.solar_date;
-                    updateLunarFromSolar();
+                    fp.setDate(data.solar_date, true);
                 } else {
                     lunarError.style.display = 'block';
                 }
@@ -314,7 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (solarInput && lunarInput) {
         updateLunarFromSolar();
-        solarInput.addEventListener('change', updateLunarFromSolar);
         lunarInput.addEventListener('change', updateSolarFromLunar); 
         lunarInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
