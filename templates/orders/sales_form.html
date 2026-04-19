@@ -12,8 +12,8 @@
                     {% csrf_token %}
                     <div class="row">
                         {% for field in form %}
-                            {% if field.name == 'paid_amount' and user.role != 'ADMIN' %}
-                                <div style="display:none;">{{ field }}</div>
+                            {% if field.name == 'paid_amount' %}
+                                {# Rendered in footer area for better flow #}
                             {% elif field.name == 'order_date' %}
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">{{ field.label }} (Dương lịch)</label>
@@ -97,9 +97,17 @@
                     
                     <div class="mt-4">
                         {% if user.role == 'ADMIN' %}
-                        <div class="h4 mb-3 fw-bold text-end">
+                        <div class="h3 mb-2 fw-bold text-end">
                             Tổng cộng: <span id="grand-total-display" class="text-primary">0</span> đ
                         </div>
+                        <div class="row justify-content-end mb-4">
+                            <div class="col-md-5 col-lg-4 text-end">
+                                <label class="form-label fw-bold text-muted small mb-1">ĐÃ THANH TOÁN (TẠI QUẦY)</label>
+                                {{ form.paid_amount }}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div style="display: none;">{{ form.paid_amount }}</div>
                         {% endif %}
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary btn-lg px-md-5 flex-grow-1 flex-md-grow-0 me-2">Lưu đơn hàng</button>
