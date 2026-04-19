@@ -133,10 +133,20 @@ class SalesCreateView(LoginRequiredMixin, CreateView):
         lines = SalesOrderLineFormSet(self.request.POST, instance=self.object)
         
         if lines.is_valid():
+            # Check paid_amount vs total_amount before saving
+            total_from_lines = sum(
+                (line.cleaned_data.get('quantity') or 0) * (line.cleaned_data.get('unit_price') or 0)
+                for line in lines if not (lines.can_delete and lines._should_delete_form(line))
+            )
+            paid_amount = form.cleaned_data.get('paid_amount') or 0
+            if paid_amount > total_from_lines:
+                form.add_error('paid_amount', f"Số tiền thanh toán ({paid_amount:,.0f}) không được vượt quá tổng giá trị đơn hàng ({total_from_lines:,.0f}).")
+                return self.render_to_response(self.get_context_data(form=form, lines=lines))
+
             self.object.save()
             lines.save()
             # Calculate total amount
-            self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
+            self.object.total_amount = total_from_lines
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
@@ -171,10 +181,20 @@ class SalesUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = self.get_context_data()
         lines = context['lines']
         if lines.is_valid():
+            # Check paid_amount vs total_amount before saving
+            total_from_lines = sum(
+                (line.cleaned_data.get('quantity') or 0) * (line.cleaned_data.get('unit_price') or 0)
+                for line in lines if not (lines.can_delete and lines._should_delete_form(line))
+            )
+            paid_amount = form.cleaned_data.get('paid_amount') or 0
+            if paid_amount > total_from_lines:
+                form.add_error('paid_amount', f"Số tiền thanh toán ({paid_amount:,.0f}) không được vượt quá tổng đơn hàng ({total_from_lines:,.0f}).")
+                return self.render_to_response(self.get_context_data(form=form, lines=lines))
+
             self.object = form.save()
             lines.save()
             # Recalculate total amount after updates
-            self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
+            self.object.total_amount = total_from_lines
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
@@ -294,11 +314,22 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
         context = self.get_context_data()
         lines = context['lines']
         if lines.is_valid():
+            # Check paid_amount vs total_amount before saving
+            total_from_lines = sum(
+                (line.cleaned_data.get('quantity') or 0) * (line.cleaned_data.get('unit_price') or 0)
+                for line in lines if not (lines.can_delete and lines._should_delete_form(line))
+            )
+            paid_amount = form.cleaned_data.get('paid_amount') or 0
+            if paid_amount > total_from_lines:
+                form.add_error('paid_amount', f"Số tiền thanh toán ({paid_amount:,.0f}) không được vượt quá tổng đơn hàng ({total_from_lines:,.0f}).")
+                return self.render_to_response(self.get_context_data(form=form, lines=lines))
+
             form.instance.employee = self.request.user
             self.object = form.save()
             lines.instance = self.object
             lines.save()
-            self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
+            # Calculate total amount
+            self.object.total_amount = total_from_lines
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
@@ -306,7 +337,7 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
             log_order_action(self.object, self.request.user, "Tạo đơn nhập hàng")
             return redirect(self.get_success_url())
         else:
-            return self.render_to_response(self.get_context_data(form=form))
+            return self.render_to_response(self.get_context_data(form=form, lines=lines))
 
     def get_success_url(self):
         return reverse('orders:purchase-detail', kwargs={'pk': self.object.pk})
@@ -332,10 +363,20 @@ class PurchaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = self.get_context_data()
         lines = context['lines']
         if lines.is_valid():
+            # Check paid_amount vs total_amount before saving
+            total_from_lines = sum(
+                (line.cleaned_data.get('quantity') or 0) * (line.cleaned_data.get('unit_price') or 0)
+                for line in lines if not (lines.can_delete and lines._should_delete_form(line))
+            )
+            paid_amount = form.cleaned_data.get('paid_amount') or 0
+            if paid_amount > total_from_lines:
+                form.add_error('paid_amount', f"Số tiền thanh toán ({paid_amount:,.0f}) không được vượt quá tổng đơn hàng ({total_from_lines:,.0f}).")
+                return self.render_to_response(self.get_context_data(form=form, lines=lines))
+
             self.object = form.save()
             lines.save()
             # Recalculate total amount after updates
-            self.object.total_amount = sum(line.line_total for line in self.object.lines.all())
+            self.object.total_amount = total_from_lines
             self.object.save()
             # Update Reservation Stock
             update_stock_from_order(self.object)
@@ -344,7 +385,7 @@ class PurchaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             messages.success(self.request, f"Cập nhật đơn nhập {self.object.code} thành công.")
             return redirect(self.get_success_url())
         else:
-            return self.render_to_response(self.get_context_data(form=form))
+            return self.render_to_response(self.get_context_data(form=form, lines=lines))
 
     def get_success_url(self):
         return reverse('orders:purchase-detail', kwargs={'pk': self.object.pk})

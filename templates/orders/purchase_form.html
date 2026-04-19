@@ -150,6 +150,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         display.textContent = formatVND(grandTotal);
+        validatePaidAmount();
+    }
+
+    const paidInput = document.querySelector('input[name="paid_amount"]');
+    function validatePaidAmount() {
+        if (!paidInput) return;
+        const paidVal = (typeof unformatMoney === 'function') ? 
+                        parseFloat(unformatMoney(paidInput.value)) : 
+                        parseVND(paidInput.value);
+        const totalText = document.getElementById('grand-total-display').textContent;
+        const grandTotal = parseVND(totalText);
+        
+        if (paidVal > grandTotal) {
+            paidInput.classList.add('is-invalid');
+            paidInput.style.borderColor = "#dc3545";
+        } else {
+            paidInput.classList.remove('is-invalid');
+            paidInput.style.borderColor = "";
+        }
+    }
+
+    if (paidInput) {
+        paidInput.addEventListener('input', validatePaidAmount);
     }
 
     function updateRemoveButtons() {
