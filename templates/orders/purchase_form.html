@@ -153,26 +153,36 @@ document.addEventListener('DOMContentLoaded', function() {
         validatePaidAmount();
     }
 
-    const paidInput = document.querySelector('input[name="paid_amount"]');
+    const visiblePaidInput = document.getElementById('id_paid_amount');
     function validatePaidAmount() {
-        if (!paidInput) return;
-        const paidVal = (typeof unformatMoney === 'function') ? 
-                        parseFloat(unformatMoney(paidInput.value)) : 
-                        parseVND(paidInput.value);
+        if (!visiblePaidInput) return;
+        const hiddenPaidInput = document.querySelector('input[name="paid_amount"]');
+        if (!hiddenPaidInput) return;
+
         const totalText = document.getElementById('grand-total-display').textContent;
+        if (!totalText) return;
         const grandTotal = parseVND(totalText);
+        const paidVal = parseFloat(hiddenPaidInput.value) || 0;
         
         if (paidVal > grandTotal) {
-            paidInput.classList.add('is-invalid');
-            paidInput.style.borderColor = "#dc3545";
-        } else {
-            paidInput.classList.remove('is-invalid');
-            paidInput.style.borderColor = "";
+            // HARD RESTRICT
+            const cappedVal = Math.floor(grandTotal / 1000);
+            visiblePaidInput.value = formatMoney(cappedVal);
+            hiddenPaidInput.value = cappedVal * 1000;
+            
+            // Visual Alert
+            visiblePaidInput.classList.add('is-invalid');
+            visiblePaidInput.style.boxShadow = "0 0 10px rgba(220, 53, 69, 0.5)";
+            setTimeout(() => {
+                visiblePaidInput.classList.remove('is-invalid');
+                visiblePaidInput.style.boxShadow = "";
+            }, 1500);
         }
     }
 
-    if (paidInput) {
-        paidInput.addEventListener('input', validatePaidAmount);
+    if (visiblePaidInput) {
+        visiblePaidInput.addEventListener('input', validatePaidAmount);
+        visiblePaidInput.addEventListener('change', validatePaidAmount);
     }
 
     function updateRemoveButtons() {
