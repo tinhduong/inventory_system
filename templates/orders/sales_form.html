@@ -354,39 +354,57 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLunarFromSolar(ymd) {
         if (!ymd) return;
         _isSyncing = true;
+        lunarInput.style.opacity = '0.5';
+        
         fetch(`/orders/convert-date/?direction=s2l&date=${ymd}`)
             .then(res => res.json())
             .then(data => {
+                console.log("S2L API Result:", data);
                 if (data.day) {
                     lunarInput.value = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
                     lunarInfo.textContent = data.leap ? '(Nhuận)' : '';
                     lunarError.style.display = 'none';
                 }
             })
-            .finally(() => { _isSyncing = false; });
+            .finally(() => { 
+                _isSyncing = false; 
+                lunarInput.style.opacity = '1';
+            });
     }
 
     function updateSolarFromLunar() {
         if (_isSyncing) return;
         const lunarVal = lunarInput.value; 
-        // Only trigger if format is dd/mm/yyyy
-        const regex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-        if (!regex.test(lunarVal)) return;
+        const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        if (!regex.test(lunarVal)) {
+            console.log("Lunar format invalid yet:", lunarVal);
+            return;
+        }
         
+        console.log("Lunar format valid! Syncing to Solar:", lunarVal);
         _isSyncing = true;
+        lunarInput.classList.add('is-valid'); // Visual feedback
+        
         fetch(`/orders/convert-date/?direction=l2s&date=${encodeURIComponent(lunarVal)}`)
             .then(res => res.json())
             .then(data => {
+                console.log("L2S API Result:", data);
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    // setDate without triggering onChange
                     fp.setDate(data.solar_date, false);
                 } else {
+                    console.warn("API returned no solar_date for:", lunarVal);
                     lunarError.style.display = 'block';
                 }
             })
-            .catch(() => { lunarError.style.display = 'block'; })
-            .finally(() => { _isSyncing = false; });
+            .catch(err => { 
+                console.error("Fetch error:", err);
+                lunarError.style.display = 'block'; 
+            })
+            .finally(() => { 
+                _isSyncing = false; 
+                setTimeout(() => lunarInput.classList.remove('is-valid'), 1000);
+            });
     }
 
     if (solarInput && lunarInput) {

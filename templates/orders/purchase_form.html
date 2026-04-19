@@ -283,6 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLunarFromSolar(ymd) {
         if (!ymd) return;
         _isSyncing = true;
+        lunarInput.style.opacity = '0.5';
         fetch(`/orders/convert-date/?direction=s2l&date=${ymd}`)
             .then(res => res.json())
             .then(data => {
@@ -292,16 +293,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     lunarError.style.display = 'none';
                 }
             })
-            .finally(() => { _isSyncing = false; });
+            .finally(() => { 
+                _isSyncing = false; 
+                lunarInput.style.opacity = '1';
+            });
     }
 
     function updateSolarFromLunar() {
         if (_isSyncing) return;
         const lunarVal = lunarInput.value; 
-        const regex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+        const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
         if (!regex.test(lunarVal)) return;
         
         _isSyncing = true;
+        lunarInput.classList.add('is-valid');
         fetch(`/orders/convert-date/?direction=l2s&date=${encodeURIComponent(lunarVal)}`)
             .then(res => res.json())
             .then(data => {
@@ -313,7 +318,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(() => { lunarError.style.display = 'block'; })
-            .finally(() => { _isSyncing = false; });
+            .finally(() => { 
+                _isSyncing = false;
+                setTimeout(() => lunarInput.classList.remove('is-valid'), 1000);
+            });
     }
 
     if (solarInput && lunarInput) {
