@@ -265,12 +265,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const lunarInfo = document.getElementById('lunar_info_display');
     const lunarError = document.getElementById('lunar_error');
 
-    let _isSyncing = false;
+    window._isLunarSyncing = false;
 
     function syncSolarToLunar() {
-        if (_isSyncing || !fp.selectedDates[0]) return;
+        if (window._isLunarSyncing || !fp.selectedDates[0]) return;
         const ymd = fp.formatDate(fp.selectedDates[0], "Y-m-d");
-        _isSyncing = true;
+        window._isLunarSyncing = true;
         
         fetch(`/orders/convert-date/?direction=s2l&date=${ymd}`)
             .then(res => res.json())
@@ -281,16 +281,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     lunarError.style.display = 'none';
                 }
             })
-            .finally(() => { _isSyncing = false; });
+            .finally(() => { 
+                setTimeout(() => { window._isLunarSyncing = false; }, 100);
+            });
     }
 
     function syncLunarToSolar() {
-        if (_isSyncing) return;
+        if (window._isLunarSyncing) return;
         const lunarVal = lunarInput.value;
         const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
         if (!regex.test(lunarVal)) return;
 
-        _isSyncing = true;
+        window._isLunarSyncing = true;
         lunarInput.classList.add('is-valid');
         
         fetch(`/orders/convert-date/?direction=l2s&date=${encodeURIComponent(lunarVal)}`)
@@ -298,15 +300,17 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    fp.setDate(data.solar_date, false); 
+                    fp.setDate(data.solar_date, true); 
                 } else {
                     lunarError.style.display = 'block';
                 }
             })
             .catch(() => { lunarError.style.display = 'block'; })
             .finally(() => { 
-                _isSyncing = false;
-                setTimeout(() => lunarInput.classList.remove('is-valid'), 500);
+                setTimeout(() => { 
+                    window._isLunarSyncing = false; 
+                    lunarInput.classList.remove('is-valid');
+                }, 500);
             });
     }
 
@@ -315,16 +319,16 @@ document.addEventListener('DOMContentLoaded', function() {
         altInput: true,
         altFormat: "d/m/Y",
         locale: "vn",
-        onClose: syncSolarToLunar,
-        onChange: syncSolarToLunar
+        onClose: function() { syncSolarToLunar(); },
+        onChange: function() { syncSolarToLunar(); }
     });
 
     if (solarInput && lunarInput) {
         if (fp.selectedDates[0]) syncSolarToLunar();
+        lunarInput.addEventListener('blur', syncLunarToSolar);
         lunarInput.addEventListener('input', function() {
             if (this.value.length === 10) syncLunarToSolar();
         });
-        lunarInput.addEventListener('change', syncLunarToSolar);
         lunarInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
