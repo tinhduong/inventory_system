@@ -260,11 +260,12 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveButtons();
     });
 
-    // --- Date Pickers Integration ---
     const solarInput = document.querySelector('input[name="order_date"]');
     const lunarInput = document.getElementById('lunar_date_input');
     const lunarInfo = document.getElementById('lunar_info_display');
     const lunarError = document.getElementById('lunar_error');
+
+    let isSyncing = false;
 
     // Initialize Flatpickr for Solar Date (Force Day/Month/Year)
     const fp = flatpickr(solarInput, {
@@ -273,46 +274,61 @@ document.addEventListener('DOMContentLoaded', function() {
         altFormat: "d/m/Y",
         locale: "vn",
         onChange: function(selectedDates, dateStr, instance) {
+            if (isSyncing) return;
             const ymd = instance.formatDate(selectedDates[0], "Y-m-d");
             updateLunarFromSolar(ymd);
         }
     });
 
     function updateLunarFromSolar(ymd) {
-        let dateVal = ymd || (fp.selectedDates[0] ? fp.formatDate(fp.selectedDates[0], "Y-m-d") : "");
-        if (!dateVal) return;
+        if (!ymd && fp.selectedDates[0]) {
+            ymd = fp.formatDate(fp.selectedDates[0], "Y-m-d");
+        }
+        if (!ymd) return;
         
-        fetch(`/orders/convert-date/?direction=s2l&date=${dateVal}`)
+        isSyncing = true;
+        fetch(`/orders/convert-date/?direction=s2l&date=${ymd}`)
             .then(res => res.json())
             .then(data => {
                 if (data.day) {
                     lunarInput.value = `${String(data.day).padStart(2, '0')}/${String(data.month).padStart(2, '0')}/${data.year}`;
                     lunarInfo.textContent = data.leap ? '(Nhuận)' : '';
+                    lunarError.style.display = 'none';
                 }
+            })
+            .finally(() => {
+                isSyncing = false;
             });
     }
 
     function updateSolarFromLunar() {
+        if (isSyncing) return;
         const lunarVal = lunarInput.value; 
-        if (!lunarVal.includes('/')) return;
+        if (!lunarVal.includes('/') || lunarVal.length < 8) return;
         
+        isSyncing = true;
         fetch(`/orders/convert-date/?direction=l2s&date=${encodeURIComponent(lunarVal)}`)
             .then(res => res.json())
             .then(data => {
                 if (data.solar_date) {
                     lunarError.style.display = 'none';
-                    fp.setDate(data.solar_date, true);
+                    fp.setDate(data.solar_date, false);
                 } else {
                     lunarError.style.display = 'block';
                 }
             })
             .catch(() => {
                 lunarError.style.display = 'block';
+            })
+            .finally(() => {
+                isSyncing = false;
             });
     }
 
     if (solarInput && lunarInput) {
-        updateLunarFromSolar();
+        const initialYmd = fp.selectedDates[0] ? fp.formatDate(fp.selectedDates[0], "Y-m-d") : "";
+        if (initialYmd) updateLunarFromSolar(initialYmd);
+
         lunarInput.addEventListener('change', updateSolarFromLunar); 
         lunarInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
