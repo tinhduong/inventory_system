@@ -1,6 +1,6 @@
 /**
  * Vietnamese Lunar Calendar Conversion (Hồ Ngọc Đức algorithm)
- * Final fixed version with correct base year (2000).
+ * Final fixed version with correct month indexing.
  */
 
 var LunarUtils = (function() {
@@ -31,7 +31,6 @@ var LunarUtils = (function() {
         var t = k / 1236.85;
         var t2 = t * t;
         var t3 = t2 * t;
-        // Base JD: 2000-01-06 (K=0) is approx 2451550.09765
         return 2451550.09765 + 29.530588853 * k + 0.0001337 * t2 - 0.00000015 * t3 + 0.00073 * Math.sin((201.56 + 1.178 * k) * Math.PI / 180);
     }
 
@@ -44,29 +43,22 @@ var LunarUtils = (function() {
     }
     
     function getLunarMonth11(y, timezone) {
-        // k is the number of lunar months since K=0 (2000-01-06)
         var k = INT((y - 2000) * 12.3685);
         var nm = getNewMoon(k);
         var off = timezone / 24.0;
         var sunLong = getSunLongitude(nm - 0.5 + off);
-        // Find NM closest to Winter Solstice (longitude 270)
-        // Usually k where longitude is approx 270-280
         if (sunLong >= 285) nm = getNewMoon(k - 1);
         else if (sunLong < 255) nm = getNewMoon(k + 1);
-        
         return INT(getNewMoon(k) + 0.5 + off);
     }
 
     function getLeapMonthOffset(a11, timezone) {
         var k = INT((a11 - 2451550.0) / 29.530588853 + 0.5);
-        var last = 0;
+        var last = -1;
         var off = timezone / 24.0;
-        var nm = getNewMoon(k);
-        var lon = getSunLongitude(nm - 0.5 + off);
-        last = INT(lon / 30);
         for (var i = 1; i <= 14; i++) {
-            nm = getNewMoon(k + i);
-            lon = getSunLongitude(nm - 0.5 + off);
+            var nm = getNewMoon(k + i);
+            var lon = getSunLongitude(nm - 0.5 + off);
             var s = INT(lon / 30);
             if (s == last) return i;
             last = s;
@@ -87,44 +79,33 @@ var LunarUtils = (function() {
             if (a11 > jd) a11 = getLunarMonth11(yy - 1, timezone);
             
             var k_a11 = INT((a11 - 2451550) / 29.530588853 + 0.5);
-            var k2 = INT((jd - a11) / 29.530588853 + 0.5);
-            var monthStart = INT(getNewMoon(k_a11 + k2) + 0.5 + off);
+            var k_jd = INT((jd - 2451550) / 29.530588853);
+            // Number of months between month 11 and this month
+            var diff = k_jd - k_a11;
+            var monthStart = INT(getNewMoon(k_a11 + diff) + 0.5 + off);
             if (monthStart > jd) {
-                k2--;
-                monthStart = INT(getNewMoon(k_a11 + k2) + 0.5 + off);
+                diff--;
+                monthStart = INT(getNewMoon(k_a11 + diff) + 0.5 + off);
             }
             
             var lunarDay = jd - monthStart + 1;
-            var diff = k2;
             var leapOff = getLeapMonthOffset(a11, timezone);
             var lunarMonth, lunarLeap = false;
             
             if (leapOff > 0 && diff >= leapOff) {
-                lunarMonth = diff;
+                lunarMonth = (diff + 10) % 12 + 1;
                 if (diff == leapOff) lunarLeap = true;
+                else if (diff > leapOff) lunarMonth = (diff + 9) % 12 + 1;
             } else {
-                lunarMonth = diff + 1;
+                lunarMonth = (diff + 10) % 12 + 1;
             }
-            
-            if (lunarMonth > 12) lunarMonth -= 12;
-            if (lunarMonth <= 0) lunarMonth += 12;
             
             // Year: Simplified New Year check
             var lunarYear = yy;
             var a11_prev = getLunarMonth11(yy - 1, timezone);
-            var k_newyear = INT((a11_prev - 2451550.0) / 29.530588853 + 0.5) + 3;
-            var m1_start = INT(getNewMoon(k_newyear) + 0.5 + off);
-            var lon1 = getSunLongitude(m1_start - 0.5 + off);
-            if (lon1 > 30 && lon1 < 60) { /* should be fine */ }
-            else if (lon1 > 60) m1_start = INT(getNewMoon(k_newyear - 1) + 0.5 + off);
-            else if (lon1 < 30) m1_start = INT(getNewMoon(k_newyear + 1) + 0.5 + off);
-            
-            // Re-check Month 1 more carefully
-            // Month 1 is the month after month 12. Month 11 contains longitude 270.
-            // Simplified: if jd < start of lunar month 1, then lunarYear = yy - 1.
-            var k_m11 = INT((a11_prev - 2451550.0) / 29.530588853 + 0.5);
+            var k_m11_prev = INT((a11_prev - 2451550.0) / 29.530588853 + 0.5);
             var leap_prev = getLeapMonthOffset(a11_prev, timezone);
-            var m1_k = k_m11 + (leap_prev > 0 ? 3 : 2);
+            var m1_k = k_m11_prev + (leap_prev > 0 ? 3 : 2);
             var nm1 = INT(getNewMoon(m1_k) + 0.5 + off);
             if (jd < nm1) lunarYear = yy - 1;
 
@@ -135,14 +116,23 @@ var LunarUtils = (function() {
             timezone = timezone || 7;
             var off = timezone / 24.0;
             var a11 = getLunarMonth11(ly, timezone);
-            if (lm > 10) a11 = getLunarMonth11(ly - 1, timezone);
+            // If month is 11 or 12, it might belong to the previous solar year's lunar calendar
+            // but our a11 is for the lunar year ending in solar year ly.
+            if (lm == 11 || lm == 12) {
+                // Check if this 11/12 belongs to this year or next
+                var solar11 = getSolarDay(a11);
+                if (ly > solar11.year) { /* ok */ }
+                else a11 = getLunarMonth11(ly - 1, timezone);
+            } else {
+                 a11 = getLunarMonth11(ly - 1, timezone);
+            }
             
             var k = INT((a11 - 2451550.0) / 29.530588853 + 0.5);
             var leapOff = getLeapMonthOffset(a11, timezone);
             
-            var diff = lm - 1;
-            if (leapOff > 0 && (lm > leapOff || (lm == leapOff && lleap))) {
-                diff = lm;
+            var diff = (lm >= 11) ? (lm - 11) : (lm + 1);
+            if (leapOff > 0 && (diff > leapOff || (diff == leapOff && lleap))) {
+                diff++;
             }
             
             var nm = getNewMoon(k + diff);
