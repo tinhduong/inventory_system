@@ -1,6 +1,6 @@
 /**
  * Vietnamese Lunar Calendar Conversion (Hồ Ngọc Đức algorithm)
- * Final fixed version with correct month indexing.
+ * Corrected year boundary logic for lunarToSolar.
  */
 
 var LunarUtils = (function() {
@@ -47,8 +47,8 @@ var LunarUtils = (function() {
         var nm = getNewMoon(k);
         var off = timezone / 24.0;
         var sunLong = getSunLongitude(nm - 0.5 + off);
-        if (sunLong >= 285) nm = getNewMoon(k - 1);
-        else if (sunLong < 255) nm = getNewMoon(k + 1);
+        if (sunLong >= 285) k -= 1;
+        else if (sunLong < 255) k += 1;
         return INT(getNewMoon(k) + 0.5 + off);
     }
 
@@ -80,7 +80,6 @@ var LunarUtils = (function() {
             
             var k_a11 = INT((a11 - 2451550) / 29.530588853 + 0.5);
             var k_jd = INT((jd - 2451550) / 29.530588853);
-            // Number of months between month 11 and this month
             var diff = k_jd - k_a11;
             var monthStart = INT(getNewMoon(k_a11 + diff) + 0.5 + off);
             if (monthStart > jd) {
@@ -100,13 +99,11 @@ var LunarUtils = (function() {
                 lunarMonth = (diff + 10) % 12 + 1;
             }
             
-            // Year: Simplified New Year check
             var lunarYear = yy;
             var a11_prev = getLunarMonth11(yy - 1, timezone);
             var k_m11_prev = INT((a11_prev - 2451550.0) / 29.530588853 + 0.5);
             var leap_prev = getLeapMonthOffset(a11_prev, timezone);
-            var m1_k = k_m11_prev + (leap_prev > 0 ? 3 : 2);
-            var nm1 = INT(getNewMoon(m1_k) + 0.5 + off);
+            var nm1 = INT(getNewMoon(k_m11_prev + (leap_prev > 0 ? 3 : 2)) + 0.5 + off);
             if (jd < nm1) lunarYear = yy - 1;
 
             return { day: lunarDay, month: lunarMonth, year: lunarYear, leap: lunarLeap };
@@ -115,17 +112,9 @@ var LunarUtils = (function() {
         lunarToSolar: function(ld, lm, ly, lleap, timezone) {
             timezone = timezone || 7;
             var off = timezone / 24.0;
-            var a11 = getLunarMonth11(ly, timezone);
-            // If month is 11 or 12, it might belong to the previous solar year's lunar calendar
-            // but our a11 is for the lunar year ending in solar year ly.
-            if (lm == 11 || lm == 12) {
-                // Check if this 11/12 belongs to this year or next
-                var solar11 = getSolarDay(a11);
-                if (ly > solar11.year) { /* ok */ }
-                else a11 = getLunarMonth11(ly - 1, timezone);
-            } else {
-                 a11 = getLunarMonth11(ly - 1, timezone);
-            }
+            // The key is which "month 11" to start from.
+            // Month 11 of Lunar Year ly is Solar Year ly's Winter Solstice.
+            var a11 = (lm >= 11) ? getLunarMonth11(ly, timezone) : getLunarMonth11(ly - 1, timezone);
             
             var k = INT((a11 - 2451550.0) / 29.530588853 + 0.5);
             var leapOff = getLeapMonthOffset(a11, timezone);
