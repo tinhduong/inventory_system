@@ -46,7 +46,7 @@ class SalesListView(LoginRequiredMixin, ListView):
     template_name = 'orders/sales_list.html'
     context_object_name = 'orders'
     ordering = ['-created_at']
-    paginate_by = 25
+    paginate_by = 15
 
     def get_queryset(self):
         from django.db.models import Prefetch
@@ -231,7 +231,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     template_name = 'orders/purchase_list.html'
     context_object_name = 'orders'
     ordering = ['-created_at']
-    paginate_by = 25
+    paginate_by = 15
 
     def get_queryset(self):
         from django.db.models import Prefetch
