@@ -133,14 +133,18 @@
                                     {% if entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}0{% endif %}
                                 </td>
                                 <td class="text-end fw-bold text-primary d-none d-md-table-cell">
-                                    {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
+                                    {% if entry.account_type == 'RECEIVABLE' %}
+                                        {% if not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}-{{ entry.amount|floatformat:0 }}{% endif %}
+                                    {% else %}0{% endif %}
                                 </td>
                                 <td class="text-end fw-bold text-danger d-none d-md-table-cell">
-                                    {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}
+                                    {% if entry.account_type == 'PAYABLE' %}
+                                        {% if not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}-{{ entry.amount|floatformat:0 }}{% endif %}
+                                    {% else %}0{% endif %}
                                 </td>
                                 <td class="text-start d-md-none">
-                                    <div class="small text-primary fw-bold">Thu: {% if entry.account_type == 'RECEIVABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}</div>
-                                    <div class="small text-danger fw-bold">Chi: {% if entry.account_type == 'PAYABLE' and not entry.is_settlement %}{{ entry.remaining_amount|floatformat:0 }}{% else %}0{% endif %}</div>
+                                    <div class="small text-primary fw-bold">Thu: {% if entry.account_type == 'RECEIVABLE' %}{% if not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}-{{ entry.amount|floatformat:0 }}{% endif %}{% else %}0{% endif %}</div>
+                                    <div class="small text-danger fw-bold">Chi: {% if entry.account_type == 'PAYABLE' %}{% if not entry.is_settlement %}{{ entry.amount|floatformat:0 }}{% else %}-{{ entry.amount|floatformat:0 }}{% endif %}{% else %}0{% endif %}</div>
                                 </td>
                                 <td class="text-center">
                                     {% if entry.remaining_amount > 0 and not entry.is_settlement %}
@@ -168,11 +172,11 @@
                                         <i class="bi bi-chevron-down ms-auto text-muted small"></i>
                                     </div>
                                 </td>
-                                <td class="text-end d-none d-md-table-cell">0</td>
-                                <td class="text-end d-none d-md-table-cell">0</td>
+                                <td class="text-end d-none d-md-table-cell text-primary fw-bold">{% if item.settlement.account_type == 'RECEIVABLE' %}-{{ item.settlement.amount_paid|floatformat:0 }}{% else %}0{% endif %}</td>
+                                <td class="text-end d-none d-md-table-cell text-danger fw-bold">{% if item.settlement.account_type == 'PAYABLE' %}-{{ item.settlement.amount_paid|floatformat:0 }}{% else %}0{% endif %}</td>
                                 <td class="text-start d-md-none text-muted">
-                                    <div class="small">Mua: 0</div>
-                                    <div class="small">Bán: 0</div>
+                                    <div class="small fw-bold text-primary">Thu: {% if item.settlement.account_type == 'RECEIVABLE' %}-{{ item.settlement.amount_paid|floatformat:0 }}{% else %}0{% endif %}</div>
+                                    <div class="small fw-bold text-danger">Chi: {% if item.settlement.account_type == 'PAYABLE' %}-{{ item.settlement.amount_paid|floatformat:0 }}{% else %}0{% endif %}</div>
                                 </td>
                                 <td class="text-start text-md-end text-success fw-bold">{{ item.settlement.amount_paid|floatformat:0 }}</td>
                                 <td class="text-end d-none d-md-table-cell">0</td>
