@@ -11,4 +11,5 @@ urlpatterns = [
     path('settlement/success/', views.SettlementSuccessView.as_view(), name='settlement-success'),
     path('settlement/<int:pk>/delete/', views.SettlementDeleteView.as_view(), name='settlement-delete'),
     path('entry/<int:pk>/pay/', views.EntryPaymentView.as_view(), name='entry-payment'),
+    path('old-debt/create/', views.OldDebtCreateView.as_view(), name='old-debt-create'),
 ]

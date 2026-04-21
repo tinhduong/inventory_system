@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="card shadow-sm mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-white fw-bold">Thiết lập Công nợ cũ / Hạch toán thủ công {% if current_customer %}cho {{ current_customer.name }}{% endif %}</div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label fw-bold">{{ field.label }}</label>
+                {{ field }}
+                
+                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                
+                {% for error in field.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Ghi nhận công nợ</button>
+            <a href="{% if current_customer %}{% url 'debt:customer-debt' current_customer.pk %}{% else %}{% url 'debt:overview' %}{% endif %}" class="btn btn-link w-100 text-muted mt-2">Hủy bỏ</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

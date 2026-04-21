@@ -64,3 +64,27 @@ class EntryPaymentForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2, label="Số tiền thanh toán", widget=forms.TextInput(attrs={'class': 'form-control money-input'}))
     payment_date = forms.DateField(label="Ngày thanh toán", widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
     note = forms.CharField(label="Ghi chú", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}))
+
+
+class OldDebtForm(forms.ModelForm):
+    class Meta:
+        model = DebtEntry
+        fields = ['customer', 'account_type', 'amount', 'entry_date', 'note']
+        widgets = {
+            'customer': forms.Select(attrs={'class': 'form-select'}),
+            'account_type': forms.Select(attrs={'class': 'form-select'}),
+            'amount': forms.TextInput(attrs={'class': 'form-control money-input', 'autocomplete': 'off'}),
+            'entry_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'note': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+        labels = {
+            'amount': 'Số dư công nợ cũ',
+            'entry_date': 'Ngày hạch toán',
+            'note': 'Ghi chú',
+            'account_type': 'Loại công nợ',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.initial.get('customer'):
+            self.fields['customer'].disabled = True

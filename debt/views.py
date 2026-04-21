@@ -17,7 +17,7 @@ from django.views.generic import CreateView, DeleteView, ListView, TemplateView
 
 from accounts.models import Customer
 from django.utils.text import slugify
-from .forms import EntryPaymentForm, SettlementForm
+from .forms import EntryPaymentForm, SettlementForm, OldDebtForm
 from .models import AccountType, DebtEntry, Settlement
 
 
@@ -385,4 +385,44 @@ class SettlementDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         
     def get_success_url(self):
         messages.success(self.request, "Đã xóa phiếu quyết toán. Công nợ đã được khôi phục.")
+        return reverse_lazy('debt:customer-debt', kwargs={'customer_id': self.object.customer.id})
+
+
+class OldDebtCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """View to add initial or manual debt entries."""
+    model = DebtEntry
+    form_class = OldDebtForm
+    template_name = 'debt/old_debt_form.html'
+
+    def test_func(self):
+        return self.request.user.role == 'ADMIN'
+
+    def get_initial(self):
+        return {
+            'entry_date': date.today(),
+            'customer': self.request.GET.get('customer'),
+            'account_type': self.request.GET.get('account_type', AccountType.RECEIVABLE)
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cid = self.request.GET.get('customer')
+        if cid:
+            context['current_customer'] = get_object_or_404(Customer, pk=cid)
+        return context
+
+    def form_valid(self, form):
+        # If customer field was disabled, it won't be in cleaned_data
+        if form.fields['customer'].disabled:
+            form.instance.customer = get_object_or_404(Customer, pk=self.request.GET.get('customer'))
+            
+        form.instance.is_settlement = False
+        if not form.instance.note:
+            form.instance.note = "Ghi tăng công nợ cũ / Hạch toán thủ công"
+        
+        response = super().form_valid(form)
+        messages.success(self.request, f"Đã thêm công nợ {form.instance.amount:,.0f} cho {form.instance.customer.name}")
+        return response
+
+    def get_success_url(self):
         return reverse_lazy('debt:customer-debt', kwargs={'customer_id': self.object.customer.id})
